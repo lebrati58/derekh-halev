@@ -60,13 +60,13 @@
 
 // 👉 COLLE ICI TA CONFIG FIREBASE (Console Firebase → Paramètres du projet → Tes applications → Web)
 const firebaseConfig = {
-  apiKey: "COLLE_TA_CLE_ICI",
-  authDomain: "ton-projet.firebaseapp.com",
-  databaseURL: "https://ton-projet-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "ton-projet",
-  storageBucket: "ton-projet.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:xxxxxxxxxxxxxx"
+  apiKey: "AIzaSyA5FbFvwQyEh5nw8tw-DLCNJAJNFHJrcNg",
+  authDomain: "dereh-halev.firebaseapp.com",
+  databaseURL: "https://dereh-halev-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "dereh-halev",
+  storageBucket: "dereh-halev.firebasestorage.app",
+  messagingSenderId: "722139818863",
+  appId: "1:722139818863:web:fe677e93a8ccf9dc52569a"
 };
 
 firebase.initializeApp(firebaseConfig);
