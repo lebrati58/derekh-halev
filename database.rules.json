@@ -1,0 +1,181 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "config": {
+      ".read": false,
+      ".write": false
+    },
+    "admins": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "root.child('config/adminPin').exists() && newData.val() === root.child('config/adminPin').val()"
+      }
+    },
+    "counters": {
+      "profileNo": {
+        ".read": "auth != null",
+        ".write": "auth != null && !root.child('banned/' + auth.uid).exists()",
+        ".validate": "newData.isNumber() && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))"
+      }
+    },
+    "profiles": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid && !root.child('banned/' + auth.uid).exists()",
+        ".validate": "newData.hasChildren(['no', 'gender', 'age', 'city', 'religion', 'intent', 'words', 'shabbat'])",
+        "no": {
+          ".validate": "newData.isNumber() && (!data.exists() || data.val() === newData.val()) && newData.val() <= root.child('counters/profileNo').val()"
+        },
+        "gender": {
+          ".validate": "newData.val() === 'm' || newData.val() === 'f'"
+        },
+        "age": {
+          ".validate": "newData.isNumber() && newData.val() >= 18 && newData.val() <= 99"
+        },
+        "city": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 40"
+        },
+        "religion": {
+          ".validate": "newData.val() === 'dati' || newData.val() === 'masorti' || newData.val() === 'hiloni'"
+        },
+        "intent": {
+          ".validate": "newData.val() === 'serious' || newData.val() === 'see'"
+        },
+        "words": {
+          "$i": {
+            ".validate": "newData.isString() && newData.val().length <= 25"
+          }
+        },
+        "shabbat": {
+          ".validate": "newData.isString() && newData.val().length <= 200"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "private": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['firstName', 'phone'])",
+        "firstName": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "phone": {
+          ".validate": "newData.isString() && newData.val().length <= 20"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "banned": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "(auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val())",
+        ".validate": "newData.val() === true"
+      }
+    },
+    "inbox": {
+      "$to": {
+        ".read": "auth != null && auth.uid === $to",
+        "$from": {
+          ".write": "auth != null && $from !== $to && ((auth.uid === $from && !data.exists() && newData.child('status').val() === 'pending' && !root.child('banned/' + auth.uid).exists() && !root.child('banned/' + $to).exists()) || (auth.uid === $to && data.exists()))",
+          ".validate": "newData.hasChildren(['fromNo', 'status', 'createdAt'])",
+          "status": {
+            ".validate": "newData.val() === 'pending' || newData.val() === 'accepted' || newData.val() === 'declined'"
+          }
+        }
+      }
+    },
+    "outbox": {
+      "$from": {
+        ".read": "auth != null && auth.uid === $from",
+        "$to": {
+          ".write": "auth != null && $from !== $to && ((auth.uid === $from && !data.exists() && newData.child('status').val() === 'pending' && !root.child('banned/' + auth.uid).exists()) || (auth.uid === $to && data.exists()))",
+          ".validate": "newData.hasChildren(['toNo', 'status', 'createdAt'])",
+          "status": {
+            ".validate": "newData.val() === 'pending' || newData.val() === 'accepted' || newData.val() === 'declined'"
+          }
+        }
+      }
+    },
+    "chats": {
+      ".read": "(auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val())",
+      "$chatId": {
+        ".read": "auth != null && (data.child('from').val() === auth.uid || data.child('to').val() === auth.uid)",
+        ".write": "auth != null && !data.exists() && newData.child('to').val() === auth.uid && $chatId === newData.child('from').val() + '_' + auth.uid && root.child('inbox/' + auth.uid + '/' + newData.child('from').val()).exists() && !root.child('banned/' + auth.uid).exists()",
+        ".validate": "newData.hasChildren(['from', 'to', 'fromNo', 'toNo', 'status', 'opened', 'createdAt'])",
+        "status": {
+          ".write": "data.exists() && newData.val() === 'ended' && ((auth != null && (data.parent().child('from').val() === auth.uid || data.parent().child('to').val() === auth.uid)) || (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))",
+          ".validate": "newData.val() === 'active' || newData.val() === 'ended'"
+        },
+        "opened": {
+          ".write": "auth != null && data.exists() && newData.val() === true && data.parent().child('status').val() === 'active' && (data.parent().child('from').val() === auth.uid || data.parent().child('to').val() === auth.uid) && root.child('reveal/' + $chatId + '/' + data.parent().child('from').val()).val() === true && root.child('reveal/' + $chatId + '/' + data.parent().child('to').val()).val() === true",
+          ".validate": "newData.isBoolean()"
+        }
+      }
+    },
+    "userChats": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$chatId": {
+          ".write": "auth != null && (root.child('chats/' + $chatId + '/from').val() === auth.uid || root.child('chats/' + $chatId + '/to').val() === auth.uid) && (root.child('chats/' + $chatId + '/from').val() === $uid || root.child('chats/' + $chatId + '/to').val() === $uid)",
+          ".validate": "newData.val() === true"
+        }
+      }
+    },
+    "messages": {
+      "$chatId": {
+        ".read": "auth != null && (root.child('chats/' + $chatId + '/from').val() === auth.uid || root.child('chats/' + $chatId + '/to').val() === auth.uid)",
+        "$msgId": {
+          ".write": "auth != null && !data.exists() && (root.child('chats/' + $chatId + '/from').val() === auth.uid || root.child('chats/' + $chatId + '/to').val() === auth.uid) && root.child('chats/' + $chatId + '/status').val() === 'active' && !root.child('banned/' + auth.uid).exists()",
+          ".validate": "newData.hasChildren(['from', 'text', 'ts']) && newData.child('from').val() === auth.uid && newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 500 && newData.child('ts').isNumber()"
+        }
+      }
+    },
+    "reveal": {
+      "$chatId": {
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid",
+          ".write": "auth != null && auth.uid === $uid && (root.child('chats/' + $chatId + '/from').val() === auth.uid || root.child('chats/' + $chatId + '/to').val() === auth.uid) && root.child('chats/' + $chatId + '/status').val() === 'active'",
+          ".validate": "newData.isBoolean()"
+        }
+      }
+    },
+    "secrets": {
+      "$chatId": {
+        ".read": "auth != null && root.child('chats/' + $chatId + '/opened').val() === true && (root.child('chats/' + $chatId + '/from').val() === auth.uid || root.child('chats/' + $chatId + '/to').val() === auth.uid)",
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid && (root.child('chats/' + $chatId + '/from').val() === auth.uid || root.child('chats/' + $chatId + '/to').val() === auth.uid) && root.child('chats/' + $chatId + '/opened').val() !== true",
+          ".validate": "newData.hasChildren(['firstName', 'phone'])",
+          "firstName": {
+            ".validate": "newData.isString() && newData.val().length <= 30"
+          },
+          "phone": {
+            ".validate": "newData.isString() && newData.val().length <= 20"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    },
+    "reports": {
+      ".read": "(auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val())",
+      "$reportId": {
+        ".write": "(auth != null && !data.exists() && newData.child('reporterUid').val() === auth.uid && (root.child('chats/' + newData.child('chatId').val() + '/from').val() === auth.uid || root.child('chats/' + newData.child('chatId').val() + '/to').val() === auth.uid)) || (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val())",
+        ".validate": "newData.hasChildren(['chatId', 'reporterUid', 'reportedUid', 'reportedNo', 'reason', 'createdAt']) && newData.child('reportedUid').val() !== newData.child('reporterUid').val() && (root.child('chats/' + newData.child('chatId').val() + '/from').val() === newData.child('reportedUid').val() || root.child('chats/' + newData.child('chatId').val() + '/to').val() === newData.child('reportedUid').val())",
+        "reason": {
+          ".validate": "newData.isString() && newData.val().length <= 300"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#140a26">
+<meta name="robots" content="noindex, nofollow">
+<title>ניהול · דרך הלב</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗝️</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="valance"></div>
+<header class="app-header">
+  <h1><span class="em">🗝️</span> <span class="tt">דרך הלב</span></h1>
+  <p class="tagline">ניהול</p>
+</header>
+
+<main>
+  <section id="screen-loading" class="screen active">
+    <div class="loader">🗝️</div>
+  </section>
+
+  <section id="screen-pin" class="screen">
+    <div class="panel">
+      <h2 style="margin-top:0">כניסת מנהלים</h2>
+      <p class="sub">הזינו את קוד ה־PIN.</p>
+      <form id="pin-form">
+        <div class="field">
+          <input type="password" id="pin" inputmode="numeric" autocomplete="off" placeholder="••••" dir="ltr" style="text-align:center;font-size:1.4rem;letter-spacing:6px">
+        </div>
+        <button class="btn gold block" id="pin-btn">כניסה</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="screen-dash" class="screen">
+    <div class="stats" id="stats"></div>
+    <p class="sub" style="margin-top:12px">🔒 המנהלים לא יכולים לקרוא שיחות, שמות או טלפונים — רק נתונים כלליים ודיווחים.</p>
+
+    <h2>🚩 דיווחים</h2>
+    <div class="list" id="reports"></div>
+
+    <h2>🎭 פרופילים</h2>
+    <div class="field"><input type="text" id="search" inputmode="numeric" placeholder="חיפוש לפי מספר פרופיל…"></div>
+    <div class="panel" style="padding:8px 10px;overflow-x:auto">
+      <table class="ptable">
+        <thead><tr><th>#</th><th>מגדר</th><th>גיל</th><th>עיר</th><th>דיווחים</th><th></th></tr></thead>
+        <tbody id="ptable"></tbody>
+      </table>
+    </div>
+
+    <div class="footer"><button class="btn link" id="logout">יציאה ממצב ניהול</button></div>
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="commun.js"></script>
+<script>
+let uid = null;
+let profiles = {}, banned = {}, chats = {}, reports = {};
+const show = id => $$(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+
+(async function boot() {
+  try {
+    uid = (await ensureAuth()).uid;
+    if (await isAdmin()) startDash(); else show("screen-pin");
+  } catch (e) { console.error(e); toast("שגיאת חיבור ל־Firebase"); show("screen-pin"); }
+})();
+
+// Admin = peut lire /reports (règle : admins/{uid} == config/adminPin)
+async function isAdmin() {
+  try { await db.ref("reports").limitToFirst(1).once("value"); return true; }
+  catch (e) { return false; }
+}
+
+$("#pin-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const pin = $("#pin").value.trim();
+  if (!pin) return;
+  const btn = $("#pin-btn"); btn.disabled = true;
+  const ref = db.ref("admins/" + uid);
+  let ok = false;
+  try { await ref.set(pin); ok = true; }
+  catch (err) {
+    // si le PIN a été saisi comme nombre dans la console Firebase
+    if (/^\d+$/.test(pin)) { try { await ref.set(Number(pin)); ok = true; } catch (e2) {} }
+  }
+  btn.disabled = false;
+  if (ok && await isAdmin()) startDash();
+  else { toast("קוד שגוי 🔒"); $("#pin").value = ""; }
+});
+
+$("#logout").addEventListener("click", async () => {
+  await db.ref("admins/" + uid).remove().catch(() => {});
+  location.reload();
+});
+
+function startDash() {
+  show("screen-dash");
+  db.ref("profiles").on("value", s => { profiles = s.val() || {}; render(); });
+  db.ref("banned").on("value", s => { banned = s.val() || {}; render(); });
+  db.ref("chats").on("value", s => { chats = s.val() || {}; render(); });
+  db.ref("reports").on("value", s => { reports = s.val() || {}; render(); });
+}
+$("#search").addEventListener("input", () => renderProfiles());
+
+function render() { renderStats(); renderReports(); renderProfiles(); }
+
+function renderStats() {
+  const P = Object.values(profiles), C = Object.values(chats), R = Object.values(reports);
+  const stats = [
+    [P.length, "נרשמים"],
+    [`${P.filter(p => p.gender === "m").length} / ${P.filter(p => p.gender === "f").length}`, "גברים / נשים"],
+    [C.filter(c => c.status === "active").length, "שיחות פעילות"],
+    [C.filter(c => c.opened).length, "מסכים שנפתחו ✨"],
+    [C.length, "סה״כ שיחות"],
+    [R.filter(r => !r.resolved).length, "דיווחים פתוחים"]
+  ];
+  $("#stats").innerHTML = stats.map(([n, l]) => `<div class="stat"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`).join("");
+}
+
+function reportCount(u) { return Object.values(reports).filter(r => r.reportedUid === u).length; }
+
+function renderReports() {
+  const list = Object.entries(reports).sort((a, b) => (!!a[1].resolved - !!b[1].resolved) || (b[1].createdAt || 0) - (a[1].createdAt || 0));
+  if (!list.length) { $("#reports").innerHTML = `<div class="empty"><span class="big">🕊️</span>אין דיווחים. הכל שקט בדרך הלב.</div>`; return; }
+  $("#reports").innerHTML = list.map(([id, r]) => {
+    const isB = !!banned[r.reportedUid];
+    return `<div class="report ${r.resolved ? "resolved" : ""}">
+      <div class="top"><span>🚩 ${esc(profileName(r.reportedNo))}${isB ? ' <span class="tag-banned">(מורחק)</span>' : ""}</span>
+        <span class="meta">${reportCount(r.reportedUid)} דיווחים</span></div>
+      <div class="reason">${esc(r.reason)}</div>
+      <div class="meta">דווח ע״י ${esc(profileName(r.reporterNo))} · ${esc(fmtTime(r.createdAt))}</div>
+      <div class="item-actions">
+        ${isB ? `<button class="btn ghost small" data-unban="${esc(r.reportedUid)}">ביטול הרחקה</button>`
+              : `<button class="btn danger small" data-ban="${esc(r.reportedUid)}">🚫 הרחקת הפרופיל</button>`}
+        ${r.resolved ? "" : `<button class="btn ghost small" data-resolve="${esc(id)}">✓ טופל</button>`}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderProfiles() {
+  const q = $("#search").value.trim();
+  const rows = Object.entries(profiles)
+    .filter(([, p]) => !q || String(p.no).includes(q))
+    .sort((a, b) => a[1].no - b[1].no);
+  $("#ptable").innerHTML = rows.map(([u, p]) => {
+    const isB = !!banned[u];
+    return `<tr>
+      <td><b>${esc(p.no)}</b></td>
+      <td>${esc(LABELS.gender[p.gender] || "")}</td>
+      <td>${esc(p.age)}</td>
+      <td>${esc(p.city)}</td>
+      <td>${reportCount(u) || ""}</td>
+      <td>${isB ? `<button class="btn ghost small" data-unban="${esc(u)}">ביטול</button>`
+                : `<button class="btn danger small" data-ban="${esc(u)}">הרחקה</button>`}</td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="6" class="center sub">אין פרופילים</td></tr>`;
+}
+
+document.addEventListener("click", async e => {
+  const ban = e.target.closest("[data-ban]"), unban = e.target.closest("[data-unban]"), res = e.target.closest("[data-resolve]");
+  if (ban) {
+    const u = ban.dataset.ban, no = (profiles[u] || {}).no;
+    const ok = await showModal({ title: "🚫 להרחיק את הפרופיל?", body: `${esc(profileName(no || "?"))} לא יוכל/תוכל להשתמש באפליקציה, וכל השיחות הפעילות שלו/ה ייסגרו.`, okText: "הרחקה", danger: true });
+    if (!ok) return;
+    try {
+      await db.ref("banned/" + u).set(true);
+      const ends = Object.entries(chats)
+        .filter(([, c]) => (c.from === u || c.to === u) && c.status === "active")
+        .map(([id]) => db.ref(`chats/${id}/status`).set("ended"));
+      await Promise.all(ends);
+      toast("הפרופיל הורחק");
+    } catch (err) { console.error(err); toast("שגיאה"); }
+  }
+  if (unban) {
+    try { await db.ref("banned/" + unban.dataset.unban).remove(); toast("ההרחקה בוטלה"); }
+    catch (err) { toast("שגיאה"); }
+  }
+  if (res) {
+    try { await db.ref(`reports/${res.dataset.resolve}/resolved`).set(true); }
+    catch (err) { toast("שגיאה"); }
+  }
+});
+</script>
+</body>
+</html>

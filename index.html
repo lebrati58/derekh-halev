@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#140a26">
+<title>דרך הלב 🎭</title>
+<meta name="description" content="מתאהבים בשיחה — לפני שרואים את הפנים">
+<meta property="og:title" content="🎭 דרך הלב">
+<meta property="og:description" content="מתאהבים בשיחה — לפני שרואים את הפנים. אנונימי, עדין, מסתורי.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎭</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="valance"></div>
+<header class="app-header">
+  <h1><span class="em">🎭</span> <span class="tt">דרך הלב</span></h1>
+  <p class="tagline">מתאהבים בשיחה — לפני שרואים את הפנים</p>
+</header>
+
+<main>
+  <!-- Chargement -->
+  <section id="screen-loading" class="screen active">
+    <div class="loader">🎭</div>
+    <p class="center sub">המסך עולה…</p>
+  </section>
+
+  <!-- Erreur -->
+  <section id="screen-error" class="screen">
+    <div class="panel center">
+      <div class="loader" style="margin-top:0">🌙</div>
+      <h2>משהו לא נפתח כמו שצריך</h2>
+      <p class="sub" id="error-text">בדקו את החיבור לאינטרנט ונסו שוב.</p>
+      <button class="btn gold" onclick="location.reload()">נסו שוב</button>
+    </div>
+  </section>
+
+  <!-- Banni -->
+  <section id="screen-banned" class="screen">
+    <div class="panel center">
+      <div class="loader" style="margin-top:0">🚪</div>
+      <h2>הפרופיל הושעה</h2>
+      <p class="sub">מנהלי הקבוצה השעו את הפרופיל הזה. לשאלות אפשר לפנות אליהם ישירות.</p>
+    </div>
+  </section>
+
+  <!-- Inscription -->
+  <section id="screen-register" class="screen">
+    <div class="panel">
+      <h2 style="margin-top:0">הכרטיס המסתורי שלך ✨</h2>
+      <p class="sub">כאן אף אחד לא רואה פנים, שם או טלפון. רק מילים, שיחה — וקצת קסם של ט״ו באב.</p>
+      <p class="sub hidden" id="old-identity"></p>
+
+      <form id="reg-form" novalidate autocomplete="off">
+        <div class="field">
+          <label for="f-name">שם פרטי <span class="hint">פרטי לגמרי 🔒 לא מוצג לאף אחד — עד ששניכם תחליטו לפתוח את המסך</span></label>
+          <input type="text" id="f-name" maxlength="30" required>
+        </div>
+
+        <div class="field">
+          <label for="f-phone">טלפון <span class="hint">נחשף רק אם שני הצדדים לוחצים על ״פתיחת המסך״</span></label>
+          <input type="tel" id="f-phone" maxlength="20" inputmode="tel" placeholder="05X-XXXXXXX" dir="ltr" style="text-align:right" required>
+        </div>
+
+        <div class="field">
+          <span class="label">אני</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="gender" value="m"><span>גבר</span></label>
+            <label class="chip"><input type="radio" name="gender" value="f"><span>אישה</span></label>
+          </div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="f-age">גיל</label>
+            <input type="number" id="f-age" min="18" max="99" inputmode="numeric" required>
+          </div>
+          <div class="field">
+            <label for="f-city">עיר</label>
+            <input type="text" id="f-city" maxlength="40" placeholder="תל אביב, ירושלים…" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">אורח חיים</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="religion" value="dati"><span>דתי/ה</span></label>
+            <label class="chip"><input type="radio" name="religion" value="masorti"><span>מסורתי/ת</span></label>
+            <label class="chip"><input type="radio" name="religion" value="hiloni"><span>חילוני/ת</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">מה אני מחפש/ת</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="intent" value="serious"><span>💍 קשר רציני</span></label>
+            <label class="chip"><input type="radio" name="intent" value="see"><span>🌊 נזרום ונראה</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">3 מילים שמתארות אותי</span>
+          <div class="row3">
+            <input type="text" class="f-word" maxlength="25" placeholder="סקרן/ית">
+            <input type="text" class="f-word" maxlength="25" placeholder="מצחיק/ה">
+            <input type="text" class="f-word" maxlength="25" placeholder="רגיש/ה">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-shabbat">השבת האידיאלית שלך? 🕯️</label>
+          <textarea id="f-shabbat" maxlength="200" placeholder="למשל: ארוחה ארוכה עם חברים, ואז שנ״צ של שלוש שעות 😴"></textarea>
+        </div>
+
+        <div class="field">
+          <label class="check"><input type="checkbox" id="f-ok">
+            <span>אני מעל גיל 18, ומתחייב/ת לשיחה מכבדת. ידוע לי שאין לשתף טלפון או קישורים בצ׳אט — המסך נפתח רק בהסכמה הדדית.</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn gold block" id="reg-btn">🎭 יוצאים לדרך</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Accueil -->
+  <section id="screen-home" class="screen">
+    <h2 style="margin-top:4px">הכרטיס שלך</h2>
+    <p class="sub">זה מה שאחרים רואים. בלי שם, בלי תמונה — רק את/ה, בדרך הלב.</p>
+    <div id="my-card"></div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="proposals">✨ הצעות</button>
+      <button class="tab" data-tab="requests">💌 בקשות <span class="badge hidden" id="badge-requests"></span></button>
+      <button class="tab" data-tab="chats">💬 שיחות <span class="badge hidden" id="badge-chats"></span></button>
+    </div>
+
+    <div class="tabpane active" id="pane-proposals">
+      <p class="sub">התאמות שנבחרו בשבילך. שולחים בקשה — ואם הצד השני מסכים, נפתחת שיחה אנונימית.</p>
+      <div class="list" id="proposals"></div>
+    </div>
+    <div class="tabpane" id="pane-requests">
+      <p class="sub">מישהו רוצה לדבר איתך בדרך הלב 💫</p>
+      <div class="list" id="requests"></div>
+    </div>
+    <div class="tabpane" id="pane-chats">
+      <div class="list" id="chats"></div>
+    </div>
+
+    <div class="footer">
+      נבנה באהבה לט״ו באב 💜<br>
+      <button class="btn link" id="delete-me">מחיקת הפרופיל שלי</button>
+    </div>
+  </section>
+</main>
+
+<!-- Chat -->
+<div id="chat-view" class="chat-view hidden">
+  <div class="chat-head">
+    <button class="icon-btn" id="chat-back" aria-label="חזרה">→</button>
+    <div class="title" id="chat-title"></div>
+    <button class="icon-btn" id="chat-menu-btn" aria-label="תפריט">⋯</button>
+    <div class="menu hidden" id="chat-menu">
+      <button id="act-report">🚩 דיווח</button>
+      <button id="act-end" class="muted">סיום השיחה</button>
+    </div>
+  </div>
+  <div class="curtain-bar" id="curtain-bar"></div>
+  <div class="messages" id="messages"></div>
+  <form class="composer" id="composer">
+    <textarea id="msg-input" rows="1" maxlength="500" placeholder="כתבו משהו מסקרן…"></textarea>
+    <button type="submit" class="btn gold send" aria-label="שליחה">➤</button>
+  </form>
+  <div class="ended-bar hidden" id="ended-bar">השיחה הסתיימה 🌙</div>
+</div>
+
+<!-- Révélation -->
+<div id="reveal" class="reveal hidden">
+  <div class="stage">
+    <div class="stage-top"></div>
+    <div class="reveal-content">
+      <h2>✨ המסך נפתח ✨</h2>
+      <p class="sub" style="margin:0">שניכם בחרתם להסיר את המסך</p>
+      <div class="who" id="reveal-who"></div>
+      <a class="btn gold" id="reveal-wa" target="_blank" rel="noopener">💬 לכתוב ב־WhatsApp</a>
+      <button class="btn link" id="reveal-close">חזרה לשיחה</button>
+    </div>
+    <div class="sparkles">
+      <span style="left:12%;top:70%;animation-delay:.2s">✨</span>
+      <span style="left:30%;top:80%;animation-delay:1.1s">💜</span>
+      <span style="left:55%;top:75%;animation-delay:.6s">✨</span>
+      <span style="left:75%;top:85%;animation-delay:1.6s">⭐</span>
+      <span style="left:88%;top:70%;animation-delay:.9s">✨</span>
+      <span style="left:45%;top:90%;animation-delay:2s">🌙</span>
+    </div>
+    <div class="curtain left"></div>
+    <div class="curtain right"></div>
+    <div class="curtain-mask">🎭</div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="commun.js"></script>
+<script>
+/* =================== État =================== */
+let uid = null;
+let me = null;          // profil public
+let priv = null;        // {firstName, phone}
+let profiles = {};      // uid -> profil
+let banned = {};
+let inbox = {};         // fromUid -> {fromNo, status, chatId}
+let outbox = {};        // toUid -> {toNo, status, chatId}
+let myChats = {};       // chatId -> meta
+const chatSubs = {};    // chatId -> ref
+const secretsCache = {};// chatId -> {uid: {firstName, phone}}
+const pressedCache = {};// chatId -> bool (moi j'ai appuyé)
+let currentChat = null;
+let msgRef = null;
+
+const show = id => { $$(".screen").forEach(s => s.classList.toggle("active", s.id === id)); window.scrollTo(0, 0); };
+const partnerOf = m => (m.from === uid ? m.to : m.from);
+const partnerNo = m => (m.from === uid ? m.toNo : m.fromNo);
+const myNo = m => (m.from === uid ? m.fromNo : m.toNo);
+
+/* =================== Démarrage =================== */
+(async function boot() {
+  try {
+    const user = await ensureAuth();
+    uid = user.uid;
+    const [pS, prS, bS] = await Promise.all([
+      db.ref("profiles/" + uid).once("value"),
+      db.ref("private/" + uid).once("value"),
+      db.ref("banned/" + uid).once("value")
+    ]);
+    if (bS.val()) return show("screen-banned");
+    if (pS.exists()) {
+      me = pS.val(); priv = prS.val();
+      store.set("identity", { uid, no: me.no });
+      startHome();
+    } else {
+      const old = store.get("identity");
+      if (old && old.uid !== uid) {
+        const el = $("#old-identity");
+        el.textContent = `נראה שנרשמת בעבר (${profileName(old.no)}) — אבל בדפדפן הזה הזיכרון נמחק. אפשר להירשם מחדש 🙂`;
+        el.classList.remove("hidden");
+      }
+      show("screen-register");
+    }
+  } catch (e) {
+    console.error(e);
+    $("#error-text").textContent = "לא הצלחנו להתחבר. (" + (e.code || e.message || e) + ")";
+    show("screen-error");
+  }
+})();
+
+/* =================== Inscription =================== */
+$("#reg-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const val = n => (document.querySelector(`input[name=${n}]:checked`) || {}).value;
+  const firstName = $("#f-name").value.trim();
+  const phone = $("#f-phone").value.trim();
+  const gender = val("gender"), religion = val("religion"), intent = val("intent");
+  const age = parseInt($("#f-age").value, 10);
+  const city = $("#f-city").value.trim();
+  const words = $$(".f-word").map(i => i.value.trim()).filter(Boolean);
+  const shabbat = $("#f-shabbat").value.trim();
+
+  if (!firstName) return toast("מה השם שלך? (הוא נשאר סודי 🔒)");
+  if (!/^\+?[\d\s\-]{9,18}$/.test(phone)) return toast("מספר טלפון לא תקין");
+  if (!gender) return toast("בחרו: גבר או אישה");
+  if (!(age >= 18 && age <= 99)) return toast("הגיל צריך להיות 18 ומעלה");
+  if (!city) return toast("באיזו עיר?");
+  if (!religion) return toast("בחרו אורח חיים");
+  if (!intent) return toast("מה את/ה מחפש/ת?");
+  if (words.length < 3) return toast("צריך 3 מילים שמתארות אותך ✨");
+  if (!shabbat) return toast("ספרו לנו על השבת האידיאלית 🕯️");
+  if ([...words, shabbat, city].some(hasForbiddenContent)) return toast("שומרים על המסתורין 🎭 — בלי טלפון ובלי קישורים");
+  if (!$("#f-ok").checked) return toast("צריך לאשר את כללי הכבוד 🙏");
+
+  const btn = $("#reg-btn");
+  btn.disabled = true; btn.textContent = "המסך עולה…";
+  try {
+    const no = await nextProfileNo();
+    priv = { firstName, phone };
+    await db.ref("private/" + uid).set(priv);
+    me = { no, gender, age, city, religion, intent, words, shabbat, createdAt: TS };
+    await db.ref("profiles/" + uid).set(me);
+    me.createdAt = Date.now();
+    store.set("identity", { uid, no });
+    toast(`ברוכים הבאים, ${profileName(no)} 🎭`);
+    startHome();
+  } catch (err) {
+    console.error(err);
+    toast("שגיאה בהרשמה — נסו שוב");
+    btn.disabled = false; btn.textContent = "🎭 יוצאים לדרך";
+  }
+});
+
+/* =================== Accueil =================== */
+function startHome() {
+  $("#my-card").innerHTML = cardHTML(me);
+  show("screen-home");
+
+  db.ref("profiles").on("value", s => { profiles = s.val() || {}; renderProposals(); renderRequests(); });
+  db.ref("banned").on("value", s => {
+    banned = s.val() || {};
+    if (banned[uid]) { closeChat(); return show("screen-banned"); }
+    renderProposals();
+  });
+  db.ref("inbox/" + uid).on("value", s => { inbox = s.val() || {}; renderRequests(); renderProposals(); });
+  db.ref("outbox/" + uid).on("value", s => { outbox = s.val() || {}; renderProposals(); });
+  db.ref("userChats/" + uid).on("value", s => {
+    Object.keys(s.val() || {}).forEach(id => {
+      if (chatSubs[id]) return;
+      chatSubs[id] = db.ref("chats/" + id);
+      chatSubs[id].on("value", cs => onChatMeta(id, cs.val()));
+    });
+  });
+}
+
+$$(".tab").forEach(t => t.addEventListener("click", () => selectTab(t.dataset.tab)));
+function selectTab(name) {
+  $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+  $$(".tabpane").forEach(p => p.classList.toggle("active", p.id === "pane-" + name));
+}
+
+function setBadge(id, n) { const b = $(id); b.textContent = n; b.classList.toggle("hidden", !n); }
+
+/* ----- Propositions (matching) ----- */
+function computeProposals() {
+  if (!me) return [];
+  const excluded = new Set();
+  Object.keys(inbox).forEach(u => excluded.add(u));                              // demandes reçues
+  Object.entries(outbox).forEach(([u, o]) => { if (o.status !== "pending") excluded.add(u); });
+  Object.values(myChats).forEach(m => excluded.add(partnerOf(m)));                // chats existants
+
+  const candidates = Object.entries(profiles)
+    .filter(([u, p]) => u !== uid && !banned[u] && !excluded.has(u) && isCompatible(me, p))
+    .map(([u, p]) => ({ uid: u, p, pending: !!(outbox[u] && outbox[u].status === "pending"), score: matchScore(me, p) }));
+
+  candidates.sort((a, b) => (b.pending - a.pending) || (b.score - a.score) || (a.p.no - b.p.no));
+  return candidates.slice(0, 3);
+}
+
+function renderProposals() {
+  const box = $("#proposals");
+  if (!box || !me) return;
+  const list = computeProposals();
+  if (!list.length) {
+    box.innerHTML = `<div class="empty"><span class="big">🌙</span>עוד אין כאן התאמה חדשה… המסך עוד לא עלה.<br>חזרו בקרוב — הקסם לוקח זמן.</div>`;
+    return;
+  }
+  box.innerHTML = list.map(c => `
+    <div>
+      ${cardHTML(c.p)}
+      <div class="item-actions">
+        ${c.pending
+          ? `<button class="btn ghost" disabled>⏳ הבקשה נשלחה — מחכים בסבלנות</button>`
+          : `<button class="btn gold" data-send="${esc(c.uid)}">💌 בקשה לשיחה</button>`}
+      </div>
+    </div>`).join("");
+}
+
+$("#proposals").addEventListener("click", async e => {
+  const b = e.target.closest("[data-send]");
+  if (!b) return;
+  b.disabled = true;
+  await sendRequest(b.dataset.send);
+});
+
+async function sendRequest(toUid) {
+  const p = profiles[toUid];
+  if (!p) return;
+  try {
+    // Si l'autre m'a déjà écrit → on accepte directement
+    if (inbox[toUid] && inbox[toUid].status === "pending") return acceptRequest(toUid);
+    await db.ref(`inbox/${toUid}/${uid}`).set({ fromNo: me.no, status: "pending", createdAt: TS });
+    await db.ref(`outbox/${uid}/${toUid}`).set({ toNo: p.no, status: "pending", createdAt: TS });
+    toast(`הבקשה נשלחה ל${profileName(p.no)} 💌`);
+  } catch (err) {
+    console.error(err); toast("לא הצלחנו לשלוח — נסו שוב");
+    renderProposals();
+  }
+}
+
+/* ----- Demandes reçues ----- */
+function renderRequests() {
+  const box = $("#requests");
+  if (!box) return;
+  const pending = Object.entries(inbox).filter(([u, r]) => r.status === "pending" && !banned[u] && profiles[u]);
+  setBadge("#badge-requests", pending.length);
+  if (!pending.length) {
+    box.innerHTML = `<div class="empty"><span class="big">💌</span>אין בקשות חדשות כרגע.</div>`;
+    return;
+  }
+  box.innerHTML = pending.map(([u]) => `
+    <div>
+      ${cardHTML(profiles[u])}
+      <div class="item-actions">
+        <button class="btn gold" data-accept="${esc(u)}">✨ פתיחת שיחה</button>
+        <button class="btn ghost" data-decline="${esc(u)}">לא הפעם</button>
+      </div>
+    </div>`).join("");
+}
+
+$("#requests").addEventListener("click", async e => {
+  const a = e.target.closest("[data-accept]"), d = e.target.closest("[data-decline]");
+  if (a) { a.disabled = true; await acceptRequest(a.dataset.accept); }
+  if (d) { d.disabled = true; await declineRequest(d.dataset.decline); }
+});
+
+async function acceptRequest(fromUid) {
+  const p = profiles[fromUid];
+  const chatId = `${fromUid}_${uid}`;
+  try {
+    await db.ref("chats/" + chatId).set({
+      from: fromUid, to: uid, fromNo: p.no, toNo: me.no,
+      status: "active", opened: false, createdAt: TS
+    });
+    await db.ref(`userChats/${uid}/${chatId}`).set(true);
+    await db.ref(`userChats/${fromUid}/${chatId}`).set(true);
+    await db.ref(`inbox/${uid}/${fromUid}`).update({ status: "accepted", chatId });
+    await db.ref(`outbox/${fromUid}/${uid}`).update({ status: "accepted", chatId }).catch(() => {});
+    toast("השיחה נפתחה 🎭");
+    selectTab("chats");
+    openChat(chatId);
+  } catch (err) {
+    console.error(err); toast("לא הצלחנו לפתוח את השיחה"); renderRequests();
+  }
+}
+
+async function declineRequest(fromUid) {
+  try {
+    await db.ref(`inbox/${uid}/${fromUid}`).update({ status: "declined" });
+    await db.ref(`outbox/${fromUid}/${uid}`).update({ status: "declined" }).catch(() => {});
+    toast("הבקשה נסגרה בעדינות 🌙");
+  } catch (err) { console.error(err); toast("שגיאה — נסו שוב"); }
+}
+
+/* ----- Chats ----- */
+let fetchingSecrets = {};
+async function onChatMeta(id, meta) {
+  if (!meta) return;
+  myChats[id] = meta;
+  if (meta.opened && !secretsCache[id] && !fetchingSecrets[id]) {
+    fetchingSecrets[id] = true;
+    try {
+      const s = await db.ref("secrets/" + id).once("value");
+      secretsCache[id] = s.val() || {};
+      if (!store.get("seen_" + id)) { store.set("seen_" + id, 1); playReveal(id); }
+    } catch (e) { console.warn(e); }
+    fetchingSecrets[id] = false;
+  }
+  renderChats(); renderProposals();
+  if (currentChat === id) updateChatView();
+}
+
+function renderChats() {
+  const box = $("#chats");
+  const list = Object.entries(myChats).sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
+  setBadge("#badge-chats", list.filter(([, m]) => m.status === "active").length);
+  if (!list.length) {
+    box.innerHTML = `<div class="empty"><span class="big">💬</span>עוד אין שיחות. הכל מתחיל בבקשה אחת 💌</div>`;
+    return;
+  }
+  box.innerHTML = list.map(([id, m]) => {
+    const pn = partnerNo(m);
+    const state = m.opened ? `<div class="state opened">✨ המסך נפתח</div>`
+      : m.status === "ended" ? `<div class="state">השיחה הסתיימה 🌙</div>`
+      : `<div class="state">שיחה פעילה · עדיין בעילום שם</div>`;
+    return `<div class="chat-row" data-chat="${esc(id)}">
+      <div class="avatar g${pn % 6}">🎭</div>
+      <div class="info"><div class="title">${esc(profileName(pn))}</div>${state}</div>
+      <div>←</div>
+    </div>`;
+  }).join("");
+}
+$("#chats").addEventListener("click", e => { const r = e.target.closest("[data-chat]"); if (r) openChat(r.dataset.chat); });
+
+/* =================== Vue chat =================== */
+async function openChat(id) {
+  const m = myChats[id];
+  closeChat();
+  currentChat = id;
+  $("#messages").innerHTML = `<div class="sys">💜 אתם בדרך הלב. בלי שמות, בלי טלפונים — רק שיחה.</div>`;
+  $("#chat-view").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  if (m) updateChatView();
+
+  msgRef = db.ref("messages/" + id).limitToLast(300);
+  msgRef.on("child_added", s => appendMsg(s.key, s.val()));
+  msgRef.on("child_removed", s => { const el = document.getElementById("m_" + s.key); if (el) el.remove(); });
+
+  try {
+    const r = await db.ref(`reveal/${id}/${uid}`).once("value");
+    pressedCache[id] = !!r.val();
+    if (pressedCache[id]) tryOpen(id);
+  } catch (e) {}
+  if (currentChat === id) updateChatView();
+}
+
+function closeChat() {
+  if (msgRef) { msgRef.off(); msgRef = null; }
+  currentChat = null;
+  $("#chat-view").classList.add("hidden");
+  $("#chat-menu").classList.add("hidden");
+  document.body.style.overflow = "";
+}
+$("#chat-back").addEventListener("click", closeChat);
+
+function appendMsg(key, m) {
+  if (!m || document.getElementById("m_" + key)) return;
+  const box = $("#messages");
+  const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+  const d = document.createElement("div");
+  d.id = "m_" + key;
+  d.className = "msg " + (m.from === uid ? "mine" : "theirs");
+  d.innerHTML = `${esc(m.text)}<span class="t">${fmtTime(m.ts)}</span>`;
+  box.appendChild(d);
+  if (nearBottom || m.from === uid) box.scrollTop = box.scrollHeight;
+}
+
+function updateChatView() {
+  const id = currentChat, m = myChats[id];
+  if (!m) return;
+  $("#chat-title").textContent = `${profileName(myNo(m))} ↔ ${profileName(partnerNo(m))}`;
+  const ended = m.status === "ended";
+  $("#composer").classList.toggle("hidden", ended);
+  $("#ended-bar").classList.toggle("hidden", !ended);
+  $("#act-end").classList.toggle("hidden", ended);
+
+  const bar = $("#curtain-bar");
+  const sec = secretsCache[id];
+  if (m.opened && sec && sec[partnerOf(m)]) {
+    const t = sec[partnerOf(m)];
+    bar.innerHTML = `<div class="revealed-box">✨ המסך נפתח: <b>${esc(t.firstName)}</b> · <span dir="ltr">${esc(t.phone)}</span>
+      <div class="btns"><a class="btn gold small" href="${esc(waLink(t.phone))}" target="_blank" rel="noopener">💬 WhatsApp</a>
+      <button class="btn ghost small" id="replay-reveal">🎭 לראות שוב</button></div></div>`;
+    $("#replay-reveal").onclick = () => playReveal(id);
+  } else if (ended) {
+    bar.innerHTML = "";
+  } else if (pressedCache[id]) {
+    bar.innerHTML = `<div class="pressed">🎭 ביקשת לפתוח את המסך</div>
+      <div class="note">הצד השני לא יודע. אם גם הוא/היא ילחצו — המסך ייפתח לשניכם ✨</div>`;
+  } else {
+    bar.innerHTML = `<button class="btn gold small" id="btn-reveal">🎭 פתיחת המסך</button>
+      <div class="note">רק אם שניכם תלחצו — שמות וטלפונים ייחשפו. הצד השני לא יידע שלחצת.</div>`;
+    $("#btn-reveal").onclick = pressReveal;
+  }
+}
+
+/* ----- Envoi de message ----- */
+$("#composer").addEventListener("submit", async e => {
+  e.preventDefault();
+  const input = $("#msg-input");
+  const text = input.value.trim();
+  if (!text || !currentChat) return;
+  if (hasForbiddenContent(text)) { toast("שומרים על המסתורין 🎭 — בלי מספרי טלפון ובלי קישורים", 3500); return; }
+  input.value = ""; autoGrow();
+  try {
+    await db.ref("messages/" + currentChat).push({ from: uid, text: text.slice(0, 500), ts: TS });
+  } catch (err) { console.error(err); toast("ההודעה לא נשלחה"); input.value = text; }
+});
+const msgInput = $("#msg-input");
+function autoGrow() { msgInput.style.height = "auto"; msgInput.style.height = Math.min(msgInput.scrollHeight, 120) + "px"; }
+msgInput.addEventListener("input", autoGrow);
+msgInput.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(pointer:fine)").matches) { e.preventDefault(); $("#composer").requestSubmit(); }
+});
+
+/* ----- Ouvrir le rideau ----- */
+async function pressReveal() {
+  const id = currentChat;
+  const ok = await showModal({
+    title: "🎭 לפתוח את המסך?",
+    body: "אם גם הצד השני ילחץ — שניכם תראו את השם ואת מספר הטלפון.<br>אם רק את/ה לחצת, <b>הצד השני לא יידע</b>.",
+    okText: "כן, אני מוכן/ה ✨", cancelText: "עוד לא"
+  });
+  if (!ok || currentChat !== id) return;
+  try {
+    if (!priv) priv = (await db.ref("private/" + uid).once("value")).val();
+    await db.ref(`secrets/${id}/${uid}`).set({ firstName: priv.firstName, phone: priv.phone });
+    await db.ref(`reveal/${id}/${uid}`).set(true);
+    pressedCache[id] = true;
+    updateChatView();
+    tryOpen(id);
+  } catch (err) { console.error(err); toast("שגיאה — נסו שוב"); }
+}
+// Réussit seulement si les deux ont appuyé (vérifié par les règles Firebase)
+function tryOpen(id) {
+  const m = myChats[id];
+  if (!m || m.opened || m.status !== "active") return;
+  db.ref(`chats/${id}/opened`).set(true).catch(() => { /* l'autre n'a pas (encore) appuyé */ });
+}
+
+function playReveal(id) {
+  const m = myChats[id], s = secretsCache[id];
+  if (!m || !s) return;
+  const mine = s[uid] || priv || {}, theirs = s[partnerOf(m)];
+  if (!theirs) return;
+  $("#reveal-who").innerHTML = `
+    <div class="person"><div class="lbl">${esc(profileName(partnerNo(m)))} הוא/היא…</div>
+      <div class="nm">${esc(theirs.firstName)}</div><div class="ph">${esc(theirs.phone)}</div></div>
+    <div class="person" style="opacity:.8"><div class="lbl">ואת/ה, ${esc(profileName(myNo(m)))}</div>
+      <div class="nm" style="font-size:1.2rem">${esc(mine.firstName || "")}</div></div>`;
+  $("#reveal-wa").href = waLink(theirs.phone);
+  const r = $("#reveal");
+  r.classList.remove("hidden", "open");
+  void r.offsetWidth;
+  setTimeout(() => r.classList.add("open"), 500);
+}
+$("#reveal-close").addEventListener("click", () => $("#reveal").classList.add("hidden"));
+
+/* ----- Menu : signaler / terminer ----- */
+$("#chat-menu-btn").addEventListener("click", e => { e.stopPropagation(); $("#chat-menu").classList.toggle("hidden"); });
+document.addEventListener("click", () => $("#chat-menu").classList.add("hidden"));
+
+$("#act-end").addEventListener("click", async () => {
+  const id = currentChat;
+  const ok = await showModal({ title: "לסיים את השיחה?", body: "השיחה תיסגר לשני הצדדים, בלי לציין מי סיים. 🌙", okText: "סיום השיחה", cancelText: "ביטול", danger: true });
+  if (!ok) return;
+  try { await db.ref(`chats/${id}/status`).set("ended"); } catch (e) { toast("שגיאה — נסו שוב"); }
+});
+
+$("#act-report").addEventListener("click", async () => {
+  const id = currentChat, m = myChats[id];
+  if (!m) return;
+  const reason = await showModal({ title: "🚩 דיווח למנהלים", body: "מה קרה? הדיווח נשלח בדיסקרטיות. המנהלים לא יכולים לקרוא את השיחה.", input: true, placeholder: "תיאור קצר…", okText: "שליחת דיווח", cancelText: "ביטול", danger: true });
+  if (!reason) return;
+  try {
+    await db.ref("reports").push({
+      chatId: id, reporterUid: uid, reporterNo: myNo(m),
+      reportedUid: partnerOf(m), reportedNo: partnerNo(m),
+      reason: reason.slice(0, 300), createdAt: TS
+    });
+    toast("תודה. הדיווח הועבר בדיסקרטיות 🙏");
+  } catch (e) { console.error(e); toast("הדיווח לא נשלח — נסו שוב"); }
+});
+
+/* ----- Supprimer mon profil ----- */
+$("#delete-me").addEventListener("click", async () => {
+  const ok = await showModal({ title: "למחוק את הפרופיל?", body: "הכרטיס שלך ייעלם, והשיחות הפעילות ייסגרו. אי אפשר לבטל.", okText: "מחיקה", cancelText: "ביטול", danger: true });
+  if (!ok) return;
+  try {
+    for (const [id, m] of Object.entries(myChats)) {
+      if (m.status === "active") await db.ref(`chats/${id}/status`).set("ended").catch(() => {});
+    }
+    await db.ref("profiles/" + uid).remove();
+    await db.ref("private/" + uid).remove();
+    Object.values(chatSubs).forEach(r => r.off());
+    ["profiles", "banned", "inbox/" + uid, "outbox/" + uid, "userChats/" + uid].forEach(p => db.ref(p).off());
+    await auth.signOut();
+    store.clear();
+    location.reload();
+  } catch (e) { console.error(e); toast("שגיאה במחיקה"); }
+});
+</script>
+</body>
+</html>
