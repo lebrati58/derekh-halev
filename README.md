@@ -11,7 +11,9 @@ On tombe amoureux d'une conversation **avant** de voir le visage.
 |---|---|
 | `index.html` | App participant : inscription, carte mystère, propositions, demandes, chat, ouverture du rideau |
 | `admin.html` | Tableau de bord admin (PIN) : stats, signalements, bannissement. **Ne peut pas lire les conversations.** |
-| `commun.js` | Config Firebase, structure de la base (en commentaire), helpers, matching, filtre anti-téléphone/liens |
+| `commun.js` | Config Firebase, structure de la base (en commentaire), helpers, filtre anti-téléphone/liens |
+| `matching.js` | Moteur de compatibilité v2 (filtres durs, score, « pourquoi vous matchez », icebreakers) — pur, sans Firebase |
+| `test_matching.js` | Tests du moteur (`node test_matching.js`) |
 | `style.css` | Design partagé (violet nuit / doré, rideau de théâtre) |
 | `database.rules.json` | Règles de sécurité Realtime Database (à coller dans la console) |
 
@@ -35,6 +37,8 @@ Vérifie que `databaseURL` est bien présent (ex. `https://ton-projet-default-rt
 ## 3. Règles de sécurité
 
 **Realtime Database → onglet Règles** → efface tout → colle le contenu de `database.rules.json` → **Publier**.
+
+> ⚠️ **À refaire après chaque mise à jour de `database.rules.json`** (ex. v2 : questionnaire, `blocks/`, `announcements/`, `paused`). Tant que les nouvelles règles ne sont pas publiées, l'app fonctionne en mode dégradé : profils enregistrés sans questionnaire, blocage/pause/annonces refusés.
 
 Ce que garantissent ces règles :
 
@@ -84,7 +88,18 @@ Le lien à poster dans le groupe WhatsApp : l'URL ci-dessus. Garde `admin.html` 
 
 **Inscription** → prénom et téléphone (privés), genre, âge, ville, religieux/traditionnel/laïc, intention, 3 mots, « ton shabbat idéal ? ». Chacun reçoit un numéro unique (`פרופיל 12`) via une transaction Firebase, et une carte mystère en CSS. L'identité est gardée dans le navigateur (Firebase Auth + `localStorage`) : on revient sans se réinscrire.
 
-**Matching** (100 % côté client) → jusqu'à 3 profils : genre opposé, écart d'âge ≤ 8 ans, religieux ↔ religieux/traditionnel, laïc ↔ laïc/traditionnel (traditionnel ↔ tous), même intention en priorité, puis âge le plus proche. Les demandes en attente restent affichées ; les profils déjà contactés, refusés ou en chat sortent de la liste.
+**Matching v2** (100 % côté client, `matching.js`) → jusqu'à 3 suggestions avec **% de compatibilité** et **« למה אתם מתאימים »** (3 points communs).
+- *Filtres durs* : genre opposé ; fourchettes d'âge personnelles mutuelles (`ageMin`/`ageMax`, sinon écart ≤ 8 ans) ; ילדים « veut ↔ n'en veut pas » exclu ; religieux ↔ laïc exclu (traditionnel ↔ tous) ; profils en pause, bloqués ou bannis exclus.
+- *Score* : intention, shabbat (קודש ↔ יום רגיל = gros malus), enfants, rythme, valeur, week-end, million, ville, proximité d'âge.
+- Les anciens profils (sans questionnaire) restent compatibles — score sur les champs de base.
+
+**Questionnaire v2** à l'inscription (tout en un clic) : fourchette d'âge recherchée, ילדים, style de shabbat, rythme, valeur principale, week-end rêvé, « le million tombé du ciel », « אני לא יכול/ה לחיות בלי… ».
+
+**Icebreaker automatique** → à l'ouverture d'un chat, une « שאלת פתיחה » basée sur leurs réponses communes apparaît comme bulle système (stockée dans `chats/{id}/icebreaker`).
+
+**Sécurité v2** → 🚫 **blocage personnel** (`blocks/{uid}/{target}` : il disparaît de mes listes, et les règles refusent ses nouvelles demandes ; discret, il n'est pas prévenu — limite : son profil peut encore me voir dans *ses* listes tant qu'il ne m'a pas contactée, le blocage agit à la demande) · ⏸️ **mode pause** (`profiles/{uid}/paused` : invisible dans les suggestions, chats conservés).
+
+**📣 פעילות היום** → l'admin publie une annonce (`announcements/current`) affichée en bannière à tous les participants ; bannière « 💌 יש לך בקשות » à l'ouverture.
 
 **Demande → acceptation → chat** anonyme `פרופיל 12 ↔ פרופיל 27`. Le filtre bloque les suites de chiffres (téléphones), liens, emails et @pseudos avec le message « שומרים על המסתורין 🎭 ».
 

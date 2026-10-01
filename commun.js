@@ -27,6 +27,19 @@
      words: ["סקרן", "מצחיק", "רגיש"]
      shabbat: "ארוחה ארוכה ואז שנ״צ"
      createdAt: <timestamp>
+     — Questionnaire v2 (optionnel, anciens profils sans) :
+     ageMin, ageMax: 25, 40            ← fourchette d'âge recherchée
+     kids: "have"|"want"|"no"|"flow"
+     shabbatStyle: "kodesh"|"massoret"|"regular"
+     pace: "home"|"out"|"mix"
+     value: "heart"|"humor"|"stable"|"open"
+     weekend: "nature"|"sea"|"movie"|"friends"|"explore"
+     million: "travel"|"invest"|"spoil"|"save"
+     cantLiveWithout: "קפה של בוקר"
+     paused: true                      ← mode pause (invisible dans les suggestions)
+
+   blocks/{uid}/{targetUid}: true     ← blocage personnel (lisible/éditable par uid seul)
+   announcements/current {text, ts}   ← activité du jour publiée par l'admin, lisible par tous
 
    private/{uid}                      ← PRIVÉ (lisible uniquement par son propriétaire)
      firstName: "דני"
@@ -134,26 +147,10 @@ async function nextProfileNo() {
   return res.snapshot.val();
 }
 
-/* ---------- Matching ---------- */
-function religionOk(a, b) {
-  if (a === "masorti" || b === "masorti") return true;   // traditionnel ↔ tous
-  return a === b;                                         // religieux↔religieux, laïc↔laïc
-}
-function isCompatible(me, p) {
-  return !!(me && p) &&
-    (p.gender === "m" || p.gender === "f") &&
-    me.gender !== p.gender &&
-    Math.abs(me.age - p.age) <= 8 &&
-    religionOk(me.religion, p.religion);
-}
-function matchScore(me, p) {
-  let s = 100;
-  if (me.intent === p.intent) s += 25;          // même intention si possible
-  if (me.religion === p.religion) s += 6;
-  if ((me.city || "").trim() && me.city.trim() === (p.city || "").trim()) s += 4;
-  s -= Math.abs(me.age - p.age) * 2;
-  return s;
-}
+/* ---------- Matching ----------
+   Toute la logique de compatibilité (filtres durs, score, raisons,
+   icebreakers) vit dans matching.js — pur, sans Firebase, testé par
+   test_matching.js. index.html charge matching.js après ce fichier. */
 
 /* ---------- Anti-fuite : téléphones & liens ---------- */
 function hasForbiddenContent(text) {
@@ -192,6 +189,7 @@ function cardHTML(p, opts = {}) {
     <div class="mc-meta">${esc(p.age)} · ${esc(p.city)} · ${esc(religionLabel(p.religion, p.gender))}</div>
     <div class="mc-intent">${esc(LABELS.intent[p.intent] || "")}</div>
     ${p.shabbat && !opts.noShabbat ? `<div class="mc-shabbat"><b>השבת האידיאלית:</b> ״${esc(p.shabbat)}״</div>` : ""}
+    ${p.cantLiveWithout ? `<div class="mc-shabbat"><b>לא חי/ה בלי:</b> ${esc(p.cantLiveWithout)}</div>` : ""}
   </div>`;
 }
 

@@ -292,3 +292,41 @@ textarea { resize: vertical; min-height: 70px; }
 .ptable th, .ptable td { padding: 8px 6px; border-bottom: 1px solid rgba(185,168,214,.15); text-align: right; }
 .ptable th { color: var(--gold-2); font-weight: 600; }
 .tag-banned { color: var(--danger); font-weight: 700; }
+
+/* ===== v2 — questionnaire, matching, annonces ===== */
+.q-divider {
+  margin: 26px 0 8px; text-align: center; font-family: var(--font-title);
+  color: var(--gold-2); font-size: 1.15rem; font-weight: 700;
+  display: flex; align-items: center; gap: 10px;
+}
+.q-divider::before, .q-divider::after { content: ""; flex: 1; height: 1px; background: rgba(212,169,74,.4); }
+
+.match-pct {
+  display: inline-block; margin-bottom: 6px; padding: 4px 14px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--gold-2), var(--gold)); color: var(--night);
+  font-weight: 800; font-size: .95rem; box-shadow: 0 4px 14px rgba(212,169,74,.3);
+}
+.match-why {
+  margin-top: 8px; background: rgba(45,27,78,.7); border: 1px solid rgba(212,169,74,.25);
+  border-radius: 14px; padding: 10px 12px; font-size: .88rem;
+}
+.match-why b { color: var(--gold-2); display: block; margin-bottom: 4px; }
+.match-why span {
+  display: inline-block; background: rgba(123,82,181,.35); border: 1px solid rgba(185,168,214,.3);
+  border-radius: 999px; padding: 3px 10px; margin: 2px 2px 2px 0;
+}
+
+.announce {
+  background: linear-gradient(135deg, rgba(212,169,74,.22), rgba(123,82,181,.3));
+  border: 1px solid var(--gold); border-radius: 14px; padding: 12px 14px;
+  margin-bottom: 12px; font-size: .95rem; animation: fade .4s ease;
+}
+.news-banner {
+  background: rgba(45,27,78,.85); border: 1px solid rgba(212,169,74,.4); border-radius: 14px;
+  padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+  justify-content: space-between; font-size: .95rem; animation: fade .4s ease;
+}
+.paused-banner {
+  background: rgba(224,96,126,.15); border: 1px solid rgba(224,96,126,.5); border-radius: 14px;
+  padding: 10px 14px; margin-bottom: 12px; font-size: .92rem; text-align: center;
+}

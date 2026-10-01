@@ -54,6 +54,61 @@
         "createdAt": {
           ".validate": "newData.isNumber()"
         },
+        "ageMin": {
+          ".validate": "newData.isNumber() && newData.val() >= 18 && newData.val() <= 99"
+        },
+        "ageMax": {
+          ".validate": "newData.isNumber() && newData.val() >= 18 && newData.val() <= 99"
+        },
+        "kids": {
+          ".validate": "newData.val() === 'have' || newData.val() === 'want' || newData.val() === 'no' || newData.val() === 'flow'"
+        },
+        "shabbatStyle": {
+          ".validate": "newData.val() === 'kodesh' || newData.val() === 'massoret' || newData.val() === 'regular'"
+        },
+        "pace": {
+          ".validate": "newData.val() === 'home' || newData.val() === 'out' || newData.val() === 'mix'"
+        },
+        "value": {
+          ".validate": "newData.val() === 'heart' || newData.val() === 'humor' || newData.val() === 'stable' || newData.val() === 'open'"
+        },
+        "weekend": {
+          ".validate": "newData.val() === 'nature' || newData.val() === 'sea' || newData.val() === 'movie' || newData.val() === 'friends' || newData.val() === 'explore'"
+        },
+        "million": {
+          ".validate": "newData.val() === 'travel' || newData.val() === 'invest' || newData.val() === 'spoil' || newData.val() === 'save'"
+        },
+        "cantLiveWithout": {
+          ".validate": "newData.isString() && newData.val().length <= 40"
+        },
+        "paused": {
+          ".validate": "newData.isBoolean()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "blocks": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$target": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.val() === true"
+        }
+      }
+    },
+    "announcements": {
+      "current": {
+        ".read": "auth != null",
+        ".write": "auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()",
+        ".validate": "newData.hasChildren(['text', 'ts'])",
+        "text": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 300"
+        },
+        "ts": {
+          ".validate": "newData.isNumber()"
+        },
         "$other": {
           ".validate": false
         }
@@ -86,7 +141,7 @@
       "$to": {
         ".read": "auth != null && auth.uid === $to",
         "$from": {
-          ".write": "auth != null && $from !== $to && ((auth.uid === $from && !data.exists() && newData.child('status').val() === 'pending' && !root.child('banned/' + auth.uid).exists() && !root.child('banned/' + $to).exists()) || (auth.uid === $to && data.exists()))",
+          ".write": "auth != null && $from !== $to && ((auth.uid === $from && !data.exists() && newData.child('status').val() === 'pending' && !root.child('banned/' + auth.uid).exists() && !root.child('banned/' + $to).exists() && !root.child('blocks/' + $to + '/' + auth.uid).exists() && !root.child('blocks/' + auth.uid + '/' + $to).exists()) || (auth.uid === $to && data.exists()))",
           ".validate": "newData.hasChildren(['fromNo', 'status', 'createdAt'])",
           "status": {
             ".validate": "newData.val() === 'pending' || newData.val() === 'accepted' || newData.val() === 'declined'"
@@ -112,6 +167,9 @@
         ".read": "auth != null && (data.child('from').val() === auth.uid || data.child('to').val() === auth.uid)",
         ".write": "auth != null && !data.exists() && newData.child('to').val() === auth.uid && $chatId === newData.child('from').val() + '_' + auth.uid && root.child('inbox/' + auth.uid + '/' + newData.child('from').val()).exists() && !root.child('banned/' + auth.uid).exists()",
         ".validate": "newData.hasChildren(['from', 'to', 'fromNo', 'toNo', 'status', 'opened', 'createdAt'])",
+        "icebreaker": {
+          ".validate": "newData.isString() && newData.val().length <= 200"
+        },
         "status": {
           ".write": "data.exists() && newData.val() === 'ended' && ((auth != null && (data.parent().child('from').val() === auth.uid || data.parent().child('to').val() === auth.uid)) || (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))",
           ".validate": "newData.val() === 'active' || newData.val() === 'ended'"

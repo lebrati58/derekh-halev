@@ -38,6 +38,17 @@
     <div class="stats" id="stats"></div>
     <p class="sub" style="margin-top:12px">🔒 המנהלים לא יכולים לקרוא שיחות, שמות או טלפונים — רק נתונים כלליים ודיווחים.</p>
 
+    <h2>📣 פעילות היום</h2>
+    <div class="panel">
+      <p class="sub" style="margin-top:0">ההודעה תוצג לכל המשתתפים בראש האפליקציה — אתגר, שאלת היום, עידוד…</p>
+      <textarea id="ann-text" maxlength="300" placeholder="למשל: הערב — שאלו את המאצ׳ שלכם מה הדבר הכי ספונטני שעשו 😉"></textarea>
+      <div class="item-actions">
+        <button class="btn gold small" id="ann-pub">פרסום</button>
+        <button class="btn ghost small" id="ann-clear">הסרת ההודעה</button>
+      </div>
+      <p class="sub" id="ann-current" style="margin:10px 0 0"></p>
+    </div>
+
     <h2>🚩 דיווחים</h2>
     <div class="list" id="reports"></div>
 
@@ -100,6 +111,21 @@ $("#logout").addEventListener("click", async () => {
 
 function startDash() {
   show("screen-dash");
+  db.ref("announcements/current").on("value", s => {
+    const a = s.val();
+    $("#ann-current").textContent = a && a.text ? "מוצג כעת: ״" + a.text + "״" : "אין הודעה פעילה כרגע";
+    if (a && a.text) $("#ann-text").value = a.text;
+  }, () => { $("#ann-current").textContent = "⚠️ כדי להפעיל הודעות — צריך לפרסם את כללי האבטחה החדשים (database.rules.json)"; });
+  $("#ann-pub").addEventListener("click", async () => {
+    const text = $("#ann-text").value.trim();
+    if (!text) return toast("כתבו הודעה קודם 😉");
+    try { await db.ref("announcements/current").set({ text: text.slice(0, 300), ts: firebase.database.ServerValue.TIMESTAMP }); toast("ההודעה פורסמה 📣"); }
+    catch (e) { console.error(e); toast("לא הצלחנו — ייתכן שצריך לפרסם את כללי האבטחה החדשים"); }
+  });
+  $("#ann-clear").addEventListener("click", async () => {
+    try { await db.ref("announcements/current").remove(); $("#ann-text").value = ""; toast("ההודעה הוסרה"); }
+    catch (e) { toast("שגיאה"); }
+  });
   db.ref("profiles").on("value", s => { profiles = s.val() || {}; render(); });
   db.ref("banned").on("value", s => { banned = s.val() || {}; render(); });
   db.ref("chats").on("value", s => { chats = s.val() || {}; render(); });

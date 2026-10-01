@@ -113,6 +113,81 @@
           <textarea id="f-shabbat" maxlength="200" placeholder="למשל: ארוחה ארוכה עם חברים, ואז שנ״צ של שלוש שעות 😴"></textarea>
         </div>
 
+        <div class="q-divider">⚡ השאלון הקצר — כמה קליקים וסיימנו</div>
+        <p class="sub">זה מה שעוזר לקסם למצוא לך התאמות. קליל, מבטיחים 😉</p>
+
+        <div class="field">
+          <span class="label">טווח גילאים שמתאים לי <span class="hint">לא חובה — אפשר להשאיר ריק</span></span>
+          <div class="row2">
+            <input type="number" id="f-agemin" min="18" max="99" inputmode="numeric" placeholder="מגיל">
+            <input type="number" id="f-agemax" min="18" max="99" inputmode="numeric" placeholder="עד גיל">
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">ילדים? 👶</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="kids" value="have"><span>יש לי 👶</span></label>
+            <label class="chip"><input type="radio" name="kids" value="want"><span>רוצה בעתיד</span></label>
+            <label class="chip"><input type="radio" name="kids" value="no"><span>לא בשבילי</span></label>
+            <label class="chip"><input type="radio" name="kids" value="flow"><span>נזרום</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">שבת אצלי זה:</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="shstyle" value="kodesh"><span>קודש 🕯️</span></label>
+            <label class="chip"><input type="radio" name="shstyle" value="massoret"><span>מסורת ונחת</span></label>
+            <label class="chip"><input type="radio" name="shstyle" value="regular"><span>יום רגיל</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">הקצב שלי:</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="pace" value="home"><span>בית וספה 🛋️</span></label>
+            <label class="chip"><input type="radio" name="pace" value="out"><span>בחוץ כל הזמן 🎉</span></label>
+            <label class="chip"><input type="radio" name="pace" value="mix"><span>תלוי בשבוע</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">הכי חשוב לי בבן/בת זוג:</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="value" value="heart"><span>לב חם ❤️</span></label>
+            <label class="chip"><input type="radio" name="value" value="humor"><span>הומור 😄</span></label>
+            <label class="chip"><input type="radio" name="value" value="stable"><span>יציבות 🏡</span></label>
+            <label class="chip"><input type="radio" name="value" value="open"><span>ראש פתוח 🌍</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">סופ״ש חלומי:</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="weekend" value="nature"><span>טבע ⛰️</span></label>
+            <label class="chip"><input type="radio" name="weekend" value="sea"><span>ים 🌊</span></label>
+            <label class="chip"><input type="radio" name="weekend" value="movie"><span>סרט ושמיכה 🎬</span></label>
+            <label class="chip"><input type="radio" name="weekend" value="friends"><span>חברים ואוכל 🍲</span></label>
+            <label class="chip"><input type="radio" name="weekend" value="explore"><span>לגלות מקום חדש ✈️</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">מיליון ש״ח נפל עליי משמיים — הולך ל:</span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="million" value="travel"><span>טיול גדול בעולם ✈️</span></label>
+            <label class="chip"><input type="radio" name="million" value="invest"><span>דירה והשקעה 🏠</span></label>
+            <label class="chip"><input type="radio" name="million" value="spoil"><span>פינוקים לאהובים 🎁</span></label>
+            <label class="chip"><input type="radio" name="million" value="save"><span>חוסך/ת, שיהיה 🐷</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-clw">תשלימו: ״אני לא יכול/ה לחיות בלי ___״ ✍️ <span class="hint">מילה–שתיים, לא חובה</span></label>
+          <input type="text" id="f-clw" maxlength="40" placeholder="קפה של בוקר, ים, מוזיקה…">
+        </div>
+
         <div class="field">
           <label class="check"><input type="checkbox" id="f-ok">
             <span>אני מעל גיל 18, ומתחייב/ת לשיחה מכבדת. ידוע לי שאין לשתף טלפון או קישורים בצ׳אט — המסך נפתח רק בהסכמה הדדית.</span>
@@ -126,6 +201,9 @@
 
   <!-- Accueil -->
   <section id="screen-home" class="screen">
+    <div class="announce hidden" id="announce"></div>
+    <div class="news-banner hidden" id="news-banner"></div>
+    <div class="paused-banner hidden" id="paused-banner">⏸️ את/ה במצב השהיה — הכרטיס שלך לא מוצג כרגע <button class="btn link" id="resume-btn">חזרה ▶️</button></div>
     <h2 style="margin-top:4px">הכרטיס שלך</h2>
     <p class="sub">זה מה שאחרים רואים. בלי שם, בלי תמונה — רק את/ה, בדרך הלב.</p>
     <div id="my-card"></div>
@@ -150,6 +228,8 @@
 
     <div class="footer">
       נבנה באהבה לט״ו באב 💜<br>
+      <button class="btn link" id="pause-toggle">⏸️ מצב השהיה</button>
+      ·
       <button class="btn link" id="delete-me">מחיקת הפרופיל שלי</button>
     </div>
   </section>
@@ -163,6 +243,7 @@
     <button class="icon-btn" id="chat-menu-btn" aria-label="תפריט">⋯</button>
     <div class="menu hidden" id="chat-menu">
       <button id="act-report">🚩 דיווח</button>
+      <button id="act-block-chat">🚫 חסימת הפרופיל</button>
       <button id="act-end" class="muted">סיום השיחה</button>
     </div>
   </div>
@@ -204,6 +285,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="commun.js"></script>
+<script src="matching.js"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -211,6 +293,7 @@ let me = null;          // profil public
 let priv = null;        // {firstName, phone}
 let profiles = {};      // uid -> profil
 let banned = {};
+let blocks = {};        // targetUid -> true (mes blocages)
 let inbox = {};         // fromUid -> {fromNo, status, chatId}
 let outbox = {};        // toUid -> {toNo, status, chatId}
 let myChats = {};       // chatId -> meta
@@ -267,6 +350,14 @@ $("#reg-form").addEventListener("submit", async e => {
   const city = $("#f-city").value.trim();
   const words = $$(".f-word").map(i => i.value.trim()).filter(Boolean);
   const shabbat = $("#f-shabbat").value.trim();
+  const kids = val("kids"), shabbatStyle = val("shstyle"), pace = val("pace"),
+        value = val("value"), weekend = val("weekend"), million = val("million");
+  let ageMin = parseInt($("#f-agemin").value, 10) || null;
+  let ageMax = parseInt($("#f-agemax").value, 10) || null;
+  if (ageMin && (ageMin < 18 || ageMin > 99)) ageMin = null;
+  if (ageMax && (ageMax < 18 || ageMax > 99)) ageMax = null;
+  if (ageMin && ageMax && ageMin > ageMax) { const t = ageMin; ageMin = ageMax; ageMax = t; }
+  const cantLiveWithout = $("#f-clw").value.trim();
 
   if (!firstName) return toast("מה השם שלך? (הוא נשאר סודי 🔒)");
   if (!/^\+?[\d\s\-]{9,18}$/.test(phone)) return toast("מספר טלפון לא תקין");
@@ -277,7 +368,13 @@ $("#reg-form").addEventListener("submit", async e => {
   if (!intent) return toast("מה את/ה מחפש/ת?");
   if (words.length < 3) return toast("צריך 3 מילים שמתארות אותך ✨");
   if (!shabbat) return toast("ספרו לנו על השבת האידיאלית 🕯️");
-  if ([...words, shabbat, city].some(hasForbiddenContent)) return toast("שומרים על המסתורין 🎭 — בלי טלפון ובלי קישורים");
+  if (!kids) return toast("ילדים — מה הכיוון? 👶");
+  if (!shabbatStyle) return toast("שבת אצלך זה…? 🕯️");
+  if (!pace) return toast("מה הקצב שלך?");
+  if (!value) return toast("מה הכי חשוב לך בבן/בת זוג?");
+  if (!weekend) return toast("סופ״ש חלומי — בחרו אחד ✨");
+  if (!million) return toast("לאן הולך המיליון? 😄");
+  if ([...words, shabbat, city, cantLiveWithout].some(hasForbiddenContent)) return toast("שומרים על המסתורין 🎭 — בלי טלפון ובלי קישורים");
   if (!$("#f-ok").checked) return toast("צריך לאשר את כללי הכבוד 🙏");
 
   const btn = $("#reg-btn");
@@ -286,8 +383,26 @@ $("#reg-form").addEventListener("submit", async e => {
     const no = await nextProfileNo();
     priv = { firstName, phone };
     await db.ref("private/" + uid).set(priv);
-    me = { no, gender, age, city, religion, intent, words, shabbat, createdAt: TS };
-    await db.ref("profiles/" + uid).set(me);
+    const base = { no, gender, age, city, religion, intent, words, shabbat, createdAt: TS };
+    const extra = {};
+    if (ageMin) extra.ageMin = ageMin;
+    if (ageMax) extra.ageMax = ageMax;
+    if (kids) extra.kids = kids;
+    if (shabbatStyle) extra.shabbatStyle = shabbatStyle;
+    if (pace) extra.pace = pace;
+    if (value) extra.value = value;
+    if (weekend) extra.weekend = weekend;
+    if (million) extra.million = million;
+    if (cantLiveWithout) extra.cantLiveWithout = cantLiveWithout;
+    me = Object.assign({}, base, extra);
+    try {
+      await db.ref("profiles/" + uid).set(me);
+    } catch (eRules) {
+      // Règles pas encore republiées (anciens champs seulement) → profil de base
+      console.warn("Règles à mettre à jour — profil enregistré sans questionnaire", eRules);
+      me = base;
+      await db.ref("profiles/" + uid).set(me);
+    }
     me.createdAt = Date.now();
     store.set("identity", { uid, no });
     toast(`ברוכים הבאים, ${profileName(no)} 🎭`);
@@ -303,8 +418,15 @@ $("#reg-form").addEventListener("submit", async e => {
 function startHome() {
   $("#my-card").innerHTML = cardHTML(me);
   show("screen-home");
+  updatePausedUI();
 
-  db.ref("profiles").on("value", s => { profiles = s.val() || {}; renderProposals(); renderRequests(); });
+  db.ref("profiles").on("value", s => {
+    profiles = s.val() || {};
+    if (profiles[uid]) { me = profiles[uid]; $("#my-card").innerHTML = cardHTML(me); updatePausedUI(); }
+    renderProposals(); renderRequests();
+  });
+  db.ref("blocks/" + uid).on("value", s => { blocks = s.val() || {}; renderProposals(); renderRequests(); }, () => {});
+  db.ref("announcements/current").on("value", s => renderAnnounce(s.val()), () => {});
   db.ref("banned").on("value", s => {
     banned = s.val() || {};
     if (banned[uid]) { closeChat(); return show("screen-banned"); }
@@ -329,6 +451,63 @@ function selectTab(name) {
 
 function setBadge(id, n) { const b = $(id); b.textContent = n; b.classList.toggle("hidden", !n); }
 
+/* ----- Annonce admin (פעילות היום) ----- */
+function renderAnnounce(a) {
+  const el = $("#announce");
+  if (a && a.text) { el.textContent = "📣 " + a.text; el.classList.remove("hidden"); }
+  else el.classList.add("hidden");
+}
+
+/* ----- Bannière « il y a du nouveau » ----- */
+function renderNews() {
+  const n = Object.entries(inbox).filter(([u, r]) => r.status === "pending" && !banned[u] && !blocks[u] && profiles[u]).length;
+  const el = $("#news-banner");
+  if (n > 0) {
+    el.innerHTML = `💌 יש לך ${n === 1 ? "בקשה שמחכה" : n + " בקשות שמחכות"} לך! <button class="btn gold small" id="news-go">לצפייה</button>`;
+    el.classList.remove("hidden");
+    $("#news-go").onclick = () => selectTab("requests");
+  } else el.classList.add("hidden");
+}
+
+/* ----- Mode pause ----- */
+function updatePausedUI() {
+  const paused = !!(me && me.paused);
+  const pb = $("#paused-banner"), pt = $("#pause-toggle");
+  if (pb) pb.classList.toggle("hidden", !paused);
+  if (pt) pt.textContent = paused ? "▶️ חזרה מהשהיה" : "⏸️ מצב השהיה";
+}
+async function setPaused(v) {
+  try {
+    await db.ref(`profiles/${uid}/paused`).set(v ? true : null);
+    if (v) me.paused = true; else delete me.paused;
+    updatePausedUI();
+    toast(v ? "את/ה במצב השהיה ⏸️" : "חזרת! ✨");
+  } catch (e) { console.error(e); toast("לא הצלחנו — נסו שוב"); }
+}
+$("#pause-toggle").addEventListener("click", async () => {
+  if (me && me.paused) return setPaused(false);
+  const ok = await showModal({ title: "⏸️ מצב השהיה?", body: "הכרטיס שלך לא יוצג בהצעות עד שתחזרו. השיחות הקיימות נשארות 🌙", okText: "השהיה", cancelText: "ביטול" });
+  if (ok) setPaused(true);
+});
+$("#resume-btn").addEventListener("click", () => setPaused(false));
+
+/* ----- Blocage personnel ----- */
+async function blockUser(target) {
+  const p = profiles[target] || {};
+  const ok = await showModal({
+    title: "🚫 לחסום את הפרופיל?",
+    body: `${esc(profileName(p.no || "?"))} לא יופיע אצלך יותר, ולא יוכל לשלוח לך בקשות חדשות. הוא/היא לא ידעו שנחסמו.`,
+    okText: "חסימה", cancelText: "ביטול", danger: true
+  });
+  if (!ok) return false;
+  try {
+    await db.ref(`blocks/${uid}/${target}`).set(true);
+    if (inbox[target] && inbox[target].status === "pending") await declineRequest(target).catch(() => {});
+    toast("הפרופיל נחסם 🚫");
+    return true;
+  } catch (e) { console.error(e); toast("לא הצלחנו לחסום — נסו שוב"); return false; }
+}
+
 /* ----- Propositions (matching) ----- */
 function computeProposals() {
   if (!me) return [];
@@ -338,7 +517,7 @@ function computeProposals() {
   Object.values(myChats).forEach(m => excluded.add(partnerOf(m)));                // chats existants
 
   const candidates = Object.entries(profiles)
-    .filter(([u, p]) => u !== uid && !banned[u] && !excluded.has(u) && isCompatible(me, p))
+    .filter(([u, p]) => u !== uid && !banned[u] && !blocks[u] && !excluded.has(u) && isCompatible(me, p))
     .map(([u, p]) => ({ uid: u, p, pending: !!(outbox[u] && outbox[u].status === "pending"), score: matchScore(me, p) }));
 
   candidates.sort((a, b) => (b.pending - a.pending) || (b.score - a.score) || (a.p.no - b.p.no));
@@ -353,15 +532,21 @@ function renderProposals() {
     box.innerHTML = `<div class="empty"><span class="big">🌙</span>עוד אין כאן התאמה חדשה… המסך עוד לא עלה.<br>חזרו בקרוב — הקסם לוקח זמן.</div>`;
     return;
   }
-  box.innerHTML = list.map(c => `
+  box.innerHTML = list.map(c => {
+    const pct = matchPercent(me, c.p);
+    const why = matchReasons(me, c.p);
+    return `
     <div>
+      <div class="match-pct">💘 ${pct}% התאמה</div>
       ${cardHTML(c.p)}
+      ${why.length ? `<div class="match-why"><b>למה אתם מתאימים:</b> ${why.map(w => `<span>${esc(w)}</span>`).join("")}</div>` : ""}
       <div class="item-actions">
         ${c.pending
           ? `<button class="btn ghost" disabled>⏳ הבקשה נשלחה — מחכים בסבלנות</button>`
           : `<button class="btn gold" data-send="${esc(c.uid)}">💌 בקשה לשיחה</button>`}
       </div>
-    </div>`).join("");
+    </div>`;
+  }).join("");
 }
 
 $("#proposals").addEventListener("click", async e => {
@@ -390,8 +575,9 @@ async function sendRequest(toUid) {
 function renderRequests() {
   const box = $("#requests");
   if (!box) return;
-  const pending = Object.entries(inbox).filter(([u, r]) => r.status === "pending" && !banned[u] && profiles[u]);
+  const pending = Object.entries(inbox).filter(([u, r]) => r.status === "pending" && !banned[u] && !blocks[u] && profiles[u]);
   setBadge("#badge-requests", pending.length);
+  renderNews();
   if (!pending.length) {
     box.innerHTML = `<div class="empty"><span class="big">💌</span>אין בקשות חדשות כרגע.</div>`;
     return;
@@ -402,14 +588,16 @@ function renderRequests() {
       <div class="item-actions">
         <button class="btn gold" data-accept="${esc(u)}">✨ פתיחת שיחה</button>
         <button class="btn ghost" data-decline="${esc(u)}">לא הפעם</button>
+        <button class="btn ghost" data-block="${esc(u)}" style="flex:0 0 auto">🚫</button>
       </div>
     </div>`).join("");
 }
 
 $("#requests").addEventListener("click", async e => {
-  const a = e.target.closest("[data-accept]"), d = e.target.closest("[data-decline]");
+  const a = e.target.closest("[data-accept]"), d = e.target.closest("[data-decline]"), bl = e.target.closest("[data-block]");
   if (a) { a.disabled = true; await acceptRequest(a.dataset.accept); }
   if (d) { d.disabled = true; await declineRequest(d.dataset.decline); }
+  if (bl) { await blockUser(bl.dataset.block); renderRequests(); }
 });
 
 async function acceptRequest(fromUid) {
@@ -418,7 +606,8 @@ async function acceptRequest(fromUid) {
   try {
     await db.ref("chats/" + chatId).set({
       from: fromUid, to: uid, fromNo: p.no, toNo: me.no,
-      status: "active", opened: false, createdAt: TS
+      status: "active", opened: false, createdAt: TS,
+      icebreaker: pickIcebreaker(p, me)
     });
     await db.ref(`userChats/${uid}/${chatId}`).set(true);
     await db.ref(`userChats/${fromUid}/${chatId}`).set(true);
@@ -488,7 +677,7 @@ async function openChat(id) {
   $("#messages").innerHTML = `<div class="sys">💜 אתם בדרך הלב. בלי שמות, בלי טלפונים — רק שיחה.</div>`;
   $("#chat-view").classList.remove("hidden");
   document.body.style.overflow = "hidden";
-  if (m) updateChatView();
+  if (m) { ensureIcebreaker(); updateChatView(); }
 
   msgRef = db.ref("messages/" + id).limitToLast(300);
   msgRef.on("child_added", s => appendMsg(s.key, s.val()));
@@ -523,9 +712,21 @@ function appendMsg(key, m) {
   if (nearBottom || m.from === uid) box.scrollTop = box.scrollHeight;
 }
 
+/* Bulle « שאלת פתיחה » automatique (icebreaker) */
+function ensureIcebreaker() {
+  const m = myChats[currentChat];
+  if (!m || !m.icebreaker || document.getElementById("ib-bubble")) return;
+  const d = document.createElement("div");
+  d.className = "sys"; d.id = "ib-bubble";
+  d.textContent = "💘 שאלת פתיחה: " + m.icebreaker;
+  const box = $("#messages");
+  box.insertBefore(d, box.children[1] || null);
+}
+
 function updateChatView() {
   const id = currentChat, m = myChats[id];
   if (!m) return;
+  ensureIcebreaker();
   $("#chat-title").textContent = `${profileName(myNo(m))} ↔ ${profileName(partnerNo(m))}`;
   const ended = m.status === "ended";
   $("#composer").classList.toggle("hidden", ended);
@@ -617,6 +818,16 @@ $("#reveal-close").addEventListener("click", () => $("#reveal").classList.add("h
 /* ----- Menu : signaler / terminer ----- */
 $("#chat-menu-btn").addEventListener("click", e => { e.stopPropagation(); $("#chat-menu").classList.toggle("hidden"); });
 document.addEventListener("click", () => $("#chat-menu").classList.add("hidden"));
+
+$("#act-block-chat").addEventListener("click", async () => {
+  const id = currentChat, m = myChats[id];
+  if (!m) return;
+  const done = await blockUser(partnerOf(m));
+  if (done) {
+    if (m.status === "active") await db.ref(`chats/${id}/status`).set("ended").catch(() => {});
+    closeChat();
+  }
+});
 
 $("#act-end").addEventListener("click", async () => {
   const id = currentChat;
