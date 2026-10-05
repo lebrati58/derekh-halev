@@ -584,8 +584,12 @@ async function sendRequest(toUid) {
   try {
     // Si l'autre m'a déjà écrit → on accepte directement
     if (inbox[toUid] && inbox[toUid].status === "pending") return acceptRequest(toUid);
-    await db.ref(`inbox/${toUid}/${uid}`).set({ fromNo: me.no, status: "pending", createdAt: TS });
-    await db.ref(`outbox/${uid}/${toUid}`).set({ toNo: p.no, status: "pending", createdAt: TS });
+    // Écriture atomique (multi-path) : soit les deux passent, soit rien —
+    // pas de demi-état si la connexion lâche entre les deux.
+    await db.ref().update({
+      [`inbox/${toUid}/${uid}`]: { fromNo: me.no, status: "pending", createdAt: TS },
+      [`outbox/${uid}/${toUid}`]: { toNo: p.no, status: "pending", createdAt: TS }
+    });
     toast(`הבקשה נשלחה ל${profileName(p.no)} 💌`);
   } catch (err) {
     console.error(err); toast("לא הצלחנו לשלוח — נסו שוב");
