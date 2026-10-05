@@ -38,7 +38,7 @@ Vérifie que `databaseURL` est bien présent (ex. `https://ton-projet-default-rt
 
 **Realtime Database → onglet Règles** → efface tout → colle le contenu de `database.rules.json` → **Publier**.
 
-> ⚠️ **À refaire après chaque mise à jour de `database.rules.json`** (ex. v2 : questionnaire, `blocks/`, `announcements/`, `paused`). Tant que les nouvelles règles ne sont pas publiées, l'app fonctionne en mode dégradé : profils enregistrés sans questionnaire, blocage/pause/annonces refusés.
+> ⚠️ **À refaire après chaque mise à jour de `database.rules.json`** (ex. v2 : questionnaire, `blocks/`, `announcements/`, `paused` · v3 : durcissement — compteur non supprimable, `fromNo`/`toNo` vérifiés contre `profiles/`, champs inconnus refusés dans `inbox`/`outbox`/`messages`). Tant que les nouvelles règles ne sont pas publiées, l'app fonctionne en mode dégradé : profils enregistrés sans questionnaire, blocage/pause/annonces refusés.
 
 Ce que garantissent ces règles :
 
@@ -49,6 +49,9 @@ Ce que garantissent ces règles :
 - **Chat** : ne peut être créé que par le destinataire d'une vraie demande.
 - **Profils bannis** : ne peuvent plus écrire (messages, demandes, profil).
 - **Admin** : reconnu uniquement si le PIN saisi = `config/adminPin`, qui n'est **lisible par personne**.
+- **Anti-usurpation (v3)** : le numéro de profil annoncé dans une demande ou un chat (`fromNo`/`toNo`) doit correspondre au vrai numéro du profil ; le compteur de numéros ne peut pas être supprimé/réinitialisé ; aucun champ inconnu accepté dans `inbox`/`outbox`/`messages`.
+
+> 🔒 Limite connue : le PIN admin peut être essayé en boucle par un compte anonyme (pas de limitation de tentatives côté Realtime Database). Choisis un PIN long (8+ caractères, pas une date).
 
 ## 4. Définir le PIN admin
 

@@ -16,7 +16,7 @@
     "counters": {
       "profileNo": {
         ".read": "auth != null",
-        ".write": "auth != null && !root.child('banned/' + auth.uid).exists()",
+        ".write": "auth != null && !root.child('banned/' + auth.uid).exists() && newData.exists()",
         ".validate": "newData.isNumber() && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))"
       }
     },
@@ -141,10 +141,22 @@
       "$to": {
         ".read": "auth != null && auth.uid === $to",
         "$from": {
-          ".write": "auth != null && $from !== $to && ((auth.uid === $from && !data.exists() && newData.child('status').val() === 'pending' && !root.child('banned/' + auth.uid).exists() && !root.child('banned/' + $to).exists() && !root.child('blocks/' + $to + '/' + auth.uid).exists() && !root.child('blocks/' + auth.uid + '/' + $to).exists()) || (auth.uid === $to && data.exists()))",
+          ".write": "auth != null && $from !== $to && ((auth.uid === $from && !data.exists() && newData.child('status').val() === 'pending' && newData.child('fromNo').val() === root.child('profiles/' + auth.uid + '/no').val() && !root.child('banned/' + auth.uid).exists() && !root.child('banned/' + $to).exists() && !root.child('blocks/' + $to + '/' + auth.uid).exists() && !root.child('blocks/' + auth.uid + '/' + $to).exists()) || (auth.uid === $to && data.exists()))",
           ".validate": "newData.hasChildren(['fromNo', 'status', 'createdAt'])",
+          "fromNo": {
+            ".validate": "newData.isNumber()"
+          },
+          "createdAt": {
+            ".validate": "newData.isNumber()"
+          },
+          "chatId": {
+            ".validate": "newData.isString()"
+          },
           "status": {
             ".validate": "newData.val() === 'pending' || newData.val() === 'accepted' || newData.val() === 'declined'"
+          },
+          "$other": {
+            ".validate": false
           }
         }
       }
@@ -153,10 +165,22 @@
       "$from": {
         ".read": "auth != null && auth.uid === $from",
         "$to": {
-          ".write": "auth != null && $from !== $to && ((auth.uid === $from && !data.exists() && newData.child('status').val() === 'pending' && !root.child('banned/' + auth.uid).exists()) || (auth.uid === $to && data.exists()))",
+          ".write": "auth != null && $from !== $to && ((auth.uid === $from && !data.exists() && newData.child('status').val() === 'pending' && newData.child('toNo').val() === root.child('profiles/' + $to + '/no').val() && !root.child('banned/' + auth.uid).exists()) || (auth.uid === $to && data.exists()))",
           ".validate": "newData.hasChildren(['toNo', 'status', 'createdAt'])",
+          "toNo": {
+            ".validate": "newData.isNumber()"
+          },
+          "createdAt": {
+            ".validate": "newData.isNumber()"
+          },
+          "chatId": {
+            ".validate": "newData.isString()"
+          },
           "status": {
             ".validate": "newData.val() === 'pending' || newData.val() === 'accepted' || newData.val() === 'declined'"
+          },
+          "$other": {
+            ".validate": false
           }
         }
       }
@@ -167,6 +191,12 @@
         ".read": "auth != null && (data.child('from').val() === auth.uid || data.child('to').val() === auth.uid)",
         ".write": "auth != null && !data.exists() && newData.child('to').val() === auth.uid && $chatId === newData.child('from').val() + '_' + auth.uid && root.child('inbox/' + auth.uid + '/' + newData.child('from').val()).exists() && !root.child('banned/' + auth.uid).exists()",
         ".validate": "newData.hasChildren(['from', 'to', 'fromNo', 'toNo', 'status', 'opened', 'createdAt'])",
+        "fromNo": {
+          ".validate": "newData.val() === root.child('profiles/' + newData.parent().child('from').val() + '/no').val()"
+        },
+        "toNo": {
+          ".validate": "newData.val() === root.child('profiles/' + newData.parent().child('to').val() + '/no').val()"
+        },
         "icebreaker": {
           ".validate": "newData.isString() && newData.val().length <= 200"
         },
@@ -194,7 +224,11 @@
         ".read": "auth != null && (root.child('chats/' + $chatId + '/from').val() === auth.uid || root.child('chats/' + $chatId + '/to').val() === auth.uid)",
         "$msgId": {
           ".write": "auth != null && !data.exists() && (root.child('chats/' + $chatId + '/from').val() === auth.uid || root.child('chats/' + $chatId + '/to').val() === auth.uid) && root.child('chats/' + $chatId + '/status').val() === 'active' && !root.child('banned/' + auth.uid).exists()",
-          ".validate": "newData.hasChildren(['from', 'text', 'ts']) && newData.child('from').val() === auth.uid && newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 500 && newData.child('ts').isNumber()"
+          ".validate": "newData.hasChildren(['from', 'text', 'ts']) && newData.child('from').val() === auth.uid && newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 500 && newData.child('ts').isNumber()",
+          "from": { ".validate": true },
+          "text": { ".validate": true },
+          "ts": { ".validate": true },
+          "$other": { ".validate": false }
         }
       }
     },

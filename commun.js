@@ -15,7 +15,8 @@
    admins/{uid}: "4829"               ← écrit par admin.html ; accepté seulement si = config/adminPin
 
    counters/
-     profileNo: 27                    ← compteur incrémenté par transaction (numéros uniques)
+     profileNo: 27                    ← compteur incrémenté par transaction (numéros uniques).
+                                        Non supprimable (règles v3) — sinon reset → numéros en double.
 
    profiles/{uid}                     ← PUBLIC (lisible par tout inscrit) — jamais de nom ni téléphone
      no: 12                           ← « פרופיל 12 »
@@ -49,11 +50,13 @@
 
    inbox/{toUid}/{fromUid}            ← demandes reçues (lisible par le destinataire)
      fromNo, status: "pending"|"accepted"|"declined", createdAt, chatId?
+     — règles v3 : fromNo doit = profiles/{fromUid}/no (anti-usurpation), champs inconnus refusés
    outbox/{fromUid}/{toUid}           ← demandes envoyées (lisible par l'expéditeur)
      toNo, status, createdAt, chatId?
+     — règles v3 : toNo doit = profiles/{toUid}/no, champs inconnus refusés
 
    chats/{chatId}                     ← métadonnées (membres + admin) — chatId = "{fromUid}_{toUid}"
-     from, to, fromNo, toNo
+     from, to, fromNo, toNo            — règles v3 : fromNo/toNo vérifiés contre profiles/ (anti-usurpation)
      status: "active" | "ended"       ← aucune trace de QUI a terminé
      opened: false | true             ← ne peut passer à true que si les DEUX reveal/ sont à true
      createdAt
