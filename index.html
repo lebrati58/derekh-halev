@@ -380,7 +380,11 @@ $("#reg-form").addEventListener("submit", async e => {
   const btn = $("#reg-btn");
   btn.disabled = true; btn.textContent = "המסך עולה…";
   try {
-    const no = await nextProfileNo();
+    // Reprise : si une tentative précédente a déjà créé un profil pour cet uid,
+    // on réutilise son numéro (immuable côté règles) au lieu d'en tirer un nouveau.
+    let no = null;
+    try { no = (await db.ref("profiles/" + uid + "/no").once("value")).val(); } catch (e) {}
+    if (!no) no = await nextProfileNo();
     priv = { firstName, phone };
     await db.ref("private/" + uid).set(priv);
     const base = { no, gender, age, city, religion, intent, words, shabbat, createdAt: TS };
@@ -409,7 +413,8 @@ $("#reg-form").addEventListener("submit", async e => {
     startHome();
   } catch (err) {
     console.error(err);
-    toast("שגיאה בהרשמה — נסו שוב");
+    const code = (err && (err.code || err.message)) || "";
+    toast("שגיאה בהרשמה — נסו שוב. אם זה חוזר, פתחו את הקישור ב־Safari/Chrome 🌐" + (code ? " [" + code + "]" : ""), 6000);
     btn.disabled = false; btn.textContent = "🎭 יוצאים לדרך";
   }
 });
