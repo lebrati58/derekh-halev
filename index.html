@@ -526,7 +526,22 @@ function computeProposals() {
     .map(([u, p]) => ({ uid: u, p, pending: !!(outbox[u] && outbox[u].status === "pending"), score: matchScore(me, p) }));
 
   candidates.sort((a, b) => (b.pending - a.pending) || (b.score - a.score) || (a.p.no - b.p.no));
-  return candidates.slice(0, 3);
+  const list = candidates.slice(0, 3);
+
+  // ✨ Découverte : si moins de 3 matchs stricts, compléter avec des profils
+  // hors préférences (âge/religion relaxés — genre, pause, blocages et
+  // désaccord enfants restent respectés) pour ne jamais laisser l'écran vide.
+  if (list.length < 3) {
+    const shown = new Set(list.map(c => c.uid));
+    const soft = Object.entries(profiles)
+      .filter(([u, p]) => u !== uid && !banned[u] && !blocks[u] && !excluded.has(u) && !shown.has(u)
+        && (p.gender === "m" || p.gender === "f") && p.gender !== me.gender
+        && !p.paused && kidsOk(me, p))
+      .map(([u, p]) => ({ uid: u, p, pending: !!(outbox[u] && outbox[u].status === "pending"), score: matchScore(me, p), soft: true }));
+    soft.sort((a, b) => (b.pending - a.pending) || (b.score - a.score) || (a.p.no - b.p.no));
+    list.push(...soft.slice(0, 3 - list.length));
+  }
+  return list;
 }
 
 function renderProposals() {
@@ -542,7 +557,9 @@ function renderProposals() {
     const why = matchReasons(me, c.p);
     return `
     <div>
-      <div class="match-pct">💘 ${pct}% התאמה</div>
+      ${c.soft
+        ? `<div class="match-pct soft">🔭 מחוץ להעדפות שלך — אבל אולי בכל זאת? ✨</div>`
+        : `<div class="match-pct">💘 ${pct}% התאמה</div>`}
       ${cardHTML(c.p)}
       ${why.length ? `<div class="match-why"><b>למה אתם מתאימים:</b> ${why.map(w => `<span>${esc(w)}</span>`).join("")}</div>` : ""}
       <div class="item-actions">

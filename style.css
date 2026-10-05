@@ -306,6 +306,10 @@ textarea { resize: vertical; min-height: 70px; }
   background: linear-gradient(135deg, var(--gold-2), var(--gold)); color: var(--night);
   font-weight: 800; font-size: .95rem; box-shadow: 0 4px 14px rgba(212,169,74,.3);
 }
+.match-pct.soft {
+  background: rgba(45,27,78,.85); color: var(--gold-2, #e8c97a);
+  border: 1px solid rgba(212,169,74,.4); box-shadow: none; font-weight: 600;
+}
 .match-why {
   margin-top: 8px; background: rgba(45,27,78,.7); border: 1px solid rgba(212,169,74,.25);
   border-radius: 14px; padding: 10px 12px; font-size: .88rem;
