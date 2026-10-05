@@ -94,7 +94,7 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 1. L'admin lit tout `chats/` : il voit qui parle avec qui (`from`/`to`, `fromNo`/`toNo`), l'icebreaker et si le rideau s'est ouvert. Ce ne sont pas les messages, mais ce sont des métadonnées de conversation.
 2. L'admin, comme tout inscrit, lit `profiles/` en entier (âge, ville, genre, textes libres), pas seulement le numéro. Les `reports` lui exposent aussi des uids et une `reason` libre où le signaleur peut recopier des messages.
 3. Les profils publics contiennent du texte libre (`words`, `shabbat`, `city`, `cantLiveWithout`) : le filtre anti-téléphone/liens est uniquement côté client, les règles ne vérifient que la longueur. Un téléphone ou un nom peut donc atterrir dans un profil public.
-4. Rideau asymétrique : `opened` exige les deux `reveal`, mais pas que les deux `secrets` existent. Un membre peut cocher `reveal` sans déposer de secret, passer `opened` à true (si l'autre a cliqué) et lire le prénom/téléphone de l'autre ; il ne peut plus déposer le sien ensuite. Non couvert par `test_rules.js`.
+4. ~~Rideau asymétrique~~ — corrigé dans les règles : `opened` exige désormais les deux `reveal` **et** les deux `secrets` (test « reveal SANS secret » dans `test_rules.js`). À republier dans la console Firebase.
 5. `secrets` n'est pas lié à `private/` : on peut y déposer n'importe quel prénom/téléphone.
 6. Un chat peut être créé directement avec `opened: true` (la règle de `opened` n'est vérifiée qu'en mise à jour). Pas de fuite constatée, mais incohérent.
 

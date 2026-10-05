@@ -120,6 +120,17 @@ async function denied(name, fn) {
   await allowed("bob lit le secret d'alice APRÈS ouverture", () => get(ref(B, "secrets/alice_bob/alice")));
   await allowed("un membre termine la שיחה",               () => set(ref(A, "chats/alice_bob/status"), "ended"));
 
+  /* ---------- Rideau : reveal SANS secret (faille asymétrique) ---------- */
+  await env.withSecurityRulesDisabled(async ctx => {
+    await set(ref(ctx.database(), "chats/alice_dave"), { from: "alice", to: "dave", fromNo: 1, toNo: 4, status: "active", opened: false, createdAt: 1 });
+  });
+  await allowed("alice dépose secret + reveal (chat dave)", async () => { await set(ref(A, "secrets/alice_dave/alice"), { firstName: "אליס", phone: "0501111111" }); await set(ref(A, "reveal/alice_dave/alice"), true); });
+  await allowed("dave coche reveal SANS déposer de secret", () => set(ref(D, "reveal/alice_dave/dave"), true));
+  await denied ("dave force opened=true sans son secret",  () => set(ref(D, "chats/alice_dave/opened"), true));
+  await denied ("dave lit le secret d'alice (pas ouvert)", () => get(ref(D, "secrets/alice_dave/alice")));
+  await allowed("dave dépose enfin son secret",            () => set(ref(D, "secrets/alice_dave/dave"), { firstName: "דייב", phone: "0504444444" }));
+  await allowed("opened=true une fois les DEUX secrets là", () => set(ref(D, "chats/alice_dave/opened"), true));
+
   /* ---------- Admin ---------- */
   await denied ("mauvais PIN → pas admin",                 () => set(ref(E, "admins/eve"), "0000"));
   await denied ("lire config/adminPin",                    () => get(ref(E, "config/adminPin")));
