@@ -1,0 +1,14 @@
+{
+  "name": "derekh-halev",
+  "private": true,
+  "description": "דרך הלב — tests (moteur de matching + règles Firebase). L'app elle-même est 100% statique, sans build.",
+  "scripts": {
+    "test": "node test_matching.js",
+    "test:rules": "firebase emulators:exec --only database --project dereh-halev-test \"node test_rules.js\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^3.0.4",
+    "firebase": "^10.12.2",
+    "firebase-tools": "^13.35.1"
+  }
+}

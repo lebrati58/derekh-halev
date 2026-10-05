@@ -62,6 +62,33 @@ Ce que garantissent ces règles :
 
 Pour changer le PIN : modifie la valeur → tous les admins actuels sont automatiquement déconnectés.
 
+## Tests
+
+```bash
+node test_matching.js    # moteur de compatibilité (pur, sans Firebase)
+npm install              # une fois — dépendances de test uniquement (l'app reste 100% statique)
+npm run test:rules       # règles de sécurité sur l'émulateur Firebase (nécessite Java)
+```
+
+`test_rules.js` vérifie, avec de vrais comptes anonymes simulés, que chaque scénario d'attaque « console JS » est refusé : lecture des téléphones d'autrui, usurpation de numéro de profil, reset du compteur, messages hors chat, lecture admin des conversations, PIN erroné…
+
+## Checklist de test manuel (mobile réel)
+
+À faire sur **Safari iPhone**, **Chrome Android** et le **navigateur intégré WhatsApp** (impossible à automatiser ici) :
+
+- [ ] Inscription complète (questionnaire + téléphone) — arrivée sur ✨ הצעות avec des profils visibles
+- [ ] Inscription avec réseau faible : couper le wifi au moment de « 🎭 יוצאים לדרך » → message d'erreur avec code → réessayer → pas de doublon de numéro
+- [ ] Fermer/rouvrir le navigateur → l'identité est retrouvée (pas de ré-inscription)
+- [ ] Envoyer 💌 → l'autre reçoit la demande → accepter → chat ouvert avec שאלת פתיחה
+- [ ] Écrire un téléphone / lien dans un message → bloqué avant envoi
+- [ ] Rideau : un seul côté appuie → rien ne se passe côté B ; les deux → animation + nom + bouton WhatsApp fonctionnel
+- [ ] ⏸️ Pause → disparaît des propositions de l'autre ; retour → réapparaît
+- [ ] 🚫 Blocage → disparaît des deux côtés, demandes refusées
+- [ ] 🚩 Signalement → visible dans admin.html ; הרחקה → écran « הורחקת » côté banni, chats fermés
+- [ ] Suppression du profil → carte disparaît, chats terminés, retour à l'écran d'inscription
+- [ ] Clavier mobile : le composer du chat reste visible quand le clavier est ouvert
+- [ ] RTL correct partout (chiffres, téléphone en LTR dans sa bulle)
+
 ## 5. Tester en local
 
 Firebase Auth ne fonctionne pas en `file://`. Depuis le dossier :
