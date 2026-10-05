@@ -167,6 +167,18 @@ function hasForbiddenContent(text) {
   return false;
 }
 
+/* ---------- Détection navigateur intégré (WhatsApp & co) ---------- */
+function inAppBrowser() {
+  const ua = navigator.userAgent || "";
+  if (/WhatsApp/i.test(ua)) return "whatsapp";
+  if (/FBAN|FBAV|FB_IAB|Instagram|Messenger/i.test(ua)) return "meta";
+  if (/Telegram/i.test(ua)) return "telegram";
+  if (/Android.*; wv\)/.test(ua)) return "webview";
+  // iOS WebView : iPhone/iPad sans « Safari/ » dans l'UA (Chrome iOS = CriOS, Firefox = FxiOS)
+  if (/iPhone|iPad|iPod/.test(ua) && !/Safari\//.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua)) return "webview";
+  return null;
+}
+
 /* ---------- Téléphone → lien WhatsApp ---------- */
 function waLink(phone) {
   let d = String(phone || "").replace(/[^\d+]/g, "");

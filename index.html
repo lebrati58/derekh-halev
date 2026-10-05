@@ -51,6 +51,15 @@
       <h2 style="margin-top:0">הכרטיס המסתורי שלך ✨</h2>
       <p class="sub">כאן אף אחד לא רואה פנים, שם או טלפון. רק מילים, שיחה — וקצת קסם של ט״ו באב.</p>
       <p class="sub hidden" id="old-identity"></p>
+      <div class="iab-banner hidden" id="iab-banner">
+        <b>🌐 טיפ קטן לפני שמתחילים:</b>
+        נראה שנכנסתם מהדפדפן הפנימי של וואטסאפ. הוא לפעמים «שוכח» אתכם — ואז הפרופיל נעלם.
+        <span id="iab-how">כדאי לפתוח בדפדפן אמיתי: לחצו על <b>⋮</b> (או <b>שיתוף</b>) למעלה → «פתיחה בדפדפן».</span>
+        <div class="item-actions" style="margin-top:8px">
+          <button type="button" class="btn ghost small" id="iab-copy">📋 העתקת הקישור</button>
+          <button type="button" class="btn link small" id="iab-dismiss">להמשיך כאן בכל זאת</button>
+        </div>
+      </div>
 
       <form id="reg-form" novalidate autocomplete="off">
         <div class="field">
@@ -330,6 +339,7 @@ const myNo = m => (m.from === uid ? m.fromNo : m.toNo);
         el.textContent = `נראה שנרשמת בעבר (${profileName(old.no)}) — אבל בדפדפן הזה הזיכרון נמחק. אפשר להירשם מחדש 🙂`;
         el.classList.remove("hidden");
       }
+      setupIabBanner();
       show("screen-register");
     }
   } catch (e) {
@@ -338,6 +348,34 @@ const myNo = m => (m.from === uid ? m.fromNo : m.toNo);
     show("screen-error");
   }
 })();
+
+/* ----- Bandeau navigateur intégré (WhatsApp & co) — avant inscription ----- */
+function setupIabBanner() {
+  const kind = inAppBrowser();
+  if (!kind || store.get("iab_ok")) return;
+  const b = $("#iab-banner");
+  b.classList.remove("hidden");
+  const ua = navigator.userAgent || "";
+  const isIOS = /iPhone|iPad|iPod/.test(ua);
+  $("#iab-how").innerHTML = isIOS
+    ? `כדאי לפתוח בדפדפן אמיתי: לחצו על <b>סמל השיתוף</b> (□ עם חץ) ← «פתיחה ב־Safari».`
+    : `כדאי לפתוח בדפדפן אמיתי: לחצו על <b>⋮</b> למעלה ← «פתיחה בדפדפן» (או «Open in Chrome»).`;
+  $("#iab-copy").addEventListener("click", async () => {
+    const url = location.href.split("#")[0];
+    try { await navigator.clipboard.writeText(url); toast("הקישור הועתק 📋 — פתחו אותו בדפדפן"); }
+    catch (e) {
+      // Fallback : sélection manuelle
+      const inp = document.createElement("input");
+      inp.value = url; document.body.appendChild(inp);
+      inp.select(); try { document.execCommand("copy"); toast("הקישור הועתק 📋"); } catch (e2) { toast(url, 6000); }
+      inp.remove();
+    }
+  });
+  $("#iab-dismiss").addEventListener("click", () => {
+    store.set("iab_ok", 1);
+    b.classList.add("hidden");
+  });
+}
 
 /* =================== Inscription =================== */
 $("#reg-form").addEventListener("submit", async e => {

@@ -306,6 +306,12 @@ textarea { resize: vertical; min-height: 70px; }
   background: linear-gradient(135deg, var(--gold-2), var(--gold)); color: var(--night);
   font-weight: 800; font-size: .95rem; box-shadow: 0 4px 14px rgba(212,169,74,.3);
 }
+.iab-banner {
+  background: rgba(45,27,78,.85); border: 1px solid rgba(212,169,74,.45);
+  border-radius: 14px; padding: 12px 14px; margin-bottom: 14px;
+  font-size: .9rem; line-height: 1.5;
+}
+.iab-banner b { color: var(--gold-2, #e8c97a); }
 .match-pct.soft {
   background: rgba(45,27,78,.85); color: var(--gold-2, #e8c97a);
   border: 1px solid rgba(212,169,74,.4); box-shadow: none; font-weight: 600;
