@@ -437,13 +437,18 @@ $("#reg-form").addEventListener("submit", async e => {
     if (million) extra.million = million;
     if (cantLiveWithout) extra.cantLiveWithout = cantLiveWithout;
     me = Object.assign({}, base, extra);
+    // Profil + réservation du numéro (profileNos) en une écriture atomique :
+    // les règles refusent un numéro déjà réservé par un autre profil.
+    // Repli : règles pas encore republiées (sans profileNos) → profil seul.
+    const saveProfile = p => db.ref().update({ ["profiles/" + uid]: p, ["profileNos/" + no]: uid })
+      .catch(() => db.ref("profiles/" + uid).set(p));
     try {
-      await db.ref("profiles/" + uid).set(me);
+      await saveProfile(me);
     } catch (eRules) {
       // Règles pas encore republiées (anciens champs seulement) → profil de base
       console.warn("Règles à mettre à jour — profil enregistré sans questionnaire", eRules);
       me = base;
-      await db.ref("profiles/" + uid).set(me);
+      await saveProfile(me);
     }
     me.createdAt = Date.now();
     store.set("identity", { uid, no });

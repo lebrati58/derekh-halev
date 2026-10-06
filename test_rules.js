@@ -49,6 +49,7 @@ async function denied(name, fn) {
         alice: { firstName: "אליס", phone: "0501111111" },
         bob:   { firstName: "בוב",  phone: "0502222222" }
       },
+      profileNos: { 1: "alice", 2: "bob", 3: "charlie", 4: "dave", 5: "mallory" },
       banned: { mallory: true },
       blocks: { bob: { dave: true } }
     });
@@ -77,6 +78,23 @@ async function denied(name, fn) {
   await denied ("compteur : saut à +3",                    () => set(ref(E, "counters/profileNo"), 9));
   await denied ("compteur : SUPPRESSION (reset → doublons)", () => remove(ref(E, "counters/profileNo")));
   await denied ("compteur : lecture sans auth",            () => get(ref(ANON, "counters/profileNo")));
+
+  /* ---------- Numéro de profil unique (index profileNos) ---------- */
+  const F = env.authenticatedContext("frank").database();  // nouveau venu
+  const eveProfile = no => ({ no, gender: "f", age: 29, city: "רמת גן", religion: "masorti", intent: "see", words: ["א", "ב", "ג"], shabbat: "-", createdAt: 1 });
+  await denied ("eve se crée avec le numéro de bob (2) sans index", () => set(ref(E, "profiles/eve"), eveProfile(2)));
+  await denied ("profil créé SANS réserver son numéro",    () => set(ref(E, "profiles/eve"), eveProfile(6)));
+  await denied ("eve prend le numéro de bob (2, déjà pris)", () => update(ref(E), { "profiles/eve": eveProfile(2), "profileNos/2": "eve" }));
+  await denied ("eve écrase la réservation de bob",        () => set(ref(E, "profileNos/2"), "eve"));
+  await denied ("réserver un numéro sans profil",          () => set(ref(E, "profileNos/6"), "eve"));
+  await denied ("réserver un numéro au nom d'un autre",    () => update(ref(E), { "profiles/eve": eveProfile(6), "profileNos/6": "frank" }));
+  await denied ("numéro au-delà du compteur (7)",          () => update(ref(E), { "profiles/eve": eveProfile(7), "profileNos/7": "eve" }));
+  await allowed("eve crée son profil + réserve le 6",      () => update(ref(E), { "profiles/eve": eveProfile(6), "profileNos/6": "eve" }));
+  await allowed("reprise : même écriture rejouée",         () => update(ref(E), { "profiles/eve": eveProfile(6), "profileNos/6": "eve" }));
+  await denied ("eve réserve un 2e numéro (pas le sien)",  () => set(ref(E, "profileNos/3"), "eve"));
+  await denied ("frank prend le 6 (déjà à eve)",           () => update(ref(F), { "profiles/frank": eveProfile(6), "profileNos/6": "frank" }));
+  await denied ("eve supprime sa réservation",             () => remove(ref(E, "profileNos/6")));
+  await denied ("lire l'index des numéros",                () => get(ref(E, "profileNos")));
 
   /* ---------- Demandes (inbox / outbox) ---------- */
   await allowed("demande alice→bob (fromNo correct)",      () => set(ref(A, "inbox/bob/alice"), { fromNo: 1, status: "pending", createdAt: 1 }));
