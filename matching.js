@@ -51,6 +51,30 @@ function isCompatible(me, p) {
     religionOk(me.religion, p.religion);
 }
 
+/* ---------- Découverte (hors préférences) ----------
+   Filtres durs relâchés (âge et religion) : genre opposé, pas en pause,
+   pas de désaccord sur les enfants. */
+function isSoftCompatible(me, p) {
+  return !!(me && p) &&
+    (p.gender === "m" || p.gender === "f") &&
+    me.gender !== p.gender &&
+    !p.paused &&
+    kidsOk(me, p);
+}
+
+/* Pourquoi un profil « découverte » n'est pas un match strict (textes affichés) */
+function softReasons(me, p) {
+  const out = [];
+  if (!me || !p) return out;
+  const meMin = _num(me.ageMin), meMax = _num(me.ageMax);
+  const pMin = _num(p.ageMin), pMax = _num(p.ageMax);
+  if ((meMin && p.age < meMin) || (meMax && p.age > meMax)) out.push("גיל מחוץ לטווח שבחרת");
+  if ((pMin && me.age < pMin) || (pMax && me.age > pMax)) out.push(p.gender === "f" ? "את/ה מחוץ לטווח הגילאים שלה" : "את/ה מחוץ לטווח הגילאים שלו");
+  if (!meMin && !meMax && !pMin && !pMax && !ageOk(me, p)) out.push(`פער גילאים של ${Math.abs(me.age - p.age)} שנים`);
+  if (!religionOk(me.religion, p.religion)) out.push("אורח חיים שונה (דתי ↔ חילוני)");
+  return out;
+}
+
 /* ---------- Score ---------- */
 function matchScore(me, p) {
   let s = 50;
@@ -162,5 +186,5 @@ function pickIcebreaker(a, b) {
 
 /* ---------- Export Node (tests) ---------- */
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { QUIZ, religionOk, ageOk, kidsOk, isCompatible, matchScore, matchPercent, matchReasons, pickIcebreaker, ICEBREAKERS, WHY };
+  module.exports = { QUIZ, religionOk, ageOk, kidsOk, isCompatible, isSoftCompatible, softReasons, matchScore, matchPercent, matchReasons, pickIcebreaker, ICEBREAKERS, WHY };
 }

@@ -108,7 +108,7 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 10. Un banni peut encore écrire dans `private/`, `blocks/`, `reveal/` et `secrets/`. Tout inscrit non banni peut faire grimper `counters/profileNo` sans créer de profil.
 
 **Code / données**
-11. Duplication partielle du matching : le complément « découverte » de `computeProposals()` (`index.html`) réécrit à la main les filtres genre/pause au lieu de passer par `matching.js`.
+11. ~~Duplication partielle du matching~~ — corrigé : le complément « découverte » utilise `isSoftCompatible()` et `softReasons()` de `matching.js`.
 12. `acceptRequest()` enchaîne 5 écritures non atomiques (alors que `sendRequest()` utilise un update multi-path) → demi-états possibles si la connexion lâche.
 13. La suppression de profil ne retire que `profiles/` et `private/` : `secrets/` (prénom + téléphone), `inbox`/`outbox`, `messages`, `blocks`, `reports` restent indéfiniment.
 14. Les numéros de profil et uids sont visibles par tous dans `profiles/` ; `banned/` est lisible par tous les inscrits.
