@@ -9,7 +9,7 @@
 <meta property="og:title" content="🎭 דרך הלב">
 <meta property="og:description" content="מתאהבים בשיחה — לפני שרואים את הפנים. אנונימי, עדין, מסתורי.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎭</text></svg>">
-<link rel="stylesheet" href="style.css?v=20261006b">
+<link rel="stylesheet" href="style.css?v=20261006c">
 </head>
 <body>
 
@@ -293,8 +293,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="commun.js?v=20261006b"></script>
-<script src="matching.js?v=20261006b"></script>
+<script src="commun.js?v=20261006c"></script>
+<script src="matching.js?v=20261006c"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -582,8 +582,7 @@ function computeProposals() {
     const shown = new Set(list.map(c => c.uid));
     const soft = Object.entries(profiles)
       .filter(([u, p]) => u !== uid && !banned[u] && !blocks[u] && !excluded.has(u) && !shown.has(u)
-        && (p.gender === "m" || p.gender === "f") && p.gender !== me.gender
-        && !p.paused && kidsOk(me, p))
+        && isSoftCompatible(me, p))
       .map(([u, p]) => ({ uid: u, p, pending: !!(outbox[u] && outbox[u].status === "pending"), score: matchScore(me, p), soft: true }));
     soft.sort((a, b) => (b.pending - a.pending) || (b.score - a.score) || (a.p.no - b.p.no));
     list.push(...soft.slice(0, 3 - list.length));
@@ -602,11 +601,14 @@ function renderProposals() {
   box.innerHTML = list.map(c => {
     const pct = matchPercent(me, c.p);
     const why = matchReasons(me, c.p);
+    const softWhy = c.soft ? softReasons(me, c.p) : [];
     return `
     <div>
+      <div class="match-pct">💘 ${pct}% התאמה</div>
       ${c.soft
-        ? `<div class="match-pct soft">🔭 מחוץ להעדפות שלך — אבל אולי בכל זאת? ✨</div>`
-        : `<div class="match-pct">💘 ${pct}% התאמה</div>`}
+        ? `<div class="match-pct soft">🔭 מחוץ להעדפות שלך — אבל אולי בכל זאת? ✨
+            ${softWhy.length ? `<div class="soft-why">${softWhy.map(w => `<span>${esc(w)}</span>`).join("")}</div>` : ""}</div>`
+        : ""}
       ${cardHTML(c.p)}
       ${why.length ? `<div class="match-why"><b>למה אתם מתאימים:</b> ${why.map(w => `<span>${esc(w)}</span>`).join("")}</div>` : ""}
       <div class="item-actions">

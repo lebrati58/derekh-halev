@@ -46,6 +46,21 @@ check("intent serious en premier", why[0].includes("רציני"));
 check("anciens profils → raisons quand même", M.matchReasons(base, guy).length >= 1);
 check("aucun point commun → tableau (peut être vide) sans crash", Array.isArray(M.matchReasons({ ...base, religion: "dati", intent: "see", city: "א" }, { ...guy, religion: "masorti", intent: "serious", city: "ב", age: 40 })));
 
+console.log("— Découverte (hors préférences) —");
+check("dati ↔ hiloni : découverte OK", M.isSoftCompatible({ ...base, religion: "dati" }, { ...guy, religion: "hiloni" }));
+check("découverte : même genre exclu", !M.isSoftCompatible(base, { ...guy, gender: "f" }));
+check("découverte : profil en pause exclu", !M.isSoftCompatible(base, { ...guy, paused: true }));
+check("découverte : enfants want ↔ no exclu", !M.isSoftCompatible({ ...base, kids: "want" }, { ...guy, kids: "no" }));
+check("raison religion", M.softReasons({ ...base, religion: "dati" }, { ...guy, religion: "hiloni" }).includes("אורח חיים שונה (דתי ↔ חילוני)"));
+check("raison : hors de MA tranche", M.softReasons({ ...base, ageMin: 25, ageMax: 30 }, { ...guy, age: 40 }).includes("גיל מחוץ לטווח שבחרת"));
+check("raison : je suis hors de SA tranche (homme)", M.softReasons(base, { ...guy, ageMin: 20, ageMax: 28 }).includes("את/ה מחוץ לטווח הגילאים שלו"));
+check("raison : je suis hors de SA tranche (femme)", M.softReasons(guy, { ...base, ageMin: 20, ageMax: 28 }).includes("את/ה מחוץ לטווח הגילאים שלה"));
+check("raison : écart > 8 ans sans tranches", M.softReasons(base, { ...guy, age: 45 }).includes("פער גילאים של 13 שנים"));
+check("match strict → aucune raison", M.softReasons(base, guy).length === 0);
+check("chaque profil découverte non strict a au moins une raison", [
+  [{ ...base, religion: "dati" }, { ...guy, religion: "hiloni" }], [base, { ...guy, age: 45 }], [{ ...base, ageMax: 30 }, guy]
+].every(([a, b]) => M.isSoftCompatible(a, b) && !M.isCompatible(a, b) && M.softReasons(a, b).length > 0));
+
 console.log("— Icebreakers —");
 check("weekend commun → question ים", M.pickIcebreaker(rich1, rich2) === M.ICEBREAKERS.weekend.sea);
 check("sans points communs → générique déterministe", M.ICEBREAKERS.generic.includes(M.pickIcebreaker(base, guy)));
