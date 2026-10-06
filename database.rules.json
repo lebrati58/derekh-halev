@@ -205,7 +205,7 @@
           ".validate": "newData.val() === 'active' || newData.val() === 'ended'"
         },
         "opened": {
-          ".write": "auth != null && data.exists() && newData.val() === true && data.parent().child('status').val() === 'active' && (data.parent().child('from').val() === auth.uid || data.parent().child('to').val() === auth.uid) && root.child('reveal/' + $chatId + '/' + data.parent().child('from').val()).val() === true && root.child('reveal/' + $chatId + '/' + data.parent().child('to').val()).val() === true",
+          ".write": "auth != null && data.exists() && newData.val() === true && data.parent().child('status').val() === 'active' && (data.parent().child('from').val() === auth.uid || data.parent().child('to').val() === auth.uid) && root.child('reveal/' + $chatId + '/' + data.parent().child('from').val()).val() === true && root.child('reveal/' + $chatId + '/' + data.parent().child('to').val()).val() === true && root.child('secrets/' + $chatId + '/' + data.parent().child('from').val()).exists() && root.child('secrets/' + $chatId + '/' + data.parent().child('to').val()).exists()",
           ".validate": "newData.isBoolean()"
         }
       }
