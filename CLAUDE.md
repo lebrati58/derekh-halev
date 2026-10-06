@@ -78,6 +78,7 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 ## Déployer
 
 - Front : push sur `main` → GitHub Pages (Deploy from branch `main` / root). Pas de build.
+- Cache mobile : `style.css`, `commun.js`, `matching.js` sont chargés avec `?v=AAAAMMJJ` dans `index.html` et `admin.html`. **Changer ce numéro (dans les deux fichiers) à chaque modification de l'un d'eux**, sinon les téléphones gardent l'ancienne version.
 - Règles : **non déployées automatiquement**. Coller `database.rules.json` dans la console Firebase (Realtime Database → Règles → Publier), ou `firebase deploy --only database --project dereh-halev`. À refaire à chaque modification des règles.
 - Domaine GitHub Pages à garder dans Firebase Auth → Domaines autorisés.
 
