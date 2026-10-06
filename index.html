@@ -13,7 +13,7 @@
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261006d">
+<link rel="stylesheet" href="style.css?v=20261006e">
 </head>
 <body>
 
@@ -26,7 +26,7 @@
 <main>
   <!-- Chargement -->
   <section id="screen-loading" class="screen active">
-    <div class="loader">🎭</div>
+    <div class="loader"><img class="heart-ico" src="logo-heart.png" alt=""></div>
     <p class="center sub">המסך עולה…</p>
   </section>
 
@@ -207,7 +207,7 @@
           </label>
         </div>
 
-        <button type="submit" class="btn gold block" id="reg-btn">🎭 יוצאים לדרך</button>
+        <button type="submit" class="btn gold block" id="reg-btn"><img class="heart-ico" src="logo-heart.png" alt=""> יוצאים לדרך</button>
       </form>
     </div>
   </section>
@@ -290,15 +290,15 @@
     </div>
     <div class="curtain left"></div>
     <div class="curtain right"></div>
-    <div class="curtain-mask">🎭</div>
+    <div class="curtain-mask"><img class="heart-ico" src="logo-heart.png" alt=""></div>
   </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="commun.js?v=20261006d"></script>
-<script src="matching.js?v=20261006d"></script>
+<script src="commun.js?v=20261006e"></script>
+<script src="matching.js?v=20261006e"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -418,7 +418,7 @@ $("#reg-form").addEventListener("submit", async e => {
   if (!value) return toast("מה הכי חשוב לך בבן/בת זוג?");
   if (!weekend) return toast("סופ״ש חלומי — בחרו אחד ✨");
   if (!million) return toast("לאן הולך המיליון? 😄");
-  if ([...words, shabbat, city, cantLiveWithout].some(hasForbiddenContent)) return toast("שומרים על המסתורין 🎭 — בלי טלפון ובלי קישורים");
+  if ([...words, shabbat, city, cantLiveWithout].some(hasForbiddenContent)) return toast("שומרים על המסתורין 💗 — בלי טלפון ובלי קישורים");
   if (!$("#f-ok").checked) return toast("צריך לאשר את כללי הכבוד 🙏");
 
   const btn = $("#reg-btn");
@@ -458,13 +458,13 @@ $("#reg-form").addEventListener("submit", async e => {
     }
     me.createdAt = Date.now();
     store.set("identity", { uid, no });
-    toast(`ברוכים הבאים, ${profileName(no)} 🎭`);
+    toast(`ברוכים הבאים, ${profileName(no)} 💗`);
     startHome();
   } catch (err) {
     console.error(err);
     const code = (err && (err.code || err.message)) || "";
     toast("שגיאה בהרשמה — נסו שוב. אם זה חוזר, פתחו את הקישור ב־Safari/Chrome 🌐" + (code ? " [" + code + "]" : ""), 6000);
-    btn.disabled = false; btn.textContent = "🎭 יוצאים לדרך";
+    btn.disabled = false; btn.innerHTML = HEART + " יוצאים לדרך";
   }
 });
 
@@ -692,7 +692,7 @@ async function acceptRequest(fromUid) {
     await db.ref(`userChats/${fromUid}/${chatId}`).set(true);
     await db.ref(`inbox/${uid}/${fromUid}`).update({ status: "accepted", chatId });
     await db.ref(`outbox/${fromUid}/${uid}`).update({ status: "accepted", chatId }).catch(() => {});
-    toast("השיחה נפתחה 🎭");
+    toast("השיחה נפתחה 💗");
     selectTab("chats");
     openChat(chatId);
   } catch (err) {
@@ -741,7 +741,7 @@ function renderChats() {
       : m.status === "ended" ? `<div class="state">השיחה הסתיימה 🌙</div>`
       : `<div class="state">שיחה פעילה · עדיין בעילום שם</div>`;
     return `<div class="chat-row" data-chat="${esc(id)}">
-      <div class="avatar ${colorClass(profiles[partnerOf(m)] || { no: pn })}">🎭</div>
+      <div class="avatar ${colorClass(profiles[partnerOf(m)] || { no: pn })}">${HEART}</div>
       <div class="info"><div class="title">${esc(profileName(pn))}</div>${state}</div>
       <div>←</div>
     </div>`;
@@ -830,15 +830,15 @@ function updateChatView() {
     const t = sec[partnerOf(m)];
     bar.innerHTML = `<div class="revealed-box">✨ המסך נפתח: <b>${esc(t.firstName)}</b> · <span dir="ltr">${esc(t.phone)}</span>
       <div class="btns"><a class="btn gold small" href="${esc(waLink(t.phone))}" target="_blank" rel="noopener">💬 WhatsApp</a>
-      <button class="btn ghost small" id="replay-reveal">🎭 לראות שוב</button></div></div>`;
+      <button class="btn ghost small" id="replay-reveal">${HEART} לראות שוב</button></div></div>`;
     $("#replay-reveal").onclick = () => playReveal(id);
   } else if (ended) {
     bar.innerHTML = "";
   } else if (pressedCache[id]) {
-    bar.innerHTML = `<div class="pressed">🎭 ביקשת לפתוח את המסך</div>
+    bar.innerHTML = `<div class="pressed">${HEART} ביקשת לפתוח את המסך</div>
       <div class="note">הצד השני לא יודע. אם גם הוא/היא ילחצו — המסך ייפתח לשניכם ✨</div>`;
   } else {
-    bar.innerHTML = `<button class="btn gold small" id="btn-reveal">🎭 פתיחת המסך</button>
+    bar.innerHTML = `<button class="btn gold small" id="btn-reveal">${HEART} פתיחת המסך</button>
       <div class="note">רק אם שניכם תלחצו — שמות וטלפונים ייחשפו. הצד השני לא יידע שלחצת.</div>`;
     $("#btn-reveal").onclick = pressReveal;
   }
@@ -850,7 +850,7 @@ $("#composer").addEventListener("submit", async e => {
   const input = $("#msg-input");
   const text = input.value.trim();
   if (!text || !currentChat) return;
-  if (hasForbiddenContent(text)) { toast("שומרים על המסתורין 🎭 — בלי מספרי טלפון ובלי קישורים", 3500); return; }
+  if (hasForbiddenContent(text)) { toast("שומרים על המסתורין 💗 — בלי מספרי טלפון ובלי קישורים", 3500); return; }
   input.value = ""; autoGrow();
   try {
     await db.ref("messages/" + currentChat).push({ from: uid, text: text.slice(0, 500), ts: TS });
@@ -881,7 +881,7 @@ msgInput.addEventListener("keydown", e => {
 async function pressReveal() {
   const id = currentChat;
   const ok = await showModal({
-    title: "🎭 לפתוח את המסך?",
+    title: "💗 לפתוח את המסך?",
     body: "אם גם הצד השני ילחץ — שניכם תראו את השם ואת מספר הטלפון.<br>אם רק את/ה לחצת, <b>הצד השני לא יידע</b>.",
     okText: "כן, אני מוכן/ה ✨", cancelText: "עוד לא"
   });

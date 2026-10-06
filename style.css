@@ -162,6 +162,7 @@ textarea { resize: vertical; min-height: 70px; }
 .f1 { background: linear-gradient(135deg, #3b1d4e, #c0507e 55%, #d4a94a); }
 .f2 { background: linear-gradient(135deg, #4d1530, #d0608a 55%, #f7c1a6); }
 .mc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.heart-ico { width: 1em; height: 1em; vertical-align: -0.15em; object-fit: contain; }
 .mc-mask { font-size: 2.4rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); animation: float 4s ease-in-out infinite; }
 @keyframes float { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-5px) rotate(4deg); } }
 .mc-ids { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }

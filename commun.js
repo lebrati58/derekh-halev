@@ -105,6 +105,7 @@ const LABELS = {
 };
 const religionLabel = (r, g) => (LABELS.religion[r] || {})[g] || "";
 const profileName = no => `פרופיל ${no}`;
+const HEART = '<img class="heart-ico" src="logo-heart.png" alt="">';   // logo cœur (remplace 🎭)
 
 /* ---------- DOM & utilitaires ---------- */
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -206,7 +207,7 @@ function cardHTML(p, opts = {}) {
   <div class="mystery-card ${colorClass(p)} ${opts.small ? "small" : ""}">
     <div class="mc-shine"></div>
     <div class="mc-top">
-      <span class="mc-mask">🎭</span>
+      <span class="mc-mask">${HEART}</span>
       <span class="mc-ids">
         ${p.gender === "m" || p.gender === "f" ? `<span class="mc-gender ${p.gender}">${p.gender === "f" ? "👩" : "👨"} ${esc(LABELS.gender[p.gender])}</span>` : ""}
         <span class="mc-no">${esc(profileName(p.no))}</span>
