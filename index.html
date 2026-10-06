@@ -473,7 +473,7 @@ function startHome() {
   db.ref("profiles").on("value", s => {
     profiles = s.val() || {};
     if (profiles[uid]) { me = profiles[uid]; $("#my-card").innerHTML = cardHTML(me); updatePausedUI(); }
-    renderProposals(); renderRequests();
+    renderProposals(); renderRequests(); renderChats();
   });
   db.ref("blocks/" + uid).on("value", s => { blocks = s.val() || {}; renderProposals(); renderRequests(); }, () => {});
   db.ref("announcements/current").on("value", s => renderAnnounce(s.val()), () => {});
@@ -735,7 +735,7 @@ function renderChats() {
       : m.status === "ended" ? `<div class="state">השיחה הסתיימה 🌙</div>`
       : `<div class="state">שיחה פעילה · עדיין בעילום שם</div>`;
     return `<div class="chat-row" data-chat="${esc(id)}">
-      <div class="avatar g${pn % 6}">🎭</div>
+      <div class="avatar ${colorClass(profiles[partnerOf(m)] || { no: pn })}">🎭</div>
       <div class="info"><div class="title">${esc(profileName(pn))}</div>${state}</div>
       <div>←</div>
     </div>`;

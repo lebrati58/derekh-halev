@@ -192,12 +192,18 @@ function waLink(phone) {
 }
 
 /* ---------- Carte mystère ---------- */
+/* Couleur de carte/avatar : palette bleue (m) ou rose (f) selon le genre, 3 nuances chacune */
+function colorClass(p) {
+  const no = (p && p.no) || 0;
+  return p && (p.gender === "m" || p.gender === "f") ? p.gender + (no % 3) : "g" + (no % 6);
+}
+
 function cardHTML(p, opts = {}) {
   if (!p) return "";
   const words = (Array.isArray(p.words) ? p.words : Object.values(p.words || {}))
     .filter(Boolean).map(w => `<span>${esc(w)}</span>`).join('<i>✦</i>');
   return `
-  <div class="mystery-card g${(p.no || 0) % 6} ${opts.small ? "small" : ""}">
+  <div class="mystery-card ${colorClass(p)} ${opts.small ? "small" : ""}">
     <div class="mc-shine"></div>
     <div class="mc-top">
       <span class="mc-mask">🎭</span>
