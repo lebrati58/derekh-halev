@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#140a26">
 <title>דרך הלב 🎭</title>
 <meta name="description" content="מתאהבים בשיחה — לפני שרואים את הפנים">
@@ -307,6 +307,8 @@ let inbox = {};         // fromUid -> {fromNo, status, chatId}
 let outbox = {};        // toUid -> {toNo, status, chatId}
 let myChats = {};       // chatId -> meta
 const chatSubs = {};    // chatId -> ref
+const lastMsgSubs = {}; // chatId -> ref (dernier message, pour les non-lus)
+const lastMsg = {};     // chatId -> {from, ts}
 const secretsCache = {};// chatId -> {uid: {firstName, phone}}
 const pressedCache = {};// chatId -> bool (moi j'ai appuyé)
 let currentChat = null;
@@ -487,6 +489,8 @@ function startHome() {
       if (chatSubs[id]) return;
       chatSubs[id] = db.ref("chats/" + id);
       chatSubs[id].on("value", cs => onChatMeta(id, cs.val()));
+      lastMsgSubs[id] = db.ref("messages/" + id).limitToLast(1);
+      lastMsgSubs[id].on("child_added", ms => { lastMsg[id] = ms.val(); renderChats(); }, () => {});
     });
   });
 }
@@ -719,14 +723,15 @@ async function onChatMeta(id, meta) {
 function renderChats() {
   const box = $("#chats");
   const list = Object.entries(myChats).sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
-  setBadge("#badge-chats", list.filter(([, m]) => m.status === "active").length);
+  setBadge("#badge-chats", list.filter(([id]) => isUnread(id)).length);
   if (!list.length) {
     box.innerHTML = `<div class="empty"><span class="big">💬</span>עוד אין שיחות. הכל מתחיל בבקשה אחת 💌</div>`;
     return;
   }
   box.innerHTML = list.map(([id, m]) => {
     const pn = partnerNo(m);
-    const state = m.opened ? `<div class="state opened">✨ המסך נפתח</div>`
+    const state = isUnread(id) ? `<div class="state unread">💬 הודעה חדשה</div>`
+      : m.opened ? `<div class="state opened">✨ המסך נפתח</div>`
       : m.status === "ended" ? `<div class="state">השיחה הסתיימה 🌙</div>`
       : `<div class="state">שיחה פעילה · עדיין בעילום שם</div>`;
     return `<div class="chat-row" data-chat="${esc(id)}">
@@ -735,6 +740,14 @@ function renderChats() {
       <div>←</div>
     </div>`;
   }).join("");
+}
+/* Non-lus : dernier message de l'autre plus récent que la dernière lecture (mémorisée dans ce navigateur) */
+function isUnread(id) {
+  const l = lastMsg[id];
+  return !!(l && l.from !== uid && id !== currentChat && (l.ts || 0) > (store.get("read_" + id) || 0));
+}
+function markRead(id, ts) {
+  if (typeof ts === "number" && ts > (store.get("read_" + id) || 0)) store.set("read_" + id, ts);
 }
 $("#chats").addEventListener("click", e => { const r = e.target.closest("[data-chat]"); if (r) openChat(r.dataset.chat); });
 
@@ -746,6 +759,7 @@ async function openChat(id) {
   $("#messages").innerHTML = `<div class="sys">💜 אתם בדרך הלב. בלי שמות, בלי טלפונים — רק שיחה.</div>`;
   $("#chat-view").classList.remove("hidden");
   document.body.style.overflow = "hidden";
+  fitChatToViewport();
   if (m) { ensureIcebreaker(); updateChatView(); }
 
   msgRef = db.ref("messages/" + id).limitToLast(300);
@@ -766,6 +780,7 @@ function closeChat() {
   $("#chat-view").classList.add("hidden");
   $("#chat-menu").classList.add("hidden");
   document.body.style.overflow = "";
+  renderChats();
 }
 $("#chat-back").addEventListener("click", closeChat);
 
@@ -779,6 +794,7 @@ function appendMsg(key, m) {
   d.innerHTML = `${esc(m.text)}<span class="t">${fmtTime(m.ts)}</span>`;
   box.appendChild(d);
   if (nearBottom || m.from === uid) box.scrollTop = box.scrollHeight;
+  if (currentChat) { markRead(currentChat, m.ts); renderChats(); }
 }
 
 /* Bulle « שאלת פתיחה » automatique (icebreaker) */
@@ -834,6 +850,20 @@ $("#composer").addEventListener("submit", async e => {
     await db.ref("messages/" + currentChat).push({ from: uid, text: text.slice(0, 500), ts: TS });
   } catch (err) { console.error(err); toast("ההודעה לא נשלחה"); input.value = text; }
 });
+/* Clavier mobile : la vue chat (position fixed) suit la zone réellement visible,
+   sinon le clavier recouvre la zone de saisie (Chrome Android, Safari iOS). */
+function fitChatToViewport() {
+  const vv = window.visualViewport, cv = $("#chat-view");
+  if (!vv || cv.classList.contains("hidden")) return;
+  cv.style.top = vv.offsetTop + "px";
+  cv.style.height = vv.height + "px";
+  const box = $("#messages");
+  box.scrollTop = box.scrollHeight;
+}
+if (window.visualViewport) {
+  visualViewport.addEventListener("resize", fitChatToViewport);
+  visualViewport.addEventListener("scroll", fitChatToViewport);
+}
 const msgInput = $("#msg-input");
 function autoGrow() { msgInput.style.height = "auto"; msgInput.style.height = Math.min(msgInput.scrollHeight, 120) + "px"; }
 msgInput.addEventListener("input", autoGrow);
@@ -931,6 +961,7 @@ $("#delete-me").addEventListener("click", async () => {
     await db.ref("profiles/" + uid).remove();
     await db.ref("private/" + uid).remove();
     Object.values(chatSubs).forEach(r => r.off());
+    Object.values(lastMsgSubs).forEach(r => r.off());
     ["profiles", "banned", "inbox/" + uid, "outbox/" + uid, "userChats/" + uid].forEach(p => db.ref(p).off());
     await auth.signOut();
     store.clear();
