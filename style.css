@@ -163,6 +163,10 @@ textarea { resize: vertical; min-height: 70px; }
 .mc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .mc-mask { font-size: 2.4rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); animation: float 4s ease-in-out infinite; }
 @keyframes float { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-5px) rotate(4deg); } }
+.mc-ids { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.mc-gender { padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: .9rem; color: #fff; border: 1px solid rgba(255,255,255,.5); }
+.mc-gender.m { background: #2f5aa8; }
+.mc-gender.f { background: #c0507e; }
 .mc-no {
   background: rgba(20,10,38,.55); border: 1px solid var(--gold); color: var(--gold-2);
   padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: .9rem; letter-spacing: .3px;

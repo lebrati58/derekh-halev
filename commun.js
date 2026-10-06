@@ -207,7 +207,10 @@ function cardHTML(p, opts = {}) {
     <div class="mc-shine"></div>
     <div class="mc-top">
       <span class="mc-mask">🎭</span>
-      <span class="mc-no">${esc(profileName(p.no))}</span>
+      <span class="mc-ids">
+        ${p.gender === "m" || p.gender === "f" ? `<span class="mc-gender ${p.gender}">${p.gender === "f" ? "👩" : "👨"} ${esc(LABELS.gender[p.gender])}</span>` : ""}
+        <span class="mc-no">${esc(profileName(p.no))}</span>
+      </span>
     </div>
     <div class="mc-words">${words}</div>
     <div class="mc-meta">${esc(p.age)} · ${esc(p.city)} · ${esc(religionLabel(p.religion, p.gender))}</div>
