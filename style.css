@@ -153,6 +153,13 @@ textarea { resize: vertical; min-height: 70px; }
 .g3 { background: linear-gradient(135deg, #43165a, #8e3b8a 55%, #e0b35a); }
 .g4 { background: linear-gradient(135deg, #231040, #6b2f7a 55%, #d18b4f); }
 .g5 { background: linear-gradient(135deg, #2d1b4e, #3f5aa8 55%, #c7a0e8); }
+/* Couleur selon le genre : bleus pour les hommes, roses pour les femmes */
+.m0 { background: linear-gradient(135deg, #14204d, #2f5aa8 55%, #6fc3d9); }
+.m1 { background: linear-gradient(135deg, #1a1a4d, #3a4fb0 55%, #d4a94a); }
+.m2 { background: linear-gradient(135deg, #102a43, #2b6f9e 55%, #8fd3c7); }
+.f0 { background: linear-gradient(135deg, #4a1240, #b0457a 55%, #f3a6b8); }
+.f1 { background: linear-gradient(135deg, #3b1d4e, #c0507e 55%, #d4a94a); }
+.f2 { background: linear-gradient(135deg, #4d1530, #d0608a 55%, #f7c1a6); }
 .mc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .mc-mask { font-size: 2.4rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); animation: float 4s ease-in-out infinite; }
 @keyframes float { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-5px) rotate(4deg); } }
