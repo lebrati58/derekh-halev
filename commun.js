@@ -39,6 +39,9 @@
      cantLiveWithout: "קפה של בוקר"
      paused: true                      ← mode pause (invisible dans les suggestions)
 
+   profileNos/{no}: uid               ← index d'unicité des numéros : réservé une seule fois, en même temps
+                                        que la création du profil (règles). Illisible par tous.
+
    blocks/{uid}/{targetUid}: true     ← blocage personnel (lisible/éditable par uid seul)
    announcements/current {text, ts}   ← activité du jour publiée par l'admin, lisible par tous
 

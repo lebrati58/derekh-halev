@@ -194,10 +194,11 @@ textarea { resize: vertical; min-height: 70px; }
 .chat-row .title { font-weight: 700; }
 .chat-row .state { font-size: .85rem; color: var(--muted); }
 .chat-row .state.opened { color: var(--gold-2); }
+.chat-row .state.unread { color: var(--gold-2); font-weight: 700; }
 
 /* Vue chat */
 .chat-view {
-  position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; right: 0; height: 100%; z-index: 50; display: flex; flex-direction: column;
   background: radial-gradient(ellipse at 50% 0, #3a2266 0%, transparent 60%), var(--night);
 }
 .chat-head {

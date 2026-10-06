@@ -25,6 +25,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur GitHub Pages. Backend : Fire
 - `admins/{uid}` — copie du PIN écrite par admin.html ; vaut « admin » si égal à `config/adminPin`.
 - `counters/profileNo` — compteur des numéros de profil (incrément +1 par transaction).
 - `profiles/{uid}` — profil **public** : `no`, `gender`, `age`, `city`, `religion`, `intent`, `words[3]`, `shabbat`, `createdAt` + questionnaire v2 optionnel (`ageMin/ageMax`, `kids`, `shabbatStyle`, `pace`, `value`, `weekend`, `million`, `cantLiveWithout`) + `paused`.
+- `profileNos/{no}: uid` — index d'unicité des numéros, réservé une fois à la création du profil.
 - `private/{uid}` — `firstName`, `phone`.
 - `blocks/{uid}/{targetUid}: true` — blocages personnels.
 - `banned/{uid}: true` — profils bannis.
@@ -46,7 +47,8 @@ Site statique HTML/CSS/JS sans build, hébergé sur GitHub Pages. Backend : Fire
 | `config` | personne | personne (console uniquement) |
 | `admins/{uid}` | soi | soi, seulement si valeur == PIN |
 | `counters/profileNo` | tout inscrit | tout inscrit non banni, +1 strict, non supprimable |
-| `profiles` | **tout inscrit** (admin compris) | soi, si non banni ; `no` immuable et ≤ compteur ; champs inconnus refusés |
+| `profiles` | **tout inscrit** (admin compris) | soi, si non banni ; `no` immuable, ≤ compteur, et réservé à soi dans `profileNos` à la création ; champs inconnus refusés |
+| `profileNos/{no}` | personne | soi, une seule fois (réécriture identique tolérée), si son profil a ce `no` ; non supprimable |
 | `private/{uid}` | soi | soi |
 | `blocks/{uid}` | soi | soi |
 | `banned` | tout inscrit | admin |
@@ -99,7 +101,7 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 6. Un chat peut être créé directement avec `opened: true` (la règle de `opened` n'est vérifiée qu'en mise à jour). Pas de fuite constatée, mais incohérent.
 
 **Intégrité**
-7. `profiles/{uid}/no` doit être ≤ compteur mais **n'est pas unique** : un inscrit peut prendre le numéro d'un autre profil, et les vérifications anti-usurpation `fromNo`/`toNo` passent alors quand même.
+7. ~~Numéro de profil non unique~~ — corrigé : index `profileNos/{no}` réservé à la création du profil (tests « Numéro de profil unique »). **Reste ouvert tant que l'index n'est pas rempli pour les profils créés avant** : leurs numéros ne sont pas réservés et peuvent encore être pris.
 8. `reports` : `reporterNo`/`reportedNo` non vérifiés, champs inconnus acceptés. `chats` accepte aussi des champs inconnus à la création.
 9. Le PIN admin est attaquable par force brute (la validation sert d'oracle) — limite déjà notée dans le README.
 10. Un banni peut encore écrire dans `private/`, `blocks/`, `reveal/` et `secrets/`. Tout inscrit non banni peut faire grimper `counters/profileNo` sans créer de profil.
