@@ -64,6 +64,7 @@ body {
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .app-header h1 .em { display: inline-block; animation: float 4s ease-in-out infinite; }
+.app-header h1 .logo { width: 1.25em; height: 1.25em; vertical-align: -0.22em; filter: drop-shadow(0 4px 8px rgba(0,0,0,.35)); animation: float 4s ease-in-out infinite; }
 .app-header .tagline { margin: 2px 0 0; color: var(--muted); font-size: .95rem; }
 
 main { max-width: 520px; margin: 0 auto; padding: 12px 16px 40px; }

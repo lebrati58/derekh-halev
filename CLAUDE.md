@@ -12,6 +12,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur GitHub Pages. Backend : Fire
 | `commun.js` | Config Firebase, schéma de la base en commentaire, helpers partagés (auth anonyme, `nextProfileNo`, filtre anti-téléphone/liens `hasForbiddenContent`, `cardHTML`, modale, toast) |
 | `matching.js` | Moteur de compatibilité pur (sans Firebase) : filtres durs, score, %, raisons « למה אתם מתאימים », icebreakers |
 | `style.css` | Styles partagés |
+| `logo.png`, `logo-heart.png`, `apple-touch-icon.png` | Logo complet (aperçu WhatsApp `og:image`), cœur seul transparent (en-tête + icône d'onglet), icône écran d'accueil |
 | `database.rules.json` | Règles de sécurité RTDB (source de vérité de la confidentialité) |
 | `firebase.json` | Pointe vers les règles + config de l'émulateur database (port 9000) |
 | `test_matching.js` | Tests du moteur de matching (Node, sans dépendance) |
