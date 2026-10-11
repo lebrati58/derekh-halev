@@ -1,7 +1,7 @@
 # CLAUDE.md — דרך הלב | Derekh HaLev
 
 Application de rencontre anonyme pour un groupe WhatsApp de célibataires. Interface en hébreu (RTL), surtout utilisée sur mobile (souvent dans le navigateur intégré de WhatsApp).
-Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https://dereh-halev.web.app** (GitHub Pages `lebrati58.github.io/derekh-halev` = ancienne adresse). Backend : Firebase Realtime Database, projet `dereh-halev`, plan Spark (pas de Cloud Functions : **toute la sécurité repose sur `database.rules.json`**). Authentification anonyme Firebase (un uid par navigateur).
+Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https://dereh-halev.web.app** (GitHub Pages `lebrati58.github.io/derekh-halev` = ancienne adresse). Backend : Firebase Realtime Database, projet `dereh-halev`, plan Blaze (paiement à l'usage, usage dans la partie gratuite ; aucune Cloud Function utilisée : **toute la sécurité repose sur `database.rules.json`**). Authentification anonyme Firebase (un uid par navigateur).
 
 ## Fichiers
 
