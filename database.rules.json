@@ -23,7 +23,7 @@
     "profiles": {
       ".read": "auth != null",
       "$uid": {
-        ".write": "auth != null && auth.uid === $uid && !root.child('banned/' + auth.uid).exists()",
+        ".write": "(auth != null && auth.uid === $uid && !root.child('banned/' + auth.uid).exists()) || (!newData.exists() && (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))",
         ".validate": "newData.hasChildren(['no', 'gender', 'age', 'city', 'religion', 'intent', 'words', 'shabbat'])",
         "no": {
           ".validate": "newData.isNumber() && (data.exists() ? data.val() === newData.val() : (newData.val() <= root.child('counters/profileNo').val() && newData.parent().parent().parent().child('profileNos/' + newData.val()).val() === $uid))"
@@ -123,7 +123,7 @@
     "private": {
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",
-        ".write": "auth != null && auth.uid === $uid",
+        ".write": "(auth != null && auth.uid === $uid) || (!newData.exists() && (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))",
         ".validate": "newData.hasChildren(['firstName', 'phone'])",
         "firstName": {
           ".validate": "newData.isString() && newData.val().length <= 30"

@@ -160,6 +160,16 @@ async function denied(name, fn) {
   await allowed("admin : publier une annonce",             () => set(ref(ADMIN, "announcements/current"), { text: "שאלת היום 😉", ts: 1 }));
   await allowed("admin : bannir un profil",                () => set(ref(ADMIN, "banned/charlie"), true));
 
+  /* ---------- Suppression d'un profil par l'admin ---------- */
+  await env.withSecurityRulesDisabled(async ctx => { await set(ref(ctx.database(), "private/charlie"), { firstName: "צ׳רלי", phone: "0503333333" }); });
+  await denied ("ADMIN : lire le private (téléphone) d'un profil", () => get(ref(ADMIN, "private/charlie")));
+  await denied ("ADMIN : modifier le private d'un profil",   () => set(ref(ADMIN, "private/charlie"), { firstName: "x", phone: "1" }));
+  await denied ("ADMIN : modifier le profil d'un autre",     () => set(ref(ADMIN, "profiles/charlie/age"), 50));
+  await denied ("inscrit normal : supprimer le profil d'un autre", () => remove(ref(A, "profiles/charlie")));
+  await denied ("inscrit normal : supprimer le private d'un autre", () => remove(ref(A, "private/charlie")));
+  await allowed("ADMIN : supprimer profil + private (multi-path)", () => update(ref(ADMIN), { "profiles/charlie": null, "private/charlie": null }));
+  await allowed("modifier son propre profil (update ciblé)", () => update(ref(A, "profiles/alice"), { city: "יפו", cantLiveWithout: null }));
+
   /* ---------- Signalements ---------- */
   await allowed("membre signale son interlocuteur",        () => push(ref(A, "reports"), { chatId: "alice_bob", reporterUid: "alice", reportedUid: "bob", reportedNo: 2, reason: "טקסט", createdAt: 1 }));
   await denied ("signaler quelqu'un HORS de ses chats",    () => push(ref(C, "reports"), { chatId: "alice_bob", reporterUid: "charlie", reportedUid: "bob", reportedNo: 2, reason: "x", createdAt: 1 }));
