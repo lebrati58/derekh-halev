@@ -13,7 +13,7 @@
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261011">
+<link rel="stylesheet" href="style.css?v=20261011b">
 </head>
 <body>
 
@@ -277,7 +277,7 @@
       <h2>✨ המסך נפתח ✨</h2>
       <p class="sub" style="margin:0">שניכם בחרתם להסיר את המסך</p>
       <div class="who" id="reveal-who"></div>
-      <a class="btn gold" id="reveal-wa" target="_blank" rel="noopener">💬 לכתוב ב־WhatsApp</a>
+      <a class="btn gold" id="reveal-wa" rel="noopener">💬 לכתוב ב־WhatsApp</a>
       <button class="btn link" id="reveal-close">חזרה לשיחה</button>
     </div>
     <div class="sparkles">
@@ -297,8 +297,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="commun.js?v=20261011"></script>
-<script src="matching.js?v=20261011"></script>
+<script src="commun.js?v=20261011b"></script>
+<script src="matching.js?v=20261011b"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -829,7 +829,7 @@ function updateChatView() {
   if (m.opened && sec && sec[partnerOf(m)]) {
     const t = sec[partnerOf(m)];
     bar.innerHTML = `<div class="revealed-box">✨ המסך נפתח: <b>${esc(t.firstName)}</b> · <span dir="ltr">${esc(t.phone)}</span>
-      <div class="btns"><a class="btn gold small" href="${esc(waLink(t.phone))}" target="_blank" rel="noopener">💬 WhatsApp</a>
+      <div class="btns"><a class="btn gold small" href="${esc(waLink(t.phone))}" rel="noopener">💬 WhatsApp</a>
       <button class="btn ghost small" id="replay-reveal">${HEART} לראות שוב</button></div></div>`;
     $("#replay-reveal").onclick = () => playReveal(id);
   } else if (ended) {

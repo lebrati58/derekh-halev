@@ -263,6 +263,7 @@ textarea { resize: vertical; min-height: 70px; }
 .reveal.open .curtain.left { transform: translateX(-96%) scaleX(.35); transform-origin: left; }
 .reveal.open .curtain.right { transform: translateX(96%) scaleX(.35); transform-origin: right; }
 .curtain-mask { position: absolute; z-index: 4; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4rem; transition: opacity .6s, transform .8s; filter: drop-shadow(0 6px 10px rgba(0,0,0,.5)); }
+.reveal.open .curtain, .reveal.open .curtain-mask { pointer-events: none; }
 .reveal.open .curtain-mask { opacity: 0; transform: translate(-50%, -90%) scale(1.6); }
 .reveal-content { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 50px 22px 22px; opacity: 0; transform: scale(.9); transition: opacity 1s 1.2s, transform 1s 1.2s; }
 .reveal.open .reveal-content { opacity: 1; transform: none; }
