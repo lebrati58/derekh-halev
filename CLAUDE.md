@@ -7,8 +7,8 @@ Site statique HTML/CSS/JS sans build, hébergé sur GitHub Pages. Backend : Fire
 
 | Fichier | Rôle |
 |---|---|
-| `index.html` | App participant (HTML + tout le JS inline) : inscription, propositions, demandes, chat, ouverture du rideau, pause/blocage/signalement, suppression du profil |
-| `admin.html` | Tableau de bord admin (connexion par PIN) : stats, signalements, bannissement, annonce du jour |
+| `index.html` | App participant (HTML + tout le JS inline) : inscription (formulaire réutilisé pour ✏️ l'édition du profil), propositions, demandes, chat, ouverture du rideau, pause/blocage/signalement, suppression du profil |
+| `admin.html` | Tableau de bord admin (connexion par PIN) : stats, signalements, bannissement, 🗑️ suppression d'un profil par numéro, annonce du jour |
 | `commun.js` | Config Firebase, schéma de la base en commentaire, helpers partagés (auth anonyme, `nextProfileNo`, filtre anti-téléphone/liens `hasForbiddenContent`, `cardHTML`, modale, toast) |
 | `matching.js` | Moteur de compatibilité pur (sans Firebase) : filtres durs, score, %, raisons « למה אתם מתאימים », icebreakers |
 | `style.css` | Styles partagés |
@@ -48,9 +48,9 @@ Site statique HTML/CSS/JS sans build, hébergé sur GitHub Pages. Backend : Fire
 | `config` | personne | personne (console uniquement) |
 | `admins/{uid}` | soi | soi, seulement si valeur == PIN |
 | `counters/profileNo` | tout inscrit | tout inscrit non banni, +1 strict, non supprimable |
-| `profiles` | **tout inscrit** (admin compris) | soi, si non banni ; `no` immuable, ≤ compteur, et réservé à soi dans `profileNos` à la création ; champs inconnus refusés |
+| `profiles` | **tout inscrit** (admin compris) | admin : **suppression seule** ; soi, si non banni ; `no` immuable, ≤ compteur, et réservé à soi dans `profileNos` à la création ; champs inconnus refusés |
 | `profileNos/{no}` | personne | soi, une seule fois (réécriture identique tolérée), si son profil a ce `no` ; non supprimable |
-| `private/{uid}` | soi | soi |
+| `private/{uid}` | soi (jamais l'admin) | soi ; admin : **suppression seule** |
 | `blocks/{uid}` | soi | soi |
 | `banned` | tout inscrit | admin |
 | `announcements/current` | tout inscrit | admin |

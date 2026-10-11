@@ -13,7 +13,7 @@
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261011b">
+<link rel="stylesheet" href="style.css?v=20261011c">
 </head>
 <body>
 
@@ -52,7 +52,7 @@
   <!-- Inscription -->
   <section id="screen-register" class="screen">
     <div class="panel">
-      <h2 style="margin-top:0">הכרטיס המסתורי שלך ✨</h2>
+      <h2 style="margin-top:0" id="reg-title">הכרטיס המסתורי שלך ✨</h2>
       <p class="sub">כאן אף אחד לא רואה פנים, שם או טלפון. רק מילים, שיחה — וקצת קסם של ט״ו באב.</p>
       <p class="sub hidden" id="old-identity"></p>
       <div class="iab-banner hidden" id="iab-banner">
@@ -208,6 +208,7 @@
         </div>
 
         <button type="submit" class="btn gold block" id="reg-btn"><img class="heart-ico" src="logo-heart.png" alt=""> יוצאים לדרך</button>
+        <button type="button" class="btn ghost block hidden" id="edit-cancel" style="margin-top:10px">ביטול</button>
       </form>
     </div>
   </section>
@@ -241,6 +242,8 @@
 
     <div class="footer">
       <span dir="ltr">built by II.be'avba'am ❤️</span><br>
+      <button class="btn link" id="edit-me">✏️ עריכת הפרופיל</button>
+      ·
       <button class="btn link" id="pause-toggle">⏸️ מצב השהיה</button>
       ·
       <button class="btn link" id="delete-me">מחיקת הפרופיל שלי</button>
@@ -297,8 +300,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="commun.js?v=20261011b"></script>
-<script src="matching.js?v=20261011b"></script>
+<script src="commun.js?v=20261011c"></script>
+<script src="matching.js?v=20261011c"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -383,6 +386,43 @@ function setupIabBanner() {
   });
 }
 
+/* =================== Édition du profil =================== */
+// Réutilise le formulaire d'inscription, pré-rempli. Le numéro, la date
+// d'inscription, la pause et les conversations sont conservés.
+let editMode = false;
+function setRadio(name, v) { $$(`input[name=${name}]`).forEach(i => { i.checked = i.value === v; }); }
+$("#edit-me").addEventListener("click", async () => {
+  if (!me) return;
+  if (!priv) { try { priv = (await db.ref("private/" + uid).once("value")).val(); } catch (e) {} }
+  editMode = true;
+  $("#f-name").value = (priv && priv.firstName) || "";
+  $("#f-phone").value = (priv && priv.phone) || "";
+  setRadio("gender", me.gender); setRadio("religion", me.religion); setRadio("intent", me.intent);
+  $("#f-age").value = me.age || "";
+  $("#f-city").value = me.city || "";
+  const w = Array.isArray(me.words) ? me.words : Object.values(me.words || {});
+  $$(".f-word").forEach((inp, i) => { inp.value = w[i] || ""; });
+  $("#f-shabbat").value = me.shabbat || "";
+  $("#f-agemin").value = me.ageMin || ""; $("#f-agemax").value = me.ageMax || "";
+  setRadio("kids", me.kids); setRadio("shstyle", me.shabbatStyle); setRadio("pace", me.pace);
+  setRadio("value", me.value); setRadio("weekend", me.weekend); setRadio("million", me.million);
+  $("#f-clw").value = me.cantLiveWithout || "";
+  $("#f-ok").checked = true;
+  $("#reg-title").textContent = `✏️ עריכת ${profileName(me.no)}`;
+  $("#reg-btn").textContent = "💾 שמירת השינויים";
+  $("#edit-cancel").classList.remove("hidden");
+  $("#old-identity").classList.add("hidden"); $("#iab-banner").classList.add("hidden");
+  show("screen-register");
+});
+function leaveEdit() {
+  editMode = false;
+  $("#reg-title").textContent = "הכרטיס המסתורי שלך ✨";
+  $("#reg-btn").disabled = false; $("#reg-btn").innerHTML = HEART + " יוצאים לדרך";
+  $("#edit-cancel").classList.add("hidden");
+  show("screen-home");
+}
+$("#edit-cancel").addEventListener("click", leaveEdit);
+
 /* =================== Inscription =================== */
 $("#reg-form").addEventListener("submit", async e => {
   e.preventDefault();
@@ -422,6 +462,26 @@ $("#reg-form").addEventListener("submit", async e => {
   if (!$("#f-ok").checked) return toast("צריך לאשר את כללי הכבוד 🙏");
 
   const btn = $("#reg-btn");
+  if (editMode) {
+    btn.disabled = true; btn.textContent = "שומרים…";
+    try {
+      priv = { firstName, phone };
+      await db.ref("private/" + uid).set(priv);
+      // update ciblé : no, createdAt et paused restent intacts ; un champ vidé est supprimé (null)
+      await db.ref("profiles/" + uid).update({
+        gender, age, city, religion, intent, words, shabbat,
+        ageMin: ageMin || null, ageMax: ageMax || null, kids: kids || null, shabbatStyle: shabbatStyle || null,
+        pace: pace || null, value: value || null, weekend: weekend || null, million: million || null,
+        cantLiveWithout: cantLiveWithout || null
+      });
+      toast("הפרופיל עודכן 💗");
+      leaveEdit();
+    } catch (err) {
+      console.error(err); toast("השמירה נכשלה — נסו שוב");
+      btn.disabled = false; btn.textContent = "💾 שמירת השינויים";
+    }
+    return;
+  }
   btn.disabled = true; btn.textContent = "המסך עולה…";
   try {
     // Reprise : si une tentative précédente a déjà créé un profil pour cet uid,
@@ -477,6 +537,7 @@ function startHome() {
   db.ref("profiles").on("value", s => {
     profiles = s.val() || {};
     if (profiles[uid]) { me = profiles[uid]; $("#my-card").innerHTML = cardHTML(me); updatePausedUI(); }
+    else if (me) { location.reload(); return; }   // profil supprimé (par l'admin) → écran d'inscription
     renderProposals(); renderRequests(); renderChats();
   });
   db.ref("blocks/" + uid).on("value", s => { blocks = s.val() || {}; renderProposals(); renderRequests(); }, () => {});

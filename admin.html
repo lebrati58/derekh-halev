@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>ניהול · דרך הלב</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗝️</text></svg>">
-<link rel="stylesheet" href="style.css?v=20261011b">
+<link rel="stylesheet" href="style.css?v=20261011c">
 </head>
 <body>
 <div class="valance"></div>
@@ -56,7 +56,7 @@
     <div class="field"><input type="text" id="search" inputmode="numeric" placeholder="חיפוש לפי מספר פרופיל…"></div>
     <div class="panel" style="padding:8px 10px;overflow-x:auto">
       <table class="ptable">
-        <thead><tr><th>#</th><th>מגדר</th><th>גיל</th><th>עיר</th><th>דיווחים</th><th></th></tr></thead>
+        <thead><tr><th>#</th><th>מגדר</th><th>גיל</th><th>עיר</th><th>דיווחים</th><th></th><th></th></tr></thead>
         <tbody id="ptable"></tbody>
       </table>
     </div>
@@ -68,7 +68,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="commun.js?v=20261011b"></script>
+<script src="commun.js?v=20261011c"></script>
 <script>
 let uid = null;
 let profiles = {}, banned = {}, chats = {}, reports = {};
@@ -184,12 +184,27 @@ function renderProfiles() {
       <td>${reportCount(u) || ""}</td>
       <td>${isB ? `<button class="btn ghost small" data-unban="${esc(u)}">ביטול</button>`
                 : `<button class="btn danger small" data-ban="${esc(u)}">הרחקה</button>`}</td>
+      <td><button class="btn ghost small" data-del="${esc(u)}" aria-label="מחיקה">🗑️</button></td>
     </tr>`;
-  }).join("") || `<tr><td colspan="6" class="center sub">אין פרופילים</td></tr>`;
+  }).join("") || `<tr><td colspan="7" class="center sub">אין פרופילים</td></tr>`;
 }
 
 document.addEventListener("click", async e => {
-  const ban = e.target.closest("[data-ban]"), unban = e.target.closest("[data-unban]"), res = e.target.closest("[data-resolve]");
+  const ban = e.target.closest("[data-ban]"), unban = e.target.closest("[data-unban]"), res = e.target.closest("[data-resolve]"), del = e.target.closest("[data-del]");
+  if (del) {
+    // Suppression par numéro : l'admin efface sans jamais lire prénom/téléphone (règles : suppression seule)
+    const u = del.dataset.del, no = (profiles[u] || {}).no;
+    const ok = await showModal({ title: `🗑️ למחוק את ${esc(profileName(no || "?"))}?`, body: "הכרטיס יימחק והשיחות הפעילות שלו/ה ייסגרו. אי אפשר לבטל.<br>בכניסה הבאה יוצג לאדם מסך הרשמה מחדש.", okText: "מחיקה", danger: true });
+    if (!ok) return;
+    try {
+      const ends = Object.entries(chats)
+        .filter(([, c]) => (c.from === u || c.to === u) && c.status === "active")
+        .map(([id]) => db.ref(`chats/${id}/status`).set("ended"));
+      await Promise.all(ends);
+      await db.ref().update({ [`profiles/${u}`]: null, [`private/${u}`]: null });
+      toast("הפרופיל נמחק");
+    } catch (err) { console.error(err); toast("המחיקה נכשלה — ייתכן שצריך לפרסם את כללי האבטחה החדשים"); }
+  }
   if (ban) {
     const u = ban.dataset.ban, no = (profiles[u] || {}).no;
     const ok = await showModal({ title: "🚫 להרחיק את הפרופיל?", body: `${esc(profileName(no || "?"))} לא יוכל/תוכל להשתמש באפליקציה, וכל השיחות הפעילות שלו/ה ייסגרו.`, okText: "הרחקה", danger: true });
