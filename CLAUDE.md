@@ -1,7 +1,7 @@
 # CLAUDE.md — דרך הלב | Derekh HaLev
 
 Application de rencontre anonyme pour un groupe WhatsApp de célibataires. Interface en hébreu (RTL), surtout utilisée sur mobile (souvent dans le navigateur intégré de WhatsApp).
-Site statique HTML/CSS/JS sans build, hébergé sur GitHub Pages. Backend : Firebase Realtime Database, projet `dereh-halev`, plan Spark (pas de Cloud Functions : **toute la sécurité repose sur `database.rules.json`**). Authentification anonyme Firebase (un uid par navigateur).
+Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https://dereh-halev.web.app** (GitHub Pages `lebrati58.github.io/derekh-halev` = ancienne adresse). Backend : Firebase Realtime Database, projet `dereh-halev`, plan Blaze (paiement à l'usage, usage dans la partie gratuite ; aucune Cloud Function utilisée : **toute la sécurité repose sur `database.rules.json`**). Authentification anonyme Firebase (un uid par navigateur).
 
 ## Fichiers
 
@@ -14,7 +14,8 @@ Site statique HTML/CSS/JS sans build, hébergé sur GitHub Pages. Backend : Fire
 | `style.css` | Styles partagés |
 | `logo.png`, `logo-heart.png`, `apple-touch-icon.png` | Logo complet (aperçu WhatsApp `og:image`), cœur seul transparent (en-tête + icône d'onglet), icône écran d'accueil |
 | `database.rules.json` | Règles de sécurité RTDB (source de vérité de la confidentialité) |
-| `firebase.json` | Pointe vers les règles + config de l'émulateur database (port 9000) |
+| `firebase.json` | Règles, Hosting (dossier `public/` généré au déploiement) + émulateurs database (9000) / hosting (5000) |
+| `.github/workflows/firebase-hosting.yml` | Déploiement auto sur dereh-halev.web.app à chaque push sur `main` (secret `FIREBASE_SERVICE_ACCOUNT`) ; copie la **liste blanche** des fichiers du site dans `public/` — tout nouveau fichier du site doit y être ajouté |
 | `test_matching.js` | Tests du moteur de matching (Node, sans dépendance) |
 | `test_rules.js` | Tests des règles sur l'émulateur (`@firebase/rules-unit-testing`) |
 | `package.json` | Dépendances et scripts de **test uniquement** |
@@ -78,7 +79,7 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 
 ## Déployer
 
-- Front : push sur `main` → GitHub Pages (Deploy from branch `main` / root). Pas de build.
+- Front : push sur `main` → GitHub Action → Firebase Hosting (https://dereh-halev.web.app). GitHub Pages publie encore la même chose sur l'ancienne adresse. Pas de build.
 - Cache mobile : `style.css`, `commun.js`, `matching.js` sont chargés avec `?v=AAAAMMJJ` (+ lettre si plusieurs fois le même jour) dans `index.html` et `admin.html`. **Changer ce numéro (dans les deux fichiers) à chaque modification de l'un d'eux**, sinon les téléphones gardent l'ancienne version.
 - Règles : **non déployées automatiquement**. Coller `database.rules.json` dans la console Firebase (Realtime Database → Règles → Publier), ou `firebase deploy --only database --project dereh-halev`. À refaire à chaque modification des règles.
 - Domaine GitHub Pages à garder dans Firebase Auth → Domaines autorisés.
