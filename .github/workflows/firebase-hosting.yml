@@ -1,0 +1,22 @@
+# Mise en ligne automatique sur https://dereh-halev.web.app à chaque push sur main.
+# Secret requis : FIREBASE_SERVICE_ACCOUNT (clé JSON d'un compte de service du projet dereh-halev).
+name: Déploiement Firebase Hosting
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Seuls les fichiers du site sont publiés (pas les tests, règles, docs…)
+      - run: |
+          mkdir -p public
+          cp index.html admin.html commun.js matching.js style.css logo.png logo-heart.png apple-touch-icon.png public/
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          channelId: live
+          projectId: dereh-halev

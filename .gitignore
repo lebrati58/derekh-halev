@@ -4,3 +4,4 @@ firebase-debug.log
 database-debug.log
 ui-debug.log
 .firebase/
+public/
