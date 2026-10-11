@@ -1,9 +1,12 @@
-# 🎭 Derekh HaLev — דרך הלב
+# 💗 Derekh HaLev — דרך הלב
 
 *Le chemin du cœur* — mini web-app de rencontre anonyme pour un groupe WhatsApp de célibataires.
 On tombe amoureux d'une conversation **avant** de voir le visage.
 
-100 % statique (HTML/CSS/JS vanilla), hébergée sur GitHub Pages, avec Firebase Realtime Database comme backend.
+100 % statique (HTML/CSS/JS vanilla), hébergée sur **Firebase Hosting**, avec Firebase Realtime Database comme backend.
+
+👉 **App : https://dereh-halev.web.app** · Admin : https://dereh-halev.web.app/admin.html
+(L'ancienne adresse `lebrati58.github.io/derekh-halev` redirige automatiquement vers la nouvelle.)
 
 ## Fichiers
 
@@ -16,6 +19,9 @@ On tombe amoureux d'une conversation **avant** de voir le visage.
 | `test_matching.js` | Tests du moteur (`node test_matching.js`) |
 | `style.css` | Design partagé (violet nuit / doré, rideau de théâtre) |
 | `database.rules.json` | Règles de sécurité Realtime Database (à coller dans la console) |
+| `logo.png`, `logo-heart.png`, `apple-touch-icon.png` | Logo (aperçu WhatsApp), cœur (en-tête, icône d'onglet), icône écran d'accueil |
+| `firebase.json` | Config Firebase : règles, Hosting (dossier `public/`), émulateurs |
+| `.github/workflows/firebase-hosting.yml` | Mise en ligne automatique sur dereh-halev.web.app à chaque push sur `main` |
 
 ---
 
@@ -77,7 +83,7 @@ npm run test:rules       # règles de sécurité sur l'émulateur Firebase (néc
 À faire sur **Safari iPhone**, **Chrome Android** et le **navigateur intégré WhatsApp** (impossible à automatiser ici) :
 
 - [ ] Inscription complète (questionnaire + téléphone) — arrivée sur ✨ הצעות avec des profils visibles
-- [ ] Inscription avec réseau faible : couper le wifi au moment de « 🎭 יוצאים לדרך » → message d'erreur avec code → réessayer → pas de doublon de numéro
+- [ ] Inscription avec réseau faible : couper le wifi au moment de « 💗 יוצאים לדרך » → message d'erreur avec code → réessayer → pas de doublon de numéro
 - [ ] Fermer/rouvrir le navigateur → l'identité est retrouvée (pas de ré-inscription)
 - [ ] Envoyer 💌 → l'autre reçoit la demande → accepter → chat ouvert avec שאלת פתיחה
 - [ ] Écrire un téléphone / lien dans un message → bloqué avant envoi
@@ -100,15 +106,26 @@ python3 -m http.server 8000
 puis ouvre <http://localhost:8000> (participant) et <http://localhost:8000/admin.html>.
 Pour simuler deux personnes : une fenêtre normale + une fenêtre de navigation privée (ou deux navigateurs).
 
-## 6. Déployer sur GitHub Pages
+## 6. Déployer (Firebase Hosting)
 
-1. Crée un dépôt GitHub (ex. `derekh-halev`), public.
-2. Envoie les 6 fichiers à la racine (bouton **Add file → Upload files** suffit).
-3. **Settings → Pages → Source : Deploy from a branch → Branch : `main` / `(root)` → Save.**
-4. Après ~1 min : `https://TON-PSEUDO.github.io/derekh-halev/`
-5. Dans Firebase : **Authentication → Settings → Domaines autorisés → Ajouter** `TON-PSEUDO.github.io`.
+**Automatique** : chaque push / fusion sur `main` déclenche la GitHub Action *Déploiement Firebase Hosting*, qui publie le site sur **https://dereh-halev.web.app** (~1 min). Rien à faire à la main.
 
-Le lien à poster dans le groupe WhatsApp : l'URL ci-dessus. Garde `admin.html` pour toi.
+- Seuls les fichiers listés dans `.github/workflows/firebase-hosting.yml` sont publiés (pages, scripts, style, logos). **Si tu ajoutes un fichier au site, ajoute-le à cette liste.**
+- Le secret GitHub `FIREBASE_SERVICE_ACCOUNT` (clé JSON d'un compte de service du projet, *Paramètres du projet → Comptes de service*) doit exister dans *Settings → Secrets and variables → Actions*.
+- Après une modification de `style.css`, `commun.js` ou `matching.js`, change le numéro `?v=…` dans `index.html` et `admin.html` (sinon les téléphones gardent l'ancienne version en cache).
+- **Les règles ne sont pas déployées par l'Action** : republie `database.rules.json` dans la console (étape 3) à chaque modification.
+- `dereh-halev.web.app` est autorisé par défaut dans Firebase Auth (pas de domaine à ajouter).
+
+**À la main** (si besoin, depuis un ordinateur) :
+
+```bash
+mkdir -p public && cp index.html admin.html commun.js matching.js style.css logo.png logo-heart.png apple-touch-icon.png public/
+npx firebase-tools deploy --only hosting --project dereh-halev
+```
+
+Le lien à poster dans le groupe WhatsApp : **https://dereh-halev.web.app**. Garde `admin.html` pour toi.
+
+> GitHub Pages publie toujours le dépôt sur l'ancienne adresse, mais `index.html` et `admin.html` y redirigent immédiatement vers dereh-halev.web.app.
 
 > La clé `apiKey` visible dans `commun.js` n'est pas un secret (c'est normal pour Firebase côté web) : la sécurité repose entièrement sur les règles.
 
@@ -131,15 +148,15 @@ Le lien à poster dans le groupe WhatsApp : l'URL ci-dessus. Garde `admin.html` 
 
 **📣 פעילות היום** → l'admin publie une annonce (`announcements/current`) affichée en bannière à tous les participants ; bannière « 💌 יש לך בקשות » à l'ouverture.
 
-**Demande → acceptation → chat** anonyme `פרופיל 12 ↔ פרופיל 27`. Le filtre bloque les suites de chiffres (téléphones), liens, emails et @pseudos avec le message « שומרים על המסתורין 🎭 ».
+**Demande → acceptation → chat** anonyme `פרופיל 12 ↔ פרופיל 27`. Le filtre bloque les suites de chiffres (téléphones), liens, emails et @pseudos avec le message « שומרים על המסתורין 💗 ».
 
-**🎭 פתיחת המסך** → quand les deux ont appuyé : animation de rideau, prénoms + téléphones + bouton WhatsApp direct. Si un seul appuie, l'autre n'en sait rien.
+**💗 פתיחת המסך** → quand les deux ont appuyé : animation de rideau, prénoms + téléphones + bouton WhatsApp direct. Si un seul appuie, l'autre n'en sait rien.
 
 **Terminer** → « השיחה הסתיימה 🌙 » des deux côtés, sans dire qui a arrêté. **Signaler** → part à l'admin, qui peut bannir (ce qui ferme aussi tous les chats actifs du profil).
 
 ## Limites à connaître
 
-- **Pas de notifications push** (app statique) : les participants doivent revenir sur le lien. Astuce : l'admin peut poster un petit rappel dans le groupe (« 3 nouveaux profils ce soir 🎭 »).
+- **Pas de notifications push** (app statique) : les participants doivent revenir sur le lien. Astuce : l'admin peut poster un petit rappel dans le groupe (« 3 nouveaux profils ce soir 💗 »).
 - **Le filtre anti-téléphone est côté client** : il arrête 99 % des cas, mais un petit malin pourrait écrire « zéro-cinq-deux… ». Le bouton signaler est là pour ça.
 - **Changement de navigateur/téléphone** = nouvelle identité (l'app le signale et propose de se réinscrire). Le navigateur intégré de WhatsApp conserve normalement ses données, mais conseiller d'ouvrir le lien dans Chrome/Safari est plus sûr.
 - Le matching charge tous les profils : parfait jusqu'à quelques milliers d'inscrits, largement suffisant pour un groupe WhatsApp.

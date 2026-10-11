@@ -114,4 +114,4 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 12. `acceptRequest()` enchaîne 5 écritures non atomiques (alors que `sendRequest()` utilise un update multi-path) → demi-états possibles si la connexion lâche.
 13. La suppression de profil ne retire que `profiles/` et `private/` : `secrets/` (prénom + téléphone), `inbox`/`outbox`, `messages`, `blocks`, `reports` restent indéfiniment.
 14. Les numéros de profil et uids sont visibles par tous dans `profiles/` ; `banned/` est lisible par tous les inscrits.
-15. README partiellement daté (« Envoie les 6 fichiers », déploiement des règles uniquement par copier-coller). Préfixe localStorage `mhm_` (ancien nom du projet) à ne pas changer sans migration.
+15. Préfixe localStorage `mhm_` (ancien nom du projet) à ne pas changer sans migration. (README mis à jour : adresse dereh-halev.web.app et déploiement auto.)
