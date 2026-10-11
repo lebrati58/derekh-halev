@@ -15,7 +15,7 @@
    admins/{uid}: "4829"               ← écrit par admin.html ; accepté seulement si = config/adminPin
 
    counters/
-     profileNo: 27                    ← compteur incrémenté par transaction (numéros uniques).
+     profileNo: 127                   ← compteur incrémenté par transaction (numéros uniques), commence à 100.
                                         Non supprimable (règles v3) — sinon reset → numéros en double.
 
    profiles/{uid}                     ← PUBLIC (lisible par tout inscrit) — jamais de nom ni téléphone
@@ -149,7 +149,7 @@ function ensureAuth() {
 
 /* ---------- Numéro de profil (transaction = pas de doublon) ---------- */
 async function nextProfileNo() {
-  const res = await db.ref("counters/profileNo").transaction(c => (c || 0) + 1);
+  const res = await db.ref("counters/profileNo").transaction(c => (c || 99) + 1);   // premier numéro : 100
   if (!res.committed) throw new Error("counter-not-committed");
   return res.snapshot.val();
 }

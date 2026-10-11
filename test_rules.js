@@ -164,6 +164,12 @@ async function denied(name, fn) {
   await allowed("membre signale son interlocuteur",        () => push(ref(A, "reports"), { chatId: "alice_bob", reporterUid: "alice", reportedUid: "bob", reportedNo: 2, reason: "טקסט", createdAt: 1 }));
   await denied ("signaler quelqu'un HORS de ses chats",    () => push(ref(C, "reports"), { chatId: "alice_bob", reporterUid: "charlie", reportedUid: "bob", reportedNo: 2, reason: "x", createdAt: 1 }));
 
+  /* ---------- Compteur vide : la numérotation commence à 100 ---------- */
+  await env.withSecurityRulesDisabled(async ctx => { await remove(ref(ctx.database(), "counters/profileNo")); });
+  await denied ("compteur vide : premier numéro = 1",      () => set(ref(E, "counters/profileNo"), 1));
+  await allowed("compteur vide : premier numéro = 100",    () => set(ref(E, "counters/profileNo"), 100));
+  await allowed("compteur : 100 → 101",                    () => set(ref(F, "counters/profileNo"), 101));
+
   await env.cleanup();
   console.log(`\n${fail === 0 ? "✅" : "❌"} ${pass}/${pass + fail} tests de règles passent`);
   process.exit(fail === 0 ? 0 : 1);

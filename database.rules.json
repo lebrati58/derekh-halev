@@ -17,7 +17,7 @@
       "profileNo": {
         ".read": "auth != null",
         ".write": "auth != null && !root.child('banned/' + auth.uid).exists() && newData.exists()",
-        ".validate": "newData.isNumber() && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))"
+        ".validate": "newData.isNumber() && ((!data.exists() && newData.val() === 100) || (data.exists() && newData.val() === data.val() + 1))"
       }
     },
     "profiles": {
