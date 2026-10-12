@@ -168,6 +168,9 @@ async function denied(name, fn) {
   await denied ("inscrit normal : supprimer le profil d'un autre", () => remove(ref(A, "profiles/charlie")));
   await denied ("inscrit normal : supprimer le private d'un autre", () => remove(ref(A, "private/charlie")));
   await allowed("ADMIN : supprimer profil + private (multi-path)", () => update(ref(ADMIN), { "profiles/charlie": null, "private/charlie": null }));
+  await allowed("langues : he + fr",                       () => set(ref(A, "profiles/alice/langs"), { he: true, fr: true }));
+  await denied ("langues : code inconnu (ru)",             () => set(ref(A, "profiles/alice/langs"), { ru: true }));
+  await denied ("langues : valeur ≠ true",                 () => set(ref(A, "profiles/alice/langs"), { en: "oui" }));
   await allowed("modifier son propre profil (update ciblé)", () => update(ref(A, "profiles/alice"), { city: "יפו", cantLiveWithout: null }));
 
   /* ---------- Signalements ---------- */

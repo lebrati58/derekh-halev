@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261011c">
+<link rel="stylesheet" href="style.css?v=20261012">
 </head>
 <body>
 
@@ -115,6 +115,15 @@ if (location.hostname === "lebrati58.github.io") {
           <div class="chips">
             <label class="chip"><input type="radio" name="intent" value="serious"><span>💍 קשר רציני</span></label>
             <label class="chip"><input type="radio" name="intent" value="see"><span>🌊 נזרום ונראה</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">שפות שאני מדבר/ת <span class="hint">אפשר לבחור כמה</span></span>
+          <div class="chips">
+            <label class="chip"><input type="checkbox" name="langs" value="he"><span>🇮🇱 עברית</span></label>
+            <label class="chip"><input type="checkbox" name="langs" value="en"><span>🇬🇧 English</span></label>
+            <label class="chip"><input type="checkbox" name="langs" value="fr"><span>🇫🇷 Français</span></label>
           </div>
         </div>
 
@@ -306,8 +315,8 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="commun.js?v=20261011c"></script>
-<script src="matching.js?v=20261011c"></script>
+<script src="commun.js?v=20261012"></script>
+<script src="matching.js?v=20261012"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -413,6 +422,7 @@ $("#edit-me").addEventListener("click", async () => {
   setRadio("kids", me.kids); setRadio("shstyle", me.shabbatStyle); setRadio("pace", me.pace);
   setRadio("value", me.value); setRadio("weekend", me.weekend); setRadio("million", me.million);
   $("#f-clw").value = me.cantLiveWithout || "";
+  $$("input[name=langs]").forEach(i => { i.checked = !!(me.langs && me.langs[i.value]); });
   $("#f-ok").checked = true;
   $("#reg-title").textContent = `✏️ עריכת ${profileName(me.no)}`;
   $("#reg-btn").textContent = "💾 שמירת השינויים";
@@ -448,6 +458,8 @@ $("#reg-form").addEventListener("submit", async e => {
   if (ageMax && (ageMax < 18 || ageMax > 99)) ageMax = null;
   if (ageMin && ageMax && ageMin > ageMax) { const t = ageMin; ageMin = ageMax; ageMax = t; }
   const cantLiveWithout = $("#f-clw").value.trim();
+  const langs = {};
+  $$("input[name=langs]:checked").forEach(i => { langs[i.value] = true; });
 
   if (!firstName) return toast("מה השם שלך? (הוא נשאר סודי 🔒)");
   if (!/^\+?[\d\s\-]{9,18}$/.test(phone)) return toast("מספר טלפון לא תקין");
@@ -456,6 +468,7 @@ $("#reg-form").addEventListener("submit", async e => {
   if (!city) return toast("באיזו עיר?");
   if (!religion) return toast("בחרו אורח חיים");
   if (!intent) return toast("מה את/ה מחפש/ת?");
+  if (!Object.keys(langs).length) return toast("באילו שפות את/ה מדבר/ת? 🇮🇱🇬🇧🇫🇷");
   if (words.length < 3) return toast("צריך 3 מילים שמתארות אותך ✨");
   if (!shabbat) return toast("ספרו לנו על השבת האידיאלית 🕯️");
   if (!kids) return toast("ילדים — מה הכיוון? 👶");
@@ -478,7 +491,7 @@ $("#reg-form").addEventListener("submit", async e => {
         gender, age, city, religion, intent, words, shabbat,
         ageMin: ageMin || null, ageMax: ageMax || null, kids: kids || null, shabbatStyle: shabbatStyle || null,
         pace: pace || null, value: value || null, weekend: weekend || null, million: million || null,
-        cantLiveWithout: cantLiveWithout || null
+        cantLiveWithout: cantLiveWithout || null, langs
       });
       toast("הפרופיל עודכן 💗");
       leaveEdit();
@@ -508,6 +521,7 @@ $("#reg-form").addEventListener("submit", async e => {
     if (weekend) extra.weekend = weekend;
     if (million) extra.million = million;
     if (cantLiveWithout) extra.cantLiveWithout = cantLiveWithout;
+    extra.langs = langs;
     me = Object.assign({}, base, extra);
     // Profil + réservation du numéro (profileNos) en une écriture atomique :
     // les règles refusent un numéro déjà réservé par un autre profil.

@@ -26,7 +26,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 - `config/adminPin` — PIN admin, saisi à la main dans la console, illisible par tous.
 - `admins/{uid}` — copie du PIN écrite par admin.html ; vaut « admin » si égal à `config/adminPin`.
 - `counters/profileNo` — compteur des numéros de profil (incrément +1 par transaction).
-- `profiles/{uid}` — profil **public** : `no`, `gender`, `age`, `city`, `religion`, `intent`, `words[3]`, `shabbat`, `createdAt` + questionnaire v2 optionnel (`ageMin/ageMax`, `kids`, `shabbatStyle`, `pace`, `value`, `weekend`, `million`, `cantLiveWithout`) + `paused`.
+- `profiles/{uid}` — profil **public** : `no`, `gender`, `age`, `city`, `religion`, `intent`, `words[3]`, `shabbat`, `createdAt` + questionnaire v2 optionnel (`ageMin/ageMax`, `kids`, `shabbatStyle`, `pace`, `value`, `weekend`, `million`, `cantLiveWithout`) + `langs` (`{he,en,fr: true}`, langues parlées → drapeaux 🇮🇱🇬🇧🇫🇷 sur la carte) + `paused`.
 - `profileNos/{no}: uid` — index d'unicité des numéros, réservé une fois à la création du profil.
 - `private/{uid}` — `firstName`, `phone`.
 - `blocks/{uid}/{targetUid}: true` — blocages personnels.

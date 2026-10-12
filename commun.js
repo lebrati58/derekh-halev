@@ -37,6 +37,7 @@
      weekend: "nature"|"sea"|"movie"|"friends"|"explore"
      million: "travel"|"invest"|"spoil"|"save"
      cantLiveWithout: "קפה של בוקר"
+     langs: { he: true, fr: true }     ← langues parlées (he/en/fr) → drapeaux sur la carte
      paused: true                      ← mode pause (invisible dans les suggestions)
 
    profileNos/{no}: uid               ← index d'unicité des numéros : réservé une seule fois, en même temps
@@ -215,6 +216,7 @@ function cardHTML(p, opts = {}) {
     </div>
     <div class="mc-words">${words}</div>
     <div class="mc-meta">${esc(p.age)} · ${esc(p.city)} · ${esc(religionLabel(p.religion, p.gender))}</div>
+    ${typeof langFlags === "function" && langFlags(p) ? `<div class="mc-langs" title="שפות">${esc(langFlags(p))}</div>` : ""}
     <div class="mc-intent">${esc(LABELS.intent[p.intent] || "")}</div>
     ${p.shabbat && !opts.noShabbat ? `<div class="mc-shabbat"><b>השבת האידיאלית:</b> ״${esc(p.shabbat)}״</div>` : ""}
     ${p.cantLiveWithout ? `<div class="mc-shabbat"><b>לא חי/ה בלי:</b> ${esc(p.cantLiveWithout)}</div>` : ""}

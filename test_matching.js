@@ -61,6 +61,16 @@ check("chaque profil découverte non strict a au moins une raison", [
   [{ ...base, religion: "dati" }, { ...guy, religion: "hiloni" }], [base, { ...guy, age: 45 }], [{ ...base, ageMax: 30 }, guy]
 ].every(([a, b]) => M.isSoftCompatible(a, b) && !M.isCompatible(a, b) && M.softReasons(a, b).length > 0));
 
+console.log("— Langues —");
+const fr1 = { ...base, langs: { he: true, fr: true } }, fr2 = { ...guy, langs: { fr: true, en: true } };
+check("drapeaux dans l'ordre he/en/fr", M.langFlags({ langs: { fr: true, he: true } }) === "🇮🇱 🇫🇷");
+check("langue inconnue ignorée", M.langFlags({ langs: { ru: true, en: true } }) === "🇬🇧");
+check("profil sans langues → chaîne vide", M.langFlags(base) === "" && M.langFlags(null) === "");
+check("langue commune (fr) détectée", JSON.stringify(M.sharedLangs(fr1, fr2)) === '["fr"]');
+check("hébreu commun ignoré", M.sharedLangs({ langs: { he: true } }, { langs: { he: true } }).length === 0);
+check("raison « שניכם מדברים צרפתית »", M.matchReasons(fr1, fr2, 10).some(r => r.includes("צרפתית") && r.includes("🇫🇷")));
+check("bonus de score pour langue commune", M.matchScore(fr1, fr2) === M.matchScore(base, guy) + 4);
+
 console.log("— Icebreakers —");
 check("weekend commun → question ים", M.pickIcebreaker(rich1, rich2) === M.ICEBREAKERS.weekend.sea);
 check("sans points communs → générique déterministe", M.ICEBREAKERS.generic.includes(M.pickIcebreaker(base, guy)));

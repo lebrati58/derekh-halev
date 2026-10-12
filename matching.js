@@ -14,6 +14,13 @@ const QUIZ = {
   million: { travel: "טיול גדול בעולם ✈️", invest: "דירה והשקעה 🏠", spoil: "פינוקים לאהובים 🎁", save: "חוסך/ת, שיהיה 🐷" }
 };
 
+/* Langues parlées (profil.langs = { he: true, fr: true, … }) */
+const LANGS = { he: { flag: "🇮🇱", name: "עברית" }, en: { flag: "🇬🇧", name: "אנגלית" }, fr: { flag: "🇫🇷", name: "צרפתית" } };
+function langList(p) { const l = (p && p.langs) || {}; return Object.keys(LANGS).filter(k => l[k] === true); }
+function langFlags(p) { return langList(p).map(l => LANGS[l].flag).join(" "); }
+/* Langues communes autres que l'hébreu (parlé par presque tous) */
+function sharedLangs(a, b) { const lb = langList(b); return langList(a).filter(l => l !== "he" && lb.includes(l)); }
+
 function _num(v) { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; }
 
 /* ---------- Filtres durs ---------- */
@@ -100,6 +107,7 @@ function matchScore(me, p) {
   if (me.weekend && me.weekend === p.weekend) s += 6;
   if (me.million && me.million === p.million) s += 5;
   if ((me.city || "").trim() && me.city.trim() === (p.city || "").trim()) s += 5;
+  if (sharedLangs(me, p).length) s += 4;
   s -= Math.min(10, Math.max(0, Math.abs((me.age || 0) - (p.age || 0)) - 2));
   return s;
 }
@@ -134,6 +142,7 @@ function matchReasons(me, p, max = 3) {
   if (same("value")) out.push(WHY.value[me.value]);
   if (same("million")) out.push(WHY.million[me.million]);
   if ((me.city || "").trim() && me.city.trim() === (p.city || "").trim()) out.push("שניכם מ" + me.city.trim());
+  sharedLangs(me, p).forEach(l => out.push(`שניכם מדברים ${LANGS[l].name} ${LANGS[l].flag}`));
   if (me.religion === p.religion && out.length < max) out.push("אורח חיים דומה");
   if (Math.abs((me.age || 0) - (p.age || 0)) <= 3 && out.length < max) out.push("גיל דומה");
   return out.slice(0, max);
@@ -186,5 +195,5 @@ function pickIcebreaker(a, b) {
 
 /* ---------- Export Node (tests) ---------- */
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { QUIZ, religionOk, ageOk, kidsOk, isCompatible, isSoftCompatible, softReasons, matchScore, matchPercent, matchReasons, pickIcebreaker, ICEBREAKERS, WHY };
+  module.exports = { QUIZ, religionOk, ageOk, kidsOk, isCompatible, isSoftCompatible, softReasons, LANGS, langList, langFlags, sharedLangs, matchScore, matchPercent, matchReasons, pickIcebreaker, ICEBREAKERS, WHY };
 }
