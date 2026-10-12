@@ -61,11 +61,36 @@ check("chaque profil découverte non strict a au moins une raison", [
   [{ ...base, religion: "dati" }, { ...guy, religion: "hiloni" }], [base, { ...guy, age: 45 }], [{ ...base, ageMax: 30 }, guy]
 ].every(([a, b]) => M.isSoftCompatible(a, b) && !M.isCompatible(a, b) && M.softReasons(a, b).length > 0));
 
+console.log("— Langues —");
+const fr1 = { ...base, langs: { he: true, fr: true } }, fr2 = { ...guy, langs: { fr: true, en: true } };
+check("drapeaux dans l'ordre he/en/fr", M.langFlags({ langs: { fr: true, he: true } }) === "🇮🇱 🇫🇷");
+check("langue inconnue ignorée", M.langFlags({ langs: { ru: true, en: true } }) === "🇬🇧");
+check("profil sans langues → chaîne vide", M.langFlags(base) === "" && M.langFlags(null) === "");
+check("langue commune (fr) détectée", JSON.stringify(M.sharedLangs(fr1, fr2)) === '["fr"]');
+check("hébreu commun ignoré", M.sharedLangs({ langs: { he: true } }, { langs: { he: true } }).length === 0);
+check("langue commune = 1re raison (visible même limité à 3)", M.matchReasons({ ...rich1, langs: { fr: true } }, { ...rich2, langs: { fr: true } })[0].includes("🇫🇷"));
+check("raison « שניכם מדברים צרפתית »", M.matchReasons(fr1, fr2, 10).some(r => r.includes("צרפתית") && r.includes("🇫🇷")));
+check("bonus de score pour langue commune", M.matchScore(fr1, fr2) === M.matchScore(base, guy) + 4);
+
 console.log("— Icebreakers —");
 check("weekend commun → question ים", M.pickIcebreaker(rich1, rich2) === M.ICEBREAKERS.weekend.sea);
 check("sans points communs → générique déterministe", M.ICEBREAKERS.generic.includes(M.pickIcebreaker(base, guy)));
 check("profils null ne crashent pas", typeof M.pickIcebreaker(null, null) === "string");
 check("icebreaker ≤ 200 chars (règle Firebase)", M.pickIcebreaker(rich1, rich2).length <= 200);
+
+console.log("— Traductions (he / en / fr) —");
+const shape = o => JSON.stringify(Object.keys(o).sort().map(k => [k, typeof o[k] === "object" ? Object.keys(o[k]).length : 1]));
+check("WHY : mêmes clés dans les 3 langues", ["en", "fr"].every(l => shape(M.WHY_I18N[l]) === shape(M.WHY_I18N.he)));
+check("Icebreakers : mêmes clés dans les 3 langues", ["en", "fr"].every(l => shape(M.ICEBREAKERS_I18N[l]) === shape(M.ICEBREAKERS_I18N.he)));
+check("Messages courts : mêmes clés", ["en", "fr"].every(l => shape(M.MSG[l]) === shape(M.MSG.he)));
+check("clé d'icebreaker neutre (weekend.sea)", M.pickIcebreakerKey(rich1, rich2) === "weekend.sea");
+check("icebreaker traduit en anglais / français", M.icebreakerText("weekend.sea", "en").includes("beach") && M.icebreakerText("weekend.sea", "fr").includes("plage"));
+check("ancien chat : texte hébreu stocké rendu tel quel", M.icebreakerText("שאלה ישנה?", "fr") === "שאלה ישנה?");
+check("clé inconnue → rendue telle quelle", M.icebreakerText("weekend.zzz", "en") === "weekend.zzz");
+check("toutes les clés tiennent dans 200 car. (règle Firebase)", M.pickIcebreakerKey(base, guy).length <= 200);
+check("raisons en français", M.matchReasons(fr1, fr2, 10, "fr").some(r => r.includes("français") && r.includes("🇫🇷")));
+check("raisons hors préférences en anglais", M.softReasons(base, { ...guy, age: 45 }, "en").includes("13-year age gap"));
+check("langue inconnue → hébreu", M.softReasons(base, { ...guy, age: 45 }, "xx").includes("פער גילאים של 13 שנים"));
 
 console.log(fail ? `\n❌ ${fail}/${n} échecs` : `\n✅ ${n}/${n} tests passent`);
 process.exit(fail ? 1 : 0);

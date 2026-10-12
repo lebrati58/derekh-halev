@@ -1,6 +1,6 @@
 # CLAUDE.md — דרך הלב | Derekh HaLev
 
-Application de rencontre anonyme pour un groupe WhatsApp de célibataires. Interface en hébreu (RTL), surtout utilisée sur mobile (souvent dans le navigateur intégré de WhatsApp).
+Application de rencontre anonyme pour un groupe WhatsApp de célibataires. Interface en hébreu (RTL), anglais et français (LTR), surtout utilisée sur mobile (souvent dans le navigateur intégré de WhatsApp).
 Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https://dereh-halev.web.app** (GitHub Pages `lebrati58.github.io/derekh-halev` = ancienne adresse). Backend : Firebase Realtime Database, projet `dereh-halev`, plan Blaze (paiement à l'usage, usage dans la partie gratuite ; aucune Cloud Function utilisée : **toute la sécurité repose sur `database.rules.json`**). Authentification anonyme Firebase (un uid par navigateur).
 
 ## Fichiers
@@ -10,6 +10,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `index.html` | App participant (HTML + tout le JS inline) : inscription (formulaire réutilisé pour ✏️ l'édition du profil), propositions, demandes, chat, ouverture du rideau, pause/blocage/signalement, suppression du profil |
 | `admin.html` | Tableau de bord admin (connexion par PIN) : stats, signalements, bannissement, 🗑️ suppression d'un profil par numéro, annonce du jour |
 | `commun.js` | Config Firebase, schéma de la base en commentaire, helpers partagés (auth anonyme, `nextProfileNo`, filtre anti-téléphone/liens `hasForbiddenContent`, `cardHTML`, modale, toast) |
+| `i18n.js` | Traductions de l'interface he/en/fr (`I18N`, `t(clé, vars)`, `applyI18n()`, `setLang()`), langue choisie au 1er lancement et mémorisée (localStorage `mhm_uiLang`). Textes fixes du HTML : `data-i18n`/`-ph`/`-aria` (clés `hNNN`) ; textes du code : `t("clé")`. **Tout nouveau texte doit être ajouté dans les 3 langues.** `admin.html` reste en hébreu |
 | `matching.js` | Moteur de compatibilité pur (sans Firebase) : filtres durs, score, %, raisons « למה אתם מתאימים », icebreakers |
 | `style.css` | Styles partagés |
 | `logo.png`, `logo-heart.png`, `apple-touch-icon.png` | Logo complet (aperçu WhatsApp `og:image`), cœur seul transparent (en-tête + icône d'onglet), icône écran d'accueil |
@@ -26,14 +27,14 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 - `config/adminPin` — PIN admin, saisi à la main dans la console, illisible par tous.
 - `admins/{uid}` — copie du PIN écrite par admin.html ; vaut « admin » si égal à `config/adminPin`.
 - `counters/profileNo` — compteur des numéros de profil (incrément +1 par transaction).
-- `profiles/{uid}` — profil **public** : `no`, `gender`, `age`, `city`, `religion`, `intent`, `words[3]`, `shabbat`, `createdAt` + questionnaire v2 optionnel (`ageMin/ageMax`, `kids`, `shabbatStyle`, `pace`, `value`, `weekend`, `million`, `cantLiveWithout`) + `paused`.
+- `profiles/{uid}` — profil **public** : `no`, `gender`, `age`, `city`, `religion`, `intent`, `words[3]`, `shabbat`, `createdAt` + questionnaire v2 optionnel (`ageMin/ageMax`, `kids`, `shabbatStyle`, `pace`, `value`, `weekend`, `million`, `cantLiveWithout`) + `langs` (`{he,en,fr: true}`, langues parlées → drapeaux 🇮🇱🇬🇧🇫🇷 sur la carte) + `paused`.
 - `profileNos/{no}: uid` — index d'unicité des numéros, réservé une fois à la création du profil.
 - `private/{uid}` — `firstName`, `phone`.
 - `blocks/{uid}/{targetUid}: true` — blocages personnels.
 - `banned/{uid}: true` — profils bannis.
 - `announcements/current` — `{text, ts}` publié par l'admin.
 - `inbox/{to}/{from}` et `outbox/{from}/{to}` — demandes : `fromNo`/`toNo`, `status` (pending/accepted/declined), `createdAt`, `chatId?`.
-- `chats/{from_to}` — métadonnées : `from`, `to` (uids), `fromNo`, `toNo`, `status` (active/ended), `opened`, `icebreaker`, `createdAt`.
+- `chats/{from_to}` — métadonnées : `from`, `to` (uids), `fromNo`, `toNo`, `status` (active/ended), `opened`, `icebreaker` (clé neutre type `weekend.sea`, traduite à l'affichage par `icebreakerText()` ; anciens chats : texte hébreu), `createdAt`.
 - `userChats/{uid}/{chatId}: true` — index des chats de chacun.
 - `messages/{chatId}/{msgId}` — `{from, text, ts}`.
 - `reveal/{chatId}/{uid}: true` — « j'ouvre le rideau ».
@@ -80,7 +81,7 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 ## Déployer
 
 - Front : push sur `main` → GitHub Action → Firebase Hosting (https://dereh-halev.web.app). GitHub Pages publie encore la même chose sur l'ancienne adresse. Pas de build.
-- Cache mobile : `style.css`, `commun.js`, `matching.js` sont chargés avec `?v=AAAAMMJJ` (+ lettre si plusieurs fois le même jour) dans `index.html` et `admin.html`. **Changer ce numéro (dans les deux fichiers) à chaque modification de l'un d'eux**, sinon les téléphones gardent l'ancienne version.
+- Cache mobile : `style.css`, `i18n.js`, `commun.js`, `matching.js` sont chargés avec `?v=AAAAMMJJ` (+ lettre si plusieurs fois le même jour) dans `index.html` et `admin.html`. **Changer ce numéro (dans les deux fichiers) à chaque modification de l'un d'eux**, sinon les téléphones gardent l'ancienne version.
 - Règles : **non déployées automatiquement**. Coller `database.rules.json` dans la console Firebase (Realtime Database → Règles → Publier), ou `firebase deploy --only database --project dereh-halev`. À refaire à chaque modification des règles.
 - Domaine GitHub Pages à garder dans Firebase Auth → Domaines autorisés.
 
@@ -114,4 +115,4 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 12. `acceptRequest()` enchaîne 5 écritures non atomiques (alors que `sendRequest()` utilise un update multi-path) → demi-états possibles si la connexion lâche.
 13. La suppression de profil ne retire que `profiles/` et `private/` : `secrets/` (prénom + téléphone), `inbox`/`outbox`, `messages`, `blocks`, `reports` restent indéfiniment.
 14. Les numéros de profil et uids sont visibles par tous dans `profiles/` ; `banned/` est lisible par tous les inscrits.
-15. README partiellement daté (« Envoie les 6 fichiers », déploiement des règles uniquement par copier-coller). Préfixe localStorage `mhm_` (ancien nom du projet) à ne pas changer sans migration.
+15. Préfixe localStorage `mhm_` (ancien nom du projet) à ne pas changer sans migration. (README mis à jour : adresse dereh-halev.web.app et déploiement auto.)

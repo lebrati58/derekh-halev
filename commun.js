@@ -37,6 +37,7 @@
      weekend: "nature"|"sea"|"movie"|"friends"|"explore"
      million: "travel"|"invest"|"spoil"|"save"
      cantLiveWithout: "קפה של בוקר"
+     langs: { he: true, fr: true }     ← langues parlées (he/en/fr) → drapeaux sur la carte
      paused: true                      ← mode pause (invisible dans les suggestions)
 
    profileNos/{no}: uid               ← index d'unicité des numéros : réservé une seule fois, en même temps
@@ -94,17 +95,13 @@ const db = firebase.database();
 const TS = firebase.database.ServerValue.TIMESTAMP;
 
 /* ---------- Libellés ---------- */
+/* Libellés traduits (i18n.js doit être chargé avant ce fichier) */
 const LABELS = {
-  gender: { m: "גבר", f: "אישה" },
-  religion: {
-    dati:    { m: "דתי",    f: "דתייה" },
-    masorti: { m: "מסורתי", f: "מסורתית" },
-    hiloni:  { m: "חילוני", f: "חילונית" }
-  },
-  intent: { serious: "💍 מחפש/ת קשר רציני", see: "🌊 נזרום ונראה" }
+  get gender() { return { m: t("g_m"), f: t("g_f") }; },
+  get intent() { return { serious: t("intent_serious"), see: t("intent_see") }; }
 };
-const religionLabel = (r, g) => (LABELS.religion[r] || {})[g] || "";
-const profileName = no => `פרופיל ${no}`;
+const religionLabel = (r, g) => (["dati", "masorti", "hiloni"].includes(r) && (g === "m" || g === "f")) ? t(`rel_${r}_${g}`) : "";
+const profileName = no => t("profile", { no });
 const HEART = '<img class="heart-ico" src="logo-heart.png" alt="">';   // logo cœur (remplace 🎭)
 
 /* ---------- DOM & utilitaires ---------- */
@@ -215,9 +212,10 @@ function cardHTML(p, opts = {}) {
     </div>
     <div class="mc-words">${words}</div>
     <div class="mc-meta">${esc(p.age)} · ${esc(p.city)} · ${esc(religionLabel(p.religion, p.gender))}</div>
+    ${typeof langFlags === "function" && langFlags(p) ? `<div class="mc-langs" title="${esc(t("langs_title"))}">${esc(langFlags(p))}</div>` : ""}
     <div class="mc-intent">${esc(LABELS.intent[p.intent] || "")}</div>
-    ${p.shabbat && !opts.noShabbat ? `<div class="mc-shabbat"><b>השבת האידיאלית:</b> ״${esc(p.shabbat)}״</div>` : ""}
-    ${p.cantLiveWithout ? `<div class="mc-shabbat"><b>לא חי/ה בלי:</b> ${esc(p.cantLiveWithout)}</div>` : ""}
+    ${p.shabbat && !opts.noShabbat ? `<div class="mc-shabbat"><b>${esc(t("card_shabbat"))}</b> “${esc(p.shabbat)}”</div>` : ""}
+    ${p.cantLiveWithout ? `<div class="mc-shabbat"><b>${esc(t("card_clw"))}</b> ${esc(p.cantLiveWithout)}</div>` : ""}
   </div>`;
 }
 
@@ -232,7 +230,7 @@ function toast(msg, ms = 2800) {
 }
 
 /* ---------- Modale (remplace alert/confirm/prompt) ---------- */
-function showModal({ title = "", body = "", input = false, placeholder = "", okText = "אישור", cancelText = "ביטול", danger = false }) {
+function showModal({ title = "", body = "", input = false, placeholder = "", okText = t("ok"), cancelText = t("cancel"), danger = false }) {
   return new Promise(resolve => {
     const wrap = document.createElement("div");
     wrap.className = "modal-wrap";

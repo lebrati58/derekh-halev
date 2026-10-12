@@ -84,6 +84,11 @@
         "paused": {
           ".validate": "newData.isBoolean()"
         },
+        "langs": {
+          "$l": {
+            ".validate": "($l === 'he' || $l === 'en' || $l === 'fr') && newData.val() === true"
+          }
+        },
         "$other": {
           ".validate": false
         }
