@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261012b">
+<link rel="stylesheet" href="style.css?v=20261012c">
 </head>
 <body>
 
@@ -250,6 +250,8 @@ if (location.hostname === "lebrati58.github.io") {
     <div class="announce hidden" id="announce"></div>
     <div class="news-banner hidden" id="news-banner"></div>
     <div class="paused-banner hidden" id="paused-banner"><span data-i18n="h104">⏸️ את/ה במצב השהיה — הכרטיס שלך לא מוצג כרגע</span> <button class="btn link" id="resume-btn" data-i18n="h068">חזרה ▶️</button></div>
+    <div class="langs-banner hidden" id="langs-banner"><span data-i18n="h107">🆕 הוסיפו את השפות שאתם מדברים — זה עוזר להתאמות! 🇮🇱🇬🇧🇫🇷</span>
+      <button class="btn gold small" id="langs-go" data-i18n="h108">✏️ להוספה</button></div>
     <h2 style="margin-top:4px" data-i18n="h069">הכרטיס שלך</h2>
     <p class="sub" data-i18n="h070">זה מה שאחרים רואים. בלי שם, בלי תמונה — רק את/ה, בדרך הלב.</p>
     <div id="my-card"></div>
@@ -332,9 +334,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261012b"></script>
-<script src="commun.js?v=20261012b"></script>
-<script src="matching.js?v=20261012b"></script>
+<script src="i18n.js?v=20261012c"></script>
+<script src="commun.js?v=20261012c"></script>
+<script src="matching.js?v=20261012c"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -590,11 +592,11 @@ $("#reg-form").addEventListener("submit", async e => {
 function startHome() {
   $("#my-card").innerHTML = cardHTML(me);
   show("screen-home");
-  updatePausedUI();
+  updatePausedUI(); updateLangsBanner();
 
   db.ref("profiles").on("value", s => {
     profiles = s.val() || {};
-    if (profiles[uid]) { me = profiles[uid]; $("#my-card").innerHTML = cardHTML(me); updatePausedUI(); }
+    if (profiles[uid]) { me = profiles[uid]; $("#my-card").innerHTML = cardHTML(me); updatePausedUI(); updateLangsBanner(); }
     else if (me) { location.reload(); return; }   // profil supprimé (par l'admin) → écran d'inscription
     renderProposals(); renderRequests(); renderChats();
   });
@@ -645,6 +647,13 @@ function renderNews() {
 }
 
 /* ----- Mode pause ----- */
+/* Bandeau « ajoutez vos langues » : profils créés avant l'ajout des langues */
+function updateLangsBanner() {
+  const b = $("#langs-banner");
+  if (b) b.classList.toggle("hidden", !me || langList(me).length > 0);
+}
+$("#langs-go").addEventListener("click", () => $("#edit-me").click());
+
 function updatePausedUI() {
   const paused = !!(me && me.paused);
   const pb = $("#paused-banner"), pt = $("#pause-toggle");
@@ -655,7 +664,7 @@ async function setPaused(v) {
   try {
     await db.ref(`profiles/${uid}/paused`).set(v ? true : null);
     if (v) me.paused = true; else delete me.paused;
-    updatePausedUI();
+    updatePausedUI(); updateLangsBanner();
     toast(v ? t("paused_on") : t("paused_off"));
   } catch (e) { console.error(e); toast(t("fail_retry")); }
 }
