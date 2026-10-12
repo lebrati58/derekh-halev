@@ -16,6 +16,8 @@ const UI_LANGS = {
 
 const I18N = {
 he: {
+  "h107": "🆕 הוסיפו את השפות שאתם מדברים — זה עוזר להתאמות! 🇮🇱🇬🇧🇫🇷",
+  "h108": "✏️ להוספה",
   "h001": "דרך הלב",
   "h002": "מתאהבים בשיחה — לפני שרואים את הפנים",
   "h003": "המסך עולה…",
@@ -238,6 +240,8 @@ he: {
   "choose_lang": "בחרו שפה"
 },
 en: {
+  "h107": "🆕 Add the languages you speak — it helps your matches! 🇮🇱🇬🇧🇫🇷",
+  "h108": "✏️ Add",
   "h001": "Derekh HaLev",
   "h002": "Fall in love with a conversation — before seeing the face",
   "h003": "The curtain is rising…",
@@ -460,6 +464,8 @@ en: {
   "choose_lang": "Choose your language"
 },
 fr: {
+  "h107": "🆕 Ajoutez les langues que vous parlez — ça aide vos affinités ! 🇮🇱🇬🇧🇫🇷",
+  "h108": "✏️ Ajouter",
   "h001": "Derekh HaLev",
   "h002": "Tomber amoureux d'une conversation — avant de voir le visage",
   "h003": "Le rideau se lève…",
