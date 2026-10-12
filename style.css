@@ -359,3 +359,17 @@ textarea { resize: vertical; min-height: 70px; }
   background: rgba(224,96,126,.15); border: 1px solid rgba(224,96,126,.5); border-radius: 14px;
   padding: 10px 14px; margin-bottom: 12px; font-size: .92rem; text-align: center;
 }
+
+/* ---------- Langues (i18n) ---------- */
+.lang-switch { display: flex; justify-content: center; gap: 6px; margin-top: 6px; }
+.lang-switch button { background: rgba(0,0,0,.2); border: 1px solid rgba(243,216,138,.25); border-radius: 999px; font-size: 1.05rem; padding: 2px 9px; cursor: pointer; opacity: .55; }
+.lang-switch button.active { opacity: 1; border-color: var(--gold); }
+.lang-choice { display: grid; gap: 10px; margin-top: 14px; }
+.lang-choice .btn { font-size: 1.1rem; }
+#f-phone { text-align: right; }
+/* Gauche-à-droite (anglais, français) : on inverse ce qui est positionné « à la main » */
+[dir="ltr"] .menu { left: auto; right: 12px; }
+[dir="ltr"] .menu button { text-align: left; }
+[dir="ltr"] #f-phone { text-align: left; }
+[dir="ltr"] .msg.mine { align-self: flex-end; }
+[dir="ltr"] .msg.theirs { align-self: flex-start; }

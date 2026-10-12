@@ -19,30 +19,47 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261012">
+<link rel="stylesheet" href="style.css?v=20261012b">
 </head>
 <body>
 
 <div class="valance"></div>
 <header class="app-header">
-  <h1><img class="logo" src="logo-heart.png" alt=""> <span class="tt">דרך הלב</span></h1>
-  <p class="tagline">מתאהבים בשיחה — לפני שרואים את הפנים</p>
+  <h1><img class="logo" src="logo-heart.png" alt=""> <span class="tt" data-i18n="h001">דרך הלב</span></h1>
+  <p class="tagline" data-i18n="h002">מתאהבים בשיחה — לפני שרואים את הפנים</p>
+  <div class="lang-switch" id="lang-switch">
+    <button type="button" data-lang="he" aria-label="עברית">🇮🇱</button>
+    <button type="button" data-lang="en" aria-label="English">🇬🇧</button>
+    <button type="button" data-lang="fr" aria-label="Français">🇫🇷</button>
+  </div>
 </header>
 
 <main>
+  <!-- Choix de la langue (premier lancement) -->
+  <section id="screen-lang" class="screen">
+    <div class="panel center">
+      <h2 style="margin-top:0">בחרו שפה · Choose your language · Choisissez votre langue</h2>
+      <div class="lang-choice">
+        <button type="button" class="btn gold block" data-lang="he">🇮🇱 עברית</button>
+        <button type="button" class="btn gold block" data-lang="en">🇬🇧 English</button>
+        <button type="button" class="btn gold block" data-lang="fr">🇫🇷 Français</button>
+      </div>
+    </div>
+  </section>
+
   <!-- Chargement -->
   <section id="screen-loading" class="screen active">
     <div class="loader"><img class="heart-ico" src="logo-heart.png" alt=""></div>
-    <p class="center sub">המסך עולה…</p>
+    <p class="center sub" data-i18n="h003">המסך עולה…</p>
   </section>
 
   <!-- Erreur -->
   <section id="screen-error" class="screen">
     <div class="panel center">
       <div class="loader" style="margin-top:0">🌙</div>
-      <h2>משהו לא נפתח כמו שצריך</h2>
-      <p class="sub" id="error-text">בדקו את החיבור לאינטרנט ונסו שוב.</p>
-      <button class="btn gold" onclick="location.reload()">נסו שוב</button>
+      <h2 data-i18n="h004">משהו לא נפתח כמו שצריך</h2>
+      <p class="sub" id="error-text" data-i18n="h005">בדקו את החיבור לאינטרנט ונסו שוב.</p>
+      <button class="btn gold" onclick="location.reload()" data-i18n="h006">נסו שוב</button>
     </div>
   </section>
 
@@ -50,180 +67,180 @@ if (location.hostname === "lebrati58.github.io") {
   <section id="screen-banned" class="screen">
     <div class="panel center">
       <div class="loader" style="margin-top:0">🚪</div>
-      <h2>הפרופיל הושעה</h2>
-      <p class="sub">מנהלי הקבוצה השעו את הפרופיל הזה. לשאלות אפשר לפנות אליהם ישירות.</p>
+      <h2 data-i18n="h007">הפרופיל הושעה</h2>
+      <p class="sub" data-i18n="h008">מנהלי הקבוצה השעו את הפרופיל הזה. לשאלות אפשר לפנות אליהם ישירות.</p>
     </div>
   </section>
 
   <!-- Inscription -->
   <section id="screen-register" class="screen">
     <div class="panel">
-      <h2 style="margin-top:0" id="reg-title">הכרטיס המסתורי שלך ✨</h2>
-      <p class="sub">כאן אף אחד לא רואה פנים, שם או טלפון. רק מילים, שיחה — וקצת קסם של ט״ו באב.</p>
+      <h2 style="margin-top:0" id="reg-title" data-i18n="h009">הכרטיס המסתורי שלך ✨</h2>
+      <p class="sub" data-i18n="h010">כאן אף אחד לא רואה פנים, שם או טלפון. רק מילים, שיחה — וקצת קסם של ט״ו באב.</p>
       <p class="sub hidden" id="old-identity"></p>
       <div class="iab-banner hidden" id="iab-banner">
-        <b>🌐 טיפ קטן לפני שמתחילים:</b>
-        נראה שנכנסתם מהדפדפן הפנימי של וואטסאפ. הוא לפעמים «שוכח» אתכם — ואז הפרופיל נעלם.
-        <span id="iab-how">כדאי לפתוח בדפדפן אמיתי: לחצו על <b>⋮</b> (או <b>שיתוף</b>) למעלה → «פתיחה בדפדפן».</span>
+        <b data-i18n="h011">🌐 טיפ קטן לפני שמתחילים:</b>
+        <span data-i18n="h097">נראה שנכנסתם מהדפדפן הפנימי של וואטסאפ. הוא לפעמים «שוכח» אתכם — ואז הפרופיל נעלם.</span>
+        <span id="iab-how">כדאי לפתוח בדפדפן אמיתי: לחצו על <b>⋮</b> (או <b data-i18n="h012">שיתוף</b>) למעלה → «פתיחה בדפדפן».</span>
         <div class="item-actions" style="margin-top:8px">
-          <button type="button" class="btn ghost small" id="iab-copy">📋 העתקת הקישור</button>
-          <button type="button" class="btn link small" id="iab-dismiss">להמשיך כאן בכל זאת</button>
+          <button type="button" class="btn ghost small" id="iab-copy" data-i18n="h013">📋 העתקת הקישור</button>
+          <button type="button" class="btn link small" id="iab-dismiss" data-i18n="h014">להמשיך כאן בכל זאת</button>
         </div>
       </div>
 
       <form id="reg-form" novalidate autocomplete="off">
         <div class="field">
-          <label for="f-name">שם פרטי <span class="hint">פרטי לגמרי 🔒 לא מוצג לאף אחד — עד ששניכם תחליטו לפתוח את המסך</span></label>
+          <label for="f-name"><span data-i18n="h098">שם פרטי</span> <span class="hint" data-i18n="h015">פרטי לגמרי 🔒 לא מוצג לאף אחד — עד ששניכם תחליטו לפתוח את המסך</span></label>
           <input type="text" id="f-name" maxlength="30" required>
         </div>
 
         <div class="field">
-          <label for="f-phone">טלפון <span class="hint">נחשף רק אם שני הצדדים לוחצים על ״פתיחת המסך״</span></label>
-          <input type="tel" id="f-phone" maxlength="20" inputmode="tel" placeholder="05X-XXXXXXX" dir="ltr" style="text-align:right" required>
+          <label for="f-phone"><span data-i18n="h099">טלפון</span> <span class="hint" data-i18n="h016">נחשף רק אם שני הצדדים לוחצים על ״פתיחת המסך״</span></label>
+          <input type="tel" id="f-phone" maxlength="20" inputmode="tel" placeholder="05X-XXXXXXX" dir="ltr" required>
         </div>
 
         <div class="field">
-          <span class="label">אני</span>
+          <span class="label" data-i18n="h017">אני</span>
           <div class="chips">
-            <label class="chip"><input type="radio" name="gender" value="m"><span>גבר</span></label>
-            <label class="chip"><input type="radio" name="gender" value="f"><span>אישה</span></label>
+            <label class="chip"><input type="radio" name="gender" value="m"><span data-i18n="h018">גבר</span></label>
+            <label class="chip"><input type="radio" name="gender" value="f"><span data-i18n="h019">אישה</span></label>
           </div>
         </div>
 
         <div class="row2">
           <div class="field">
-            <label for="f-age">גיל</label>
+            <label for="f-age" data-i18n="h020">גיל</label>
             <input type="number" id="f-age" min="18" max="99" inputmode="numeric" required>
           </div>
           <div class="field">
-            <label for="f-city">עיר</label>
-            <input type="text" id="f-city" maxlength="40" placeholder="תל אביב, ירושלים…" required>
+            <label for="f-city" data-i18n="h021">עיר</label>
+            <input type="text" id="f-city" maxlength="40" placeholder="תל אביב, ירושלים…" data-i18n-ph="h085" required>
           </div>
         </div>
 
         <div class="field">
-          <span class="label">אורח חיים</span>
+          <span class="label" data-i18n="h022">אורח חיים</span>
           <div class="chips">
-            <label class="chip"><input type="radio" name="religion" value="dati"><span>דתי/ה</span></label>
-            <label class="chip"><input type="radio" name="religion" value="masorti"><span>מסורתי/ת</span></label>
-            <label class="chip"><input type="radio" name="religion" value="hiloni"><span>חילוני/ת</span></label>
+            <label class="chip"><input type="radio" name="religion" value="dati"><span data-i18n="h023">דתי/ה</span></label>
+            <label class="chip"><input type="radio" name="religion" value="masorti"><span data-i18n="h024">מסורתי/ת</span></label>
+            <label class="chip"><input type="radio" name="religion" value="hiloni"><span data-i18n="h025">חילוני/ת</span></label>
           </div>
         </div>
 
         <div class="field">
-          <span class="label">מה אני מחפש/ת</span>
+          <span class="label" data-i18n="h026">מה אני מחפש/ת</span>
           <div class="chips">
-            <label class="chip"><input type="radio" name="intent" value="serious"><span>💍 קשר רציני</span></label>
-            <label class="chip"><input type="radio" name="intent" value="see"><span>🌊 נזרום ונראה</span></label>
+            <label class="chip"><input type="radio" name="intent" value="serious"><span data-i18n="h027">💍 קשר רציני</span></label>
+            <label class="chip"><input type="radio" name="intent" value="see"><span data-i18n="h028">🌊 נזרום ונראה</span></label>
           </div>
         </div>
 
         <div class="field">
-          <span class="label">שפות שאני מדבר/ת <span class="hint">אפשר לבחור כמה</span></span>
+          <span class="label"><span data-i18n="h100">שפות שאני מדבר/ת</span> <span class="hint" data-i18n="h029">אפשר לבחור כמה</span></span>
           <div class="chips">
-            <label class="chip"><input type="checkbox" name="langs" value="he"><span>🇮🇱 עברית</span></label>
+            <label class="chip"><input type="checkbox" name="langs" value="he"><span data-i18n="h030">🇮🇱 עברית</span></label>
             <label class="chip"><input type="checkbox" name="langs" value="en"><span>🇬🇧 English</span></label>
             <label class="chip"><input type="checkbox" name="langs" value="fr"><span>🇫🇷 Français</span></label>
           </div>
         </div>
 
         <div class="field">
-          <span class="label">3 מילים שמתארות אותי</span>
+          <span class="label" data-i18n="h031">3 מילים שמתארות אותי</span>
           <div class="row3">
-            <input type="text" class="f-word" maxlength="25" placeholder="סקרן/ית">
-            <input type="text" class="f-word" maxlength="25" placeholder="מצחיק/ה">
-            <input type="text" class="f-word" maxlength="25" placeholder="רגיש/ה">
+            <input type="text" class="f-word" maxlength="25" placeholder="סקרן/ית" data-i18n-ph="h086">
+            <input type="text" class="f-word" maxlength="25" placeholder="מצחיק/ה" data-i18n-ph="h087">
+            <input type="text" class="f-word" maxlength="25" placeholder="רגיש/ה" data-i18n-ph="h088">
           </div>
         </div>
 
         <div class="field">
-          <label for="f-shabbat">השבת האידיאלית שלך? 🕯️</label>
-          <textarea id="f-shabbat" maxlength="200" placeholder="למשל: ארוחה ארוכה עם חברים, ואז שנ״צ של שלוש שעות 😴"></textarea>
+          <label for="f-shabbat" data-i18n="h032">השבת האידיאלית שלך? 🕯️</label>
+          <textarea id="f-shabbat" maxlength="200" placeholder="למשל: ארוחה ארוכה עם חברים, ואז שנ״צ של שלוש שעות 😴" data-i18n-ph="h089"></textarea>
         </div>
 
-        <div class="q-divider">⚡ השאלון הקצר — כמה קליקים וסיימנו</div>
-        <p class="sub">זה מה שעוזר לקסם למצוא לך התאמות. קליל, מבטיחים 😉</p>
+        <div class="q-divider" data-i18n="h033">⚡ השאלון הקצר — כמה קליקים וסיימנו</div>
+        <p class="sub" data-i18n="h034">זה מה שעוזר לקסם למצוא לך התאמות. קליל, מבטיחים 😉</p>
 
         <div class="field">
-          <span class="label">טווח גילאים שמתאים לי <span class="hint">לא חובה — אפשר להשאיר ריק</span></span>
+          <span class="label"><span data-i18n="h101">טווח גילאים שמתאים לי</span> <span class="hint" data-i18n="h035">לא חובה — אפשר להשאיר ריק</span></span>
           <div class="row2">
-            <input type="number" id="f-agemin" min="18" max="99" inputmode="numeric" placeholder="מגיל">
-            <input type="number" id="f-agemax" min="18" max="99" inputmode="numeric" placeholder="עד גיל">
+            <input type="number" id="f-agemin" min="18" max="99" inputmode="numeric" placeholder="מגיל" data-i18n-ph="h090">
+            <input type="number" id="f-agemax" min="18" max="99" inputmode="numeric" placeholder="עד גיל" data-i18n-ph="h091">
           </div>
         </div>
 
         <div class="field">
-          <span class="label">ילדים? 👶</span>
+          <span class="label" data-i18n="h036">ילדים? 👶</span>
           <div class="chips">
-            <label class="chip"><input type="radio" name="kids" value="have"><span>יש לי 👶</span></label>
-            <label class="chip"><input type="radio" name="kids" value="want"><span>רוצה בעתיד</span></label>
-            <label class="chip"><input type="radio" name="kids" value="no"><span>לא בשבילי</span></label>
-            <label class="chip"><input type="radio" name="kids" value="flow"><span>נזרום</span></label>
+            <label class="chip"><input type="radio" name="kids" value="have"><span data-i18n="h037">יש לי 👶</span></label>
+            <label class="chip"><input type="radio" name="kids" value="want"><span data-i18n="h038">רוצה בעתיד</span></label>
+            <label class="chip"><input type="radio" name="kids" value="no"><span data-i18n="h039">לא בשבילי</span></label>
+            <label class="chip"><input type="radio" name="kids" value="flow"><span data-i18n="h040">נזרום</span></label>
           </div>
         </div>
 
         <div class="field">
-          <span class="label">שבת אצלי זה:</span>
+          <span class="label" data-i18n="h041">שבת אצלי זה:</span>
           <div class="chips">
-            <label class="chip"><input type="radio" name="shstyle" value="kodesh"><span>קודש 🕯️</span></label>
-            <label class="chip"><input type="radio" name="shstyle" value="massoret"><span>מסורת ונחת</span></label>
-            <label class="chip"><input type="radio" name="shstyle" value="regular"><span>יום רגיל</span></label>
+            <label class="chip"><input type="radio" name="shstyle" value="kodesh"><span data-i18n="h042">קודש 🕯️</span></label>
+            <label class="chip"><input type="radio" name="shstyle" value="massoret"><span data-i18n="h043">מסורת ונחת</span></label>
+            <label class="chip"><input type="radio" name="shstyle" value="regular"><span data-i18n="h044">יום רגיל</span></label>
           </div>
         </div>
 
         <div class="field">
-          <span class="label">הקצב שלי:</span>
+          <span class="label" data-i18n="h045">הקצב שלי:</span>
           <div class="chips">
-            <label class="chip"><input type="radio" name="pace" value="home"><span>בית וספה 🛋️</span></label>
-            <label class="chip"><input type="radio" name="pace" value="out"><span>בחוץ כל הזמן 🎉</span></label>
-            <label class="chip"><input type="radio" name="pace" value="mix"><span>תלוי בשבוע</span></label>
+            <label class="chip"><input type="radio" name="pace" value="home"><span data-i18n="h046">בית וספה 🛋️</span></label>
+            <label class="chip"><input type="radio" name="pace" value="out"><span data-i18n="h047">בחוץ כל הזמן 🎉</span></label>
+            <label class="chip"><input type="radio" name="pace" value="mix"><span data-i18n="h048">תלוי בשבוע</span></label>
           </div>
         </div>
 
         <div class="field">
-          <span class="label">הכי חשוב לי בבן/בת זוג:</span>
+          <span class="label" data-i18n="h049">הכי חשוב לי בבן/בת זוג:</span>
           <div class="chips">
-            <label class="chip"><input type="radio" name="value" value="heart"><span>לב חם ❤️</span></label>
-            <label class="chip"><input type="radio" name="value" value="humor"><span>הומור 😄</span></label>
-            <label class="chip"><input type="radio" name="value" value="stable"><span>יציבות 🏡</span></label>
-            <label class="chip"><input type="radio" name="value" value="open"><span>ראש פתוח 🌍</span></label>
+            <label class="chip"><input type="radio" name="value" value="heart"><span data-i18n="h050">לב חם ❤️</span></label>
+            <label class="chip"><input type="radio" name="value" value="humor"><span data-i18n="h051">הומור 😄</span></label>
+            <label class="chip"><input type="radio" name="value" value="stable"><span data-i18n="h052">יציבות 🏡</span></label>
+            <label class="chip"><input type="radio" name="value" value="open"><span data-i18n="h053">ראש פתוח 🌍</span></label>
           </div>
         </div>
 
         <div class="field">
-          <span class="label">סופ״ש חלומי:</span>
+          <span class="label" data-i18n="h054">סופ״ש חלומי:</span>
           <div class="chips">
-            <label class="chip"><input type="radio" name="weekend" value="nature"><span>טבע ⛰️</span></label>
-            <label class="chip"><input type="radio" name="weekend" value="sea"><span>ים 🌊</span></label>
-            <label class="chip"><input type="radio" name="weekend" value="movie"><span>סרט ושמיכה 🎬</span></label>
-            <label class="chip"><input type="radio" name="weekend" value="friends"><span>חברים ואוכל 🍲</span></label>
-            <label class="chip"><input type="radio" name="weekend" value="explore"><span>לגלות מקום חדש ✈️</span></label>
+            <label class="chip"><input type="radio" name="weekend" value="nature"><span data-i18n="h055">טבע ⛰️</span></label>
+            <label class="chip"><input type="radio" name="weekend" value="sea"><span data-i18n="h056">ים 🌊</span></label>
+            <label class="chip"><input type="radio" name="weekend" value="movie"><span data-i18n="h057">סרט ושמיכה 🎬</span></label>
+            <label class="chip"><input type="radio" name="weekend" value="friends"><span data-i18n="h058">חברים ואוכל 🍲</span></label>
+            <label class="chip"><input type="radio" name="weekend" value="explore"><span data-i18n="h059">לגלות מקום חדש ✈️</span></label>
           </div>
         </div>
 
         <div class="field">
-          <span class="label">מיליון ש״ח נפל עליי משמיים — הולך ל:</span>
+          <span class="label" data-i18n="h060">מיליון ש״ח נפל עליי משמיים — הולך ל:</span>
           <div class="chips">
-            <label class="chip"><input type="radio" name="million" value="travel"><span>טיול גדול בעולם ✈️</span></label>
-            <label class="chip"><input type="radio" name="million" value="invest"><span>דירה והשקעה 🏠</span></label>
-            <label class="chip"><input type="radio" name="million" value="spoil"><span>פינוקים לאהובים 🎁</span></label>
-            <label class="chip"><input type="radio" name="million" value="save"><span>חוסך/ת, שיהיה 🐷</span></label>
+            <label class="chip"><input type="radio" name="million" value="travel"><span data-i18n="h061">טיול גדול בעולם ✈️</span></label>
+            <label class="chip"><input type="radio" name="million" value="invest"><span data-i18n="h062">דירה והשקעה 🏠</span></label>
+            <label class="chip"><input type="radio" name="million" value="spoil"><span data-i18n="h063">פינוקים לאהובים 🎁</span></label>
+            <label class="chip"><input type="radio" name="million" value="save"><span data-i18n="h064">חוסך/ת, שיהיה 🐷</span></label>
           </div>
         </div>
 
         <div class="field">
-          <label for="f-clw">תשלימו: ״אני לא יכול/ה לחיות בלי ___״ ✍️ <span class="hint">מילה–שתיים, לא חובה</span></label>
-          <input type="text" id="f-clw" maxlength="40" placeholder="קפה של בוקר, ים, מוזיקה…">
+          <label for="f-clw"><span data-i18n="h102">תשלימו: ״אני לא יכול/ה לחיות בלי ___״ ✍️</span> <span class="hint" data-i18n="h065">מילה–שתיים, לא חובה</span></label>
+          <input type="text" id="f-clw" maxlength="40" placeholder="קפה של בוקר, ים, מוזיקה…" data-i18n-ph="h092">
         </div>
 
         <div class="field">
           <label class="check"><input type="checkbox" id="f-ok">
-            <span>אני מעל גיל 18, ומתחייב/ת לשיחה מכבדת. ידוע לי שאין לשתף טלפון או קישורים בצ׳אט — המסך נפתח רק בהסכמה הדדית.</span>
+            <span data-i18n="h066">אני מעל גיל 18, ומתחייב/ת לשיחה מכבדת. ידוע לי שאין לשתף טלפון או קישורים בצ׳אט — המסך נפתח רק בהסכמה הדדית.</span>
           </label>
         </div>
 
-        <button type="submit" class="btn gold block" id="reg-btn"><img class="heart-ico" src="logo-heart.png" alt=""> יוצאים לדרך</button>
-        <button type="button" class="btn ghost block hidden" id="edit-cancel" style="margin-top:10px">ביטול</button>
+        <button type="submit" class="btn gold block" id="reg-btn"><img class="heart-ico" src="logo-heart.png" alt=""> <span data-i18n="h103">יוצאים לדרך</span></button>
+        <button type="button" class="btn ghost block hidden" id="edit-cancel" style="margin-top:10px" data-i18n="h067">ביטול</button>
       </form>
     </div>
   </section>
@@ -232,23 +249,23 @@ if (location.hostname === "lebrati58.github.io") {
   <section id="screen-home" class="screen">
     <div class="announce hidden" id="announce"></div>
     <div class="news-banner hidden" id="news-banner"></div>
-    <div class="paused-banner hidden" id="paused-banner">⏸️ את/ה במצב השהיה — הכרטיס שלך לא מוצג כרגע <button class="btn link" id="resume-btn">חזרה ▶️</button></div>
-    <h2 style="margin-top:4px">הכרטיס שלך</h2>
-    <p class="sub">זה מה שאחרים רואים. בלי שם, בלי תמונה — רק את/ה, בדרך הלב.</p>
+    <div class="paused-banner hidden" id="paused-banner"><span data-i18n="h104">⏸️ את/ה במצב השהיה — הכרטיס שלך לא מוצג כרגע</span> <button class="btn link" id="resume-btn" data-i18n="h068">חזרה ▶️</button></div>
+    <h2 style="margin-top:4px" data-i18n="h069">הכרטיס שלך</h2>
+    <p class="sub" data-i18n="h070">זה מה שאחרים רואים. בלי שם, בלי תמונה — רק את/ה, בדרך הלב.</p>
     <div id="my-card"></div>
 
     <div class="tabs" role="tablist">
-      <button class="tab active" data-tab="proposals">✨ הצעות</button>
-      <button class="tab" data-tab="requests">💌 בקשות <span class="badge hidden" id="badge-requests"></span></button>
-      <button class="tab" data-tab="chats">💬 שיחות <span class="badge hidden" id="badge-chats"></span></button>
+      <button class="tab active" data-tab="proposals" data-i18n="h071">✨ הצעות</button>
+      <button class="tab" data-tab="requests"><span data-i18n="h105">💌 בקשות</span> <span class="badge hidden" id="badge-requests"></span></button>
+      <button class="tab" data-tab="chats"><span data-i18n="h106">💬 שיחות</span> <span class="badge hidden" id="badge-chats"></span></button>
     </div>
 
     <div class="tabpane active" id="pane-proposals">
-      <p class="sub">התאמות שנבחרו בשבילך. שולחים בקשה — ואם הצד השני מסכים, נפתחת שיחה אנונימית.</p>
+      <p class="sub" data-i18n="h072">התאמות שנבחרו בשבילך. שולחים בקשה — ואם הצד השני מסכים, נפתחת שיחה אנונימית.</p>
       <div class="list" id="proposals"></div>
     </div>
     <div class="tabpane" id="pane-requests">
-      <p class="sub">מישהו רוצה לדבר איתך בדרך הלב 💫</p>
+      <p class="sub" data-i18n="h073">מישהו רוצה לדבר איתך בדרך הלב 💫</p>
       <div class="list" id="requests"></div>
     </div>
     <div class="tabpane" id="pane-chats">
@@ -257,11 +274,11 @@ if (location.hostname === "lebrati58.github.io") {
 
     <div class="footer">
       <span dir="ltr">built by II.be'avba'am ❤️</span><br>
-      <button class="btn link" id="edit-me">✏️ עריכת הפרופיל</button>
+      <button class="btn link" id="edit-me" data-i18n="h074">✏️ עריכת הפרופיל</button>
       ·
-      <button class="btn link" id="pause-toggle">⏸️ מצב השהיה</button>
+      <button class="btn link" id="pause-toggle" data-i18n="h075">⏸️ מצב השהיה</button>
       ·
-      <button class="btn link" id="delete-me">מחיקת הפרופיל שלי</button>
+      <button class="btn link" id="delete-me" data-i18n="h076">מחיקת הפרופיל שלי</button>
     </div>
   </section>
 </main>
@@ -269,22 +286,22 @@ if (location.hostname === "lebrati58.github.io") {
 <!-- Chat -->
 <div id="chat-view" class="chat-view hidden">
   <div class="chat-head">
-    <button class="icon-btn" id="chat-back" aria-label="חזרה">→</button>
+    <button class="icon-btn" id="chat-back" aria-label="חזרה" data-i18n-aria="h093" data-i18n="back_arrow">→</button>
     <div class="title" id="chat-title"></div>
-    <button class="icon-btn" id="chat-menu-btn" aria-label="תפריט">⋯</button>
+    <button class="icon-btn" id="chat-menu-btn" aria-label="תפריט" data-i18n-aria="h094">⋯</button>
     <div class="menu hidden" id="chat-menu">
-      <button id="act-report">🚩 דיווח</button>
-      <button id="act-block-chat">🚫 חסימת הפרופיל</button>
-      <button id="act-end" class="muted">סיום השיחה</button>
+      <button id="act-report" data-i18n="h077">🚩 דיווח</button>
+      <button id="act-block-chat" data-i18n="h078">🚫 חסימת הפרופיל</button>
+      <button id="act-end" class="muted" data-i18n="h079">סיום השיחה</button>
     </div>
   </div>
   <div class="curtain-bar" id="curtain-bar"></div>
   <div class="messages" id="messages"></div>
   <form class="composer" id="composer">
-    <textarea id="msg-input" rows="1" maxlength="500" placeholder="כתבו משהו מסקרן…"></textarea>
-    <button type="submit" class="btn gold send" aria-label="שליחה">➤</button>
+    <textarea id="msg-input" rows="1" maxlength="500" placeholder="כתבו משהו מסקרן…" data-i18n-ph="h095"></textarea>
+    <button type="submit" class="btn gold send" aria-label="שליחה" data-i18n-aria="h096">➤</button>
   </form>
-  <div class="ended-bar hidden" id="ended-bar">השיחה הסתיימה 🌙</div>
+  <div class="ended-bar hidden" id="ended-bar" data-i18n="h080">השיחה הסתיימה 🌙</div>
 </div>
 
 <!-- Révélation -->
@@ -292,11 +309,11 @@ if (location.hostname === "lebrati58.github.io") {
   <div class="stage">
     <div class="stage-top"></div>
     <div class="reveal-content">
-      <h2>✨ המסך נפתח ✨</h2>
-      <p class="sub" style="margin:0">שניכם בחרתם להסיר את המסך</p>
+      <h2 data-i18n="h081">✨ המסך נפתח ✨</h2>
+      <p class="sub" style="margin:0" data-i18n="h082">שניכם בחרתם להסיר את המסך</p>
       <div class="who" id="reveal-who"></div>
-      <a class="btn gold" id="reveal-wa" rel="noopener">💬 לכתוב ב־WhatsApp</a>
-      <button class="btn link" id="reveal-close">חזרה לשיחה</button>
+      <a class="btn gold" id="reveal-wa" rel="noopener" data-i18n="h083">💬 לכתוב ב־WhatsApp</a>
+      <button class="btn link" id="reveal-close" data-i18n="h084">חזרה לשיחה</button>
     </div>
     <div class="sparkles">
       <span style="left:12%;top:70%;animation-delay:.2s">✨</span>
@@ -315,8 +332,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="commun.js?v=20261012"></script>
-<script src="matching.js?v=20261012"></script>
+<script src="i18n.js?v=20261012b"></script>
+<script src="commun.js?v=20261012b"></script>
+<script src="matching.js?v=20261012b"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -342,7 +360,27 @@ const partnerNo = m => (m.from === uid ? m.toNo : m.fromNo);
 const myNo = m => (m.from === uid ? m.fromNo : m.toNo);
 
 /* =================== Démarrage =================== */
+/* ----- Langue ----- */
+function chooseLangIfNeeded() {
+  if (hasChosenLang()) return Promise.resolve();
+  show("screen-lang");
+  return new Promise(resolve => {
+    $$("#screen-lang [data-lang]").forEach(b => b.addEventListener("click", () => { setLang(b.dataset.lang); markLang(); resolve(); }, { once: true }));
+  });
+}
+function markLang() { $$("#lang-switch [data-lang]").forEach(b => b.classList.toggle("active", b.dataset.lang === LANG)); }
+$$("#lang-switch [data-lang]").forEach(b => b.addEventListener("click", () => {
+  const big = $(`#screen-lang.active [data-lang="${b.dataset.lang}"]`);
+  if (big) return big.click();   // écran de choix affiché : même effet que le gros bouton
+  if (b.dataset.lang === LANG) return;
+  setLang(b.dataset.lang); markLang();
+  if (me) location.reload();   // écran d'accueil / chat : on recharge pour tout retraduire
+}));
+
 (async function boot() {
+  applyI18n(); markLang();
+  await chooseLangIfNeeded();
+  show("screen-loading");
   try {
     const user = await ensureAuth();
     uid = user.uid;
@@ -360,7 +398,7 @@ const myNo = m => (m.from === uid ? m.fromNo : m.toNo);
       const old = store.get("identity");
       if (old && old.uid !== uid) {
         const el = $("#old-identity");
-        el.textContent = `נראה שנרשמת בעבר (${profileName(old.no)}) — אבל בדפדפן הזה הזיכרון נמחק. אפשר להירשם מחדש 🙂`;
+        el.textContent = t("old_identity", { name: profileName(old.no) });
         el.classList.remove("hidden");
       }
       setupIabBanner();
@@ -368,7 +406,7 @@ const myNo = m => (m.from === uid ? m.fromNo : m.toNo);
     }
   } catch (e) {
     console.error(e);
-    $("#error-text").textContent = "לא הצלחנו להתחבר. (" + (e.code || e.message || e) + ")";
+    $("#error-text").textContent = t("err_connect") + " (" + (e.code || e.message || e) + ")";
     show("screen-error");
   }
 })();
@@ -382,16 +420,16 @@ function setupIabBanner() {
   const ua = navigator.userAgent || "";
   const isIOS = /iPhone|iPad|iPod/.test(ua);
   $("#iab-how").innerHTML = isIOS
-    ? `כדאי לפתוח בדפדפן אמיתי: לחצו על <b>סמל השיתוף</b> (□ עם חץ) ← «פתיחה ב־Safari».`
-    : `כדאי לפתוח בדפדפן אמיתי: לחצו על <b>⋮</b> למעלה ← «פתיחה בדפדפן» (או «Open in Chrome»).`;
+    ? t("iab_ios")
+    : t("iab_android");
   $("#iab-copy").addEventListener("click", async () => {
     const url = location.href.split("#")[0];
-    try { await navigator.clipboard.writeText(url); toast("הקישור הועתק 📋 — פתחו אותו בדפדפן"); }
+    try { await navigator.clipboard.writeText(url); toast(t("link_copied_open")); }
     catch (e) {
       // Fallback : sélection manuelle
       const inp = document.createElement("input");
       inp.value = url; document.body.appendChild(inp);
-      inp.select(); try { document.execCommand("copy"); toast("הקישור הועתק 📋"); } catch (e2) { toast(url, 6000); }
+      inp.select(); try { document.execCommand("copy"); toast(t("link_copied")); } catch (e2) { toast(url, 6000); }
       inp.remove();
     }
   });
@@ -424,16 +462,16 @@ $("#edit-me").addEventListener("click", async () => {
   $("#f-clw").value = me.cantLiveWithout || "";
   $$("input[name=langs]").forEach(i => { i.checked = !!(me.langs && me.langs[i.value]); });
   $("#f-ok").checked = true;
-  $("#reg-title").textContent = `✏️ עריכת ${profileName(me.no)}`;
-  $("#reg-btn").textContent = "💾 שמירת השינויים";
+  $("#reg-title").textContent = t("edit_title", { name: profileName(me.no) });
+  $("#reg-btn").textContent = t("save_changes");
   $("#edit-cancel").classList.remove("hidden");
   $("#old-identity").classList.add("hidden"); $("#iab-banner").classList.add("hidden");
   show("screen-register");
 });
 function leaveEdit() {
   editMode = false;
-  $("#reg-title").textContent = "הכרטיס המסתורי שלך ✨";
-  $("#reg-btn").disabled = false; $("#reg-btn").innerHTML = HEART + " יוצאים לדרך";
+  $("#reg-title").textContent = t("h009");
+  $("#reg-btn").disabled = false; $("#reg-btn").innerHTML = HEART + " " + t("h103");
   $("#edit-cancel").classList.add("hidden");
   show("screen-home");
 }
@@ -461,28 +499,28 @@ $("#reg-form").addEventListener("submit", async e => {
   const langs = {};
   $$("input[name=langs]:checked").forEach(i => { langs[i.value] = true; });
 
-  if (!firstName) return toast("מה השם שלך? (הוא נשאר סודי 🔒)");
-  if (!/^\+?[\d\s\-]{9,18}$/.test(phone)) return toast("מספר טלפון לא תקין");
-  if (!gender) return toast("בחרו: גבר או אישה");
-  if (!(age >= 18 && age <= 99)) return toast("הגיל צריך להיות 18 ומעלה");
-  if (!city) return toast("באיזו עיר?");
-  if (!religion) return toast("בחרו אורח חיים");
-  if (!intent) return toast("מה את/ה מחפש/ת?");
-  if (!Object.keys(langs).length) return toast("באילו שפות את/ה מדבר/ת? 🇮🇱🇬🇧🇫🇷");
-  if (words.length < 3) return toast("צריך 3 מילים שמתארות אותך ✨");
-  if (!shabbat) return toast("ספרו לנו על השבת האידיאלית 🕯️");
-  if (!kids) return toast("ילדים — מה הכיוון? 👶");
-  if (!shabbatStyle) return toast("שבת אצלך זה…? 🕯️");
-  if (!pace) return toast("מה הקצב שלך?");
-  if (!value) return toast("מה הכי חשוב לך בבן/בת זוג?");
-  if (!weekend) return toast("סופ״ש חלומי — בחרו אחד ✨");
-  if (!million) return toast("לאן הולך המיליון? 😄");
-  if ([...words, shabbat, city, cantLiveWithout].some(hasForbiddenContent)) return toast("שומרים על המסתורין 💗 — בלי טלפון ובלי קישורים");
-  if (!$("#f-ok").checked) return toast("צריך לאשר את כללי הכבוד 🙏");
+  if (!firstName) return toast(t("v_name"));
+  if (!/^\+?[\d\s\-]{9,18}$/.test(phone)) return toast(t("v_phone"));
+  if (!gender) return toast(t("v_gender"));
+  if (!(age >= 18 && age <= 99)) return toast(t("v_age"));
+  if (!city) return toast(t("v_city"));
+  if (!religion) return toast(t("v_religion"));
+  if (!intent) return toast(t("v_intent"));
+  if (!Object.keys(langs).length) return toast(t("v_langs"));
+  if (words.length < 3) return toast(t("v_words"));
+  if (!shabbat) return toast(t("v_shabbat"));
+  if (!kids) return toast(t("v_kids"));
+  if (!shabbatStyle) return toast(t("v_shstyle"));
+  if (!pace) return toast(t("v_pace"));
+  if (!value) return toast(t("v_value"));
+  if (!weekend) return toast(t("v_weekend"));
+  if (!million) return toast(t("v_million"));
+  if ([...words, shabbat, city, cantLiveWithout].some(hasForbiddenContent)) return toast(t("v_forbidden"));
+  if (!$("#f-ok").checked) return toast(t("v_ok"));
 
   const btn = $("#reg-btn");
   if (editMode) {
-    btn.disabled = true; btn.textContent = "שומרים…";
+    btn.disabled = true; btn.textContent = t("saving");
     try {
       priv = { firstName, phone };
       await db.ref("private/" + uid).set(priv);
@@ -493,15 +531,15 @@ $("#reg-form").addEventListener("submit", async e => {
         pace: pace || null, value: value || null, weekend: weekend || null, million: million || null,
         cantLiveWithout: cantLiveWithout || null, langs
       });
-      toast("הפרופיל עודכן 💗");
+      toast(t("profile_updated"));
       leaveEdit();
     } catch (err) {
-      console.error(err); toast("השמירה נכשלה — נסו שוב");
-      btn.disabled = false; btn.textContent = "💾 שמירת השינויים";
+      console.error(err); toast(t("save_failed"));
+      btn.disabled = false; btn.textContent = t("save_changes");
     }
     return;
   }
-  btn.disabled = true; btn.textContent = "המסך עולה…";
+  btn.disabled = true; btn.textContent = t("h003");
   try {
     // Reprise : si une tentative précédente a déjà créé un profil pour cet uid,
     // on réutilise son numéro (immuable côté règles) au lieu d'en tirer un nouveau.
@@ -538,13 +576,13 @@ $("#reg-form").addEventListener("submit", async e => {
     }
     me.createdAt = Date.now();
     store.set("identity", { uid, no });
-    toast(`ברוכים הבאים, ${profileName(no)} 💗`);
+    toast(t("welcome", { name: profileName(no) }));
     startHome();
   } catch (err) {
     console.error(err);
     const code = (err && (err.code || err.message)) || "";
-    toast("שגיאה בהרשמה — נסו שוב. אם זה חוזר, פתחו את הקישור ב־Safari/Chrome 🌐" + (code ? " [" + code + "]" : ""), 6000);
-    btn.disabled = false; btn.innerHTML = HEART + " יוצאים לדרך";
+    toast(t("reg_error") + (code ? " [" + code + "]" : ""), 6000);
+    btn.disabled = false; btn.innerHTML = HEART + " " + t("h103");
   }
 });
 
@@ -600,7 +638,7 @@ function renderNews() {
   const n = Object.entries(inbox).filter(([u, r]) => r.status === "pending" && !banned[u] && !blocks[u] && profiles[u]).length;
   const el = $("#news-banner");
   if (n > 0) {
-    el.innerHTML = `💌 יש לך ${n === 1 ? "בקשה שמחכה" : n + " בקשות שמחכות"} לך! <button class="btn gold small" id="news-go">לצפייה</button>`;
+    el.innerHTML = `${esc(n === 1 ? t("news_one") : t("news_many", { n }))} <button class="btn gold small" id="news-go">${esc(t("news_go"))}</button>`;
     el.classList.remove("hidden");
     $("#news-go").onclick = () => selectTab("requests");
   } else el.classList.add("hidden");
@@ -611,19 +649,19 @@ function updatePausedUI() {
   const paused = !!(me && me.paused);
   const pb = $("#paused-banner"), pt = $("#pause-toggle");
   if (pb) pb.classList.toggle("hidden", !paused);
-  if (pt) pt.textContent = paused ? "▶️ חזרה מהשהיה" : "⏸️ מצב השהיה";
+  if (pt) pt.textContent = paused ? t("pause_resume") : t("h075");
 }
 async function setPaused(v) {
   try {
     await db.ref(`profiles/${uid}/paused`).set(v ? true : null);
     if (v) me.paused = true; else delete me.paused;
     updatePausedUI();
-    toast(v ? "את/ה במצב השהיה ⏸️" : "חזרת! ✨");
-  } catch (e) { console.error(e); toast("לא הצלחנו — נסו שוב"); }
+    toast(v ? t("paused_on") : t("paused_off"));
+  } catch (e) { console.error(e); toast(t("fail_retry")); }
 }
 $("#pause-toggle").addEventListener("click", async () => {
   if (me && me.paused) return setPaused(false);
-  const ok = await showModal({ title: "⏸️ מצב השהיה?", body: "הכרטיס שלך לא יוצג בהצעות עד שתחזרו. השיחות הקיימות נשארות 🌙", okText: "השהיה", cancelText: "ביטול" });
+  const ok = await showModal({ title: t("pause_title"), body: esc(t("pause_body")), okText: t("pause_ok"), cancelText: t("cancel") });
   if (ok) setPaused(true);
 });
 $("#resume-btn").addEventListener("click", () => setPaused(false));
@@ -632,17 +670,17 @@ $("#resume-btn").addEventListener("click", () => setPaused(false));
 async function blockUser(target) {
   const p = profiles[target] || {};
   const ok = await showModal({
-    title: "🚫 לחסום את הפרופיל?",
-    body: `${esc(profileName(p.no || "?"))} לא יופיע אצלך יותר, ולא יוכל לשלוח לך בקשות חדשות. הוא/היא לא ידעו שנחסמו.`,
-    okText: "חסימה", cancelText: "ביטול", danger: true
+    title: t("block_title"),
+    body: esc(t("block_body", { name: profileName(p.no || "?") })),
+    okText: t("block_ok"), cancelText: t("cancel"), danger: true
   });
   if (!ok) return false;
   try {
     await db.ref(`blocks/${uid}/${target}`).set(true);
     if (inbox[target] && inbox[target].status === "pending") await declineRequest(target).catch(() => {});
-    toast("הפרופיל נחסם 🚫");
+    toast(t("blocked"));
     return true;
-  } catch (e) { console.error(e); toast("לא הצלחנו לחסום — נסו שוב"); return false; }
+  } catch (e) { console.error(e); toast(t("block_fail")); return false; }
 }
 
 /* ----- Propositions (matching) ----- */
@@ -680,26 +718,26 @@ function renderProposals() {
   if (!box || !me) return;
   const list = computeProposals();
   if (!list.length) {
-    box.innerHTML = `<div class="empty"><span class="big">🌙</span>עוד אין כאן התאמה חדשה… המסך עוד לא עלה.<br>חזרו בקרוב — הקסם לוקח זמן.</div>`;
+    box.innerHTML = `<div class="empty"><span class="big">🌙</span>${t("no_proposals")}</div>`;
     return;
   }
   box.innerHTML = list.map(c => {
     const pct = matchPercent(me, c.p);
-    const why = matchReasons(me, c.p);
-    const softWhy = c.soft ? softReasons(me, c.p) : [];
+    const why = matchReasons(me, c.p, 3, LANG);
+    const softWhy = c.soft ? softReasons(me, c.p, LANG) : [];
     return `
     <div>
-      <div class="match-pct">💘 ${pct}% התאמה</div>
+      <div class="match-pct">${esc(t("match_pct", { pct }))}</div>
       ${c.soft
-        ? `<div class="match-pct soft">🔭 מחוץ להעדפות שלך — אבל אולי בכל זאת? ✨
+        ? `<div class="match-pct soft">${esc(t("soft_banner"))}
             ${softWhy.length ? `<div class="soft-why">${softWhy.map(w => `<span>${esc(w)}</span>`).join("")}</div>` : ""}</div>`
         : ""}
       ${cardHTML(c.p)}
-      ${why.length ? `<div class="match-why"><b>למה אתם מתאימים:</b> ${why.map(w => `<span>${esc(w)}</span>`).join("")}</div>` : ""}
+      ${why.length ? `<div class="match-why"><b>${esc(t("why_title"))}</b> ${why.map(w => `<span>${esc(w)}</span>`).join("")}</div>` : ""}
       <div class="item-actions">
         ${c.pending
-          ? `<button class="btn ghost" disabled>⏳ הבקשה נשלחה — מחכים בסבלנות</button>`
-          : `<button class="btn gold" data-send="${esc(c.uid)}">💌 בקשה לשיחה</button>`}
+          ? `<button class="btn ghost" disabled>${esc(t("req_waiting"))}</button>`
+          : `<button class="btn gold" data-send="${esc(c.uid)}">${esc(t("req_send"))}</button>`}
       </div>
     </div>`;
   }).join("");
@@ -724,9 +762,9 @@ async function sendRequest(toUid) {
       [`inbox/${toUid}/${uid}`]: { fromNo: me.no, status: "pending", createdAt: TS },
       [`outbox/${uid}/${toUid}`]: { toNo: p.no, status: "pending", createdAt: TS }
     });
-    toast(`הבקשה נשלחה ל${profileName(p.no)} 💌`);
+    toast(t("req_sent", { name: profileName(p.no) }));
   } catch (err) {
-    console.error(err); toast("לא הצלחנו לשלוח — נסו שוב");
+    console.error(err); toast(t("send_fail"));
     renderProposals();
   }
 }
@@ -739,15 +777,15 @@ function renderRequests() {
   setBadge("#badge-requests", pending.length);
   renderNews();
   if (!pending.length) {
-    box.innerHTML = `<div class="empty"><span class="big">💌</span>אין בקשות חדשות כרגע.</div>`;
+    box.innerHTML = `<div class="empty"><span class="big">💌</span>${esc(t("no_requests"))}</div>`;
     return;
   }
   box.innerHTML = pending.map(([u]) => `
     <div>
       ${cardHTML(profiles[u])}
       <div class="item-actions">
-        <button class="btn gold" data-accept="${esc(u)}">✨ פתיחת שיחה</button>
-        <button class="btn ghost" data-decline="${esc(u)}">לא הפעם</button>
+        <button class="btn gold" data-accept="${esc(u)}">${esc(t("accept"))}</button>
+        <button class="btn ghost" data-decline="${esc(u)}">${esc(t("decline"))}</button>
         <button class="btn ghost" data-block="${esc(u)}" style="flex:0 0 auto">🚫</button>
       </div>
     </div>`).join("");
@@ -767,17 +805,17 @@ async function acceptRequest(fromUid) {
     await db.ref("chats/" + chatId).set({
       from: fromUid, to: uid, fromNo: p.no, toNo: me.no,
       status: "active", opened: false, createdAt: TS,
-      icebreaker: pickIcebreaker(p, me)
+      icebreaker: pickIcebreakerKey(p, me)
     });
     await db.ref(`userChats/${uid}/${chatId}`).set(true);
     await db.ref(`userChats/${fromUid}/${chatId}`).set(true);
     await db.ref(`inbox/${uid}/${fromUid}`).update({ status: "accepted", chatId });
     await db.ref(`outbox/${fromUid}/${uid}`).update({ status: "accepted", chatId }).catch(() => {});
-    toast("השיחה נפתחה 💗");
+    toast(t("chat_opened"));
     selectTab("chats");
     openChat(chatId);
   } catch (err) {
-    console.error(err); toast("לא הצלחנו לפתוח את השיחה"); renderRequests();
+    console.error(err); toast(t("open_fail")); renderRequests();
   }
 }
 
@@ -785,8 +823,8 @@ async function declineRequest(fromUid) {
   try {
     await db.ref(`inbox/${uid}/${fromUid}`).update({ status: "declined" });
     await db.ref(`outbox/${fromUid}/${uid}`).update({ status: "declined" }).catch(() => {});
-    toast("הבקשה נסגרה בעדינות 🌙");
-  } catch (err) { console.error(err); toast("שגיאה — נסו שוב"); }
+    toast(t("declined"));
+  } catch (err) { console.error(err); toast(t("error_retry")); }
 }
 
 /* ----- Chats ----- */
@@ -812,19 +850,19 @@ function renderChats() {
   const list = Object.entries(myChats).sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
   setBadge("#badge-chats", list.filter(([id]) => isUnread(id)).length);
   if (!list.length) {
-    box.innerHTML = `<div class="empty"><span class="big">💬</span>עוד אין שיחות. הכל מתחיל בבקשה אחת 💌</div>`;
+    box.innerHTML = `<div class="empty"><span class="big">💬</span>${esc(t("no_chats"))}</div>`;
     return;
   }
   box.innerHTML = list.map(([id, m]) => {
     const pn = partnerNo(m);
-    const state = isUnread(id) ? `<div class="state unread">💬 הודעה חדשה</div>`
-      : m.opened ? `<div class="state opened">✨ המסך נפתח</div>`
-      : m.status === "ended" ? `<div class="state">השיחה הסתיימה 🌙</div>`
-      : `<div class="state">שיחה פעילה · עדיין בעילום שם</div>`;
+    const state = isUnread(id) ? `<div class="state unread">${esc(t("st_unread"))}</div>`
+      : m.opened ? `<div class="state opened">${esc(t("st_opened"))}</div>`
+      : m.status === "ended" ? `<div class="state">${esc(t("st_ended"))}</div>`
+      : `<div class="state">${esc(t("st_active"))}</div>`;
     return `<div class="chat-row" data-chat="${esc(id)}">
       <div class="avatar ${colorClass(profiles[partnerOf(m)] || { no: pn })}">${HEART}</div>
       <div class="info"><div class="title">${esc(profileName(pn))}</div>${state}</div>
-      <div>←</div>
+      <div>${t("fwd_arrow")}</div>
     </div>`;
   }).join("");
 }
@@ -843,7 +881,7 @@ async function openChat(id) {
   const m = myChats[id];
   closeChat();
   currentChat = id;
-  $("#messages").innerHTML = `<div class="sys">💜 אתם בדרך הלב. בלי שמות, בלי טלפונים — רק שיחה.</div>`;
+  $("#messages").innerHTML = `<div class="sys">${esc(t("chat_intro"))}</div>`;
   $("#chat-view").classList.remove("hidden");
   document.body.style.overflow = "hidden";
   fitChatToViewport();
@@ -890,7 +928,7 @@ function ensureIcebreaker() {
   if (!m || !m.icebreaker || document.getElementById("ib-bubble")) return;
   const d = document.createElement("div");
   d.className = "sys"; d.id = "ib-bubble";
-  d.textContent = "💘 שאלת פתיחה: " + m.icebreaker;
+  d.textContent = t("icebreaker_lbl") + icebreakerText(m.icebreaker, LANG);
   const box = $("#messages");
   box.insertBefore(d, box.children[1] || null);
 }
@@ -908,19 +946,19 @@ function updateChatView() {
   const bar = $("#curtain-bar");
   const sec = secretsCache[id];
   if (m.opened && sec && sec[partnerOf(m)]) {
-    const t = sec[partnerOf(m)];
-    bar.innerHTML = `<div class="revealed-box">✨ המסך נפתח: <b>${esc(t.firstName)}</b> · <span dir="ltr">${esc(t.phone)}</span>
-      <div class="btns"><a class="btn gold small" href="${esc(waLink(t.phone))}" rel="noopener">💬 WhatsApp</a>
-      <button class="btn ghost small" id="replay-reveal">${HEART} לראות שוב</button></div></div>`;
+    const tp = sec[partnerOf(m)];   // (pas « t » : ce nom est la fonction de traduction)
+    bar.innerHTML = `<div class="revealed-box">${esc(t("revealed"))} <b>${esc(tp.firstName)}</b> · <span dir="ltr">${esc(tp.phone)}</span>
+      <div class="btns"><a class="btn gold small" href="${esc(waLink(tp.phone))}" rel="noopener">💬 WhatsApp</a>
+      <button class="btn ghost small" id="replay-reveal">${HEART} ${esc(t("see_again"))}</button></div></div>`;
     $("#replay-reveal").onclick = () => playReveal(id);
   } else if (ended) {
     bar.innerHTML = "";
   } else if (pressedCache[id]) {
-    bar.innerHTML = `<div class="pressed">${HEART} ביקשת לפתוח את המסך</div>
-      <div class="note">הצד השני לא יודע. אם גם הוא/היא ילחצו — המסך ייפתח לשניכם ✨</div>`;
+    bar.innerHTML = `<div class="pressed">${HEART} ${esc(t("pressed"))}</div>
+      <div class="note">${esc(t("pressed_note"))}</div>`;
   } else {
-    bar.innerHTML = `<button class="btn gold small" id="btn-reveal">${HEART} פתיחת המסך</button>
-      <div class="note">רק אם שניכם תלחצו — שמות וטלפונים ייחשפו. הצד השני לא יידע שלחצת.</div>`;
+    bar.innerHTML = `<button class="btn gold small" id="btn-reveal">${HEART} ${esc(t("reveal_btn"))}</button>
+      <div class="note">${esc(t("reveal_note"))}</div>`;
     $("#btn-reveal").onclick = pressReveal;
   }
 }
@@ -931,11 +969,11 @@ $("#composer").addEventListener("submit", async e => {
   const input = $("#msg-input");
   const text = input.value.trim();
   if (!text || !currentChat) return;
-  if (hasForbiddenContent(text)) { toast("שומרים על המסתורין 💗 — בלי מספרי טלפון ובלי קישורים", 3500); return; }
+  if (hasForbiddenContent(text)) { toast(t("msg_forbidden"), 3500); return; }
   input.value = ""; autoGrow();
   try {
     await db.ref("messages/" + currentChat).push({ from: uid, text: text.slice(0, 500), ts: TS });
-  } catch (err) { console.error(err); toast("ההודעה לא נשלחה"); input.value = text; }
+  } catch (err) { console.error(err); toast(t("msg_fail")); input.value = text; }
 });
 /* Clavier mobile : la vue chat (position fixed) suit la zone réellement visible,
    sinon le clavier recouvre la zone de saisie (Chrome Android, Safari iOS). */
@@ -962,9 +1000,9 @@ msgInput.addEventListener("keydown", e => {
 async function pressReveal() {
   const id = currentChat;
   const ok = await showModal({
-    title: "💗 לפתוח את המסך?",
-    body: "אם גם הצד השני ילחץ — שניכם תראו את השם ואת מספר הטלפון.<br>אם רק את/ה לחצת, <b>הצד השני לא יידע</b>.",
-    okText: "כן, אני מוכן/ה ✨", cancelText: "עוד לא"
+    title: t("reveal_title"),
+    body: t("reveal_body"),
+    okText: t("reveal_ok"), cancelText: t("reveal_not_yet")
   });
   if (!ok || currentChat !== id) return;
   try {
@@ -974,7 +1012,7 @@ async function pressReveal() {
     pressedCache[id] = true;
     updateChatView();
     tryOpen(id);
-  } catch (err) { console.error(err); toast("שגיאה — נסו שוב"); }
+  } catch (err) { console.error(err); toast(t("error_retry")); }
 }
 // Réussit seulement si les deux ont appuyé (vérifié par les règles Firebase)
 function tryOpen(id) {
@@ -989,9 +1027,9 @@ function playReveal(id) {
   const mine = s[uid] || priv || {}, theirs = s[partnerOf(m)];
   if (!theirs) return;
   $("#reveal-who").innerHTML = `
-    <div class="person"><div class="lbl">${esc(profileName(partnerNo(m)))} הוא/היא…</div>
+    <div class="person"><div class="lbl">${esc(t("reveal_is", { name: profileName(partnerNo(m)) }))}</div>
       <div class="nm">${esc(theirs.firstName)}</div><div class="ph">${esc(theirs.phone)}</div></div>
-    <div class="person" style="opacity:.8"><div class="lbl">ואת/ה, ${esc(profileName(myNo(m)))}</div>
+    <div class="person" style="opacity:.8"><div class="lbl">${esc(t("reveal_you", { name: profileName(myNo(m)) }))}</div>
       <div class="nm" style="font-size:1.2rem">${esc(mine.firstName || "")}</div></div>`;
   $("#reveal-wa").href = waLink(theirs.phone);
   const r = $("#reveal");
@@ -1017,15 +1055,15 @@ $("#act-block-chat").addEventListener("click", async () => {
 
 $("#act-end").addEventListener("click", async () => {
   const id = currentChat;
-  const ok = await showModal({ title: "לסיים את השיחה?", body: "השיחה תיסגר לשני הצדדים, בלי לציין מי סיים. 🌙", okText: "סיום השיחה", cancelText: "ביטול", danger: true });
+  const ok = await showModal({ title: t("end_title"), body: esc(t("end_body")), okText: t("end_ok"), cancelText: t("cancel"), danger: true });
   if (!ok) return;
-  try { await db.ref(`chats/${id}/status`).set("ended"); } catch (e) { toast("שגיאה — נסו שוב"); }
+  try { await db.ref(`chats/${id}/status`).set("ended"); } catch (e) { toast(t("error_retry")); }
 });
 
 $("#act-report").addEventListener("click", async () => {
   const id = currentChat, m = myChats[id];
   if (!m) return;
-  const reason = await showModal({ title: "🚩 דיווח למנהלים", body: "מה קרה? הדיווח נשלח בדיסקרטיות. המנהלים לא יכולים לקרוא את השיחה.", input: true, placeholder: "תיאור קצר…", okText: "שליחת דיווח", cancelText: "ביטול", danger: true });
+  const reason = await showModal({ title: t("report_title"), body: esc(t("report_body")), input: true, placeholder: t("report_ph"), okText: t("report_ok"), cancelText: t("cancel"), danger: true });
   if (!reason) return;
   try {
     await db.ref("reports").push({
@@ -1033,13 +1071,13 @@ $("#act-report").addEventListener("click", async () => {
       reportedUid: partnerOf(m), reportedNo: partnerNo(m),
       reason: reason.slice(0, 300), createdAt: TS
     });
-    toast("תודה. הדיווח הועבר בדיסקרטיות 🙏");
-  } catch (e) { console.error(e); toast("הדיווח לא נשלח — נסו שוב"); }
+    toast(t("report_thanks"));
+  } catch (e) { console.error(e); toast(t("report_fail")); }
 });
 
 /* ----- Supprimer mon profil ----- */
 $("#delete-me").addEventListener("click", async () => {
-  const ok = await showModal({ title: "למחוק את הפרופיל?", body: "הכרטיס שלך ייעלם, והשיחות הפעילות ייסגרו. אי אפשר לבטל.", okText: "מחיקה", cancelText: "ביטול", danger: true });
+  const ok = await showModal({ title: t("del_title"), body: esc(t("del_body")), okText: t("del_ok"), cancelText: t("cancel"), danger: true });
   if (!ok) return;
   try {
     for (const [id, m] of Object.entries(myChats)) {
@@ -1053,7 +1091,7 @@ $("#delete-me").addEventListener("click", async () => {
     await auth.signOut();
     store.clear();
     location.reload();
-  } catch (e) { console.error(e); toast("שגיאה במחיקה"); }
+  } catch (e) { console.error(e); toast(t("del_fail")); }
 });
 </script>
 </body>

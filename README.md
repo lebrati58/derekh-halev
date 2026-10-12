@@ -15,6 +15,7 @@ On tombe amoureux d'une conversation **avant** de voir le visage.
 | `index.html` | App participant : inscription, carte mystère, propositions, demandes, chat, ouverture du rideau |
 | `admin.html` | Tableau de bord admin (PIN) : stats, signalements, bannissement. **Ne peut pas lire les conversations.** |
 | `commun.js` | Config Firebase, structure de la base (en commentaire), helpers, filtre anti-téléphone/liens |
+| `i18n.js` | Traductions de l'interface (hébreu, anglais, français), choix de langue, passage RTL/LTR |
 | `matching.js` | Moteur de compatibilité v2 (filtres durs, score, « pourquoi vous matchez », icebreakers) — pur, sans Firebase |
 | `test_matching.js` | Tests du moteur (`node test_matching.js`) |
 | `style.css` | Design partagé (violet nuit / doré, rideau de théâtre) |
@@ -119,7 +120,7 @@ Pour simuler deux personnes : une fenêtre normale + une fenêtre de navigation 
 **À la main** (si besoin, depuis un ordinateur) :
 
 ```bash
-mkdir -p public && cp index.html admin.html commun.js matching.js style.css logo.png logo-heart.png apple-touch-icon.png public/
+mkdir -p public && cp index.html admin.html i18n.js commun.js matching.js style.css logo.png logo-heart.png apple-touch-icon.png public/
 npx firebase-tools deploy --only hosting --project dereh-halev
 ```
 
