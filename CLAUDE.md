@@ -67,7 +67,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 
 ## Logique de matching
 
-Toute la compatibilité vit dans `matching.js` (`isCompatible`, `matchScore`, `matchPercent`, `matchReasons`, `pickIcebreaker`, `kidsOk`…), chargé par `index.html` après `commun.js`. Elle tourne **côté client** : `computeProposals()` dans `index.html` charge tous les `profiles`, exclut soi/bannis/bloqués/demandes et chats existants, puis appelle `matching.js` (3 propositions max, complétées par des profils « découverte » hors préférences si besoin). L'icebreaker est calculé à l'acceptation et stocké dans `chats/{id}/icebreaker`.
+Toute la compatibilité vit dans `matching.js` (`isCompatible`, `matchScore`, `matchPercent`, `matchReasons`, `pickIcebreaker`, `kidsOk`…), chargé par `index.html` après `commun.js`. Elle tourne **côté client** : `computeProposals()` dans `index.html` charge tous les `profiles`, exclut soi/bannis/bloqués/demandes et chats existants, puis appelle `matching.js` (tous les profils compatibles, triés par score, suivis de tous les profils « découverte » hors préférences). L'icebreaker est calculé à l'acceptation et stocké dans `chats/{id}/icebreaker`.
 
 ## Tester en local
 
