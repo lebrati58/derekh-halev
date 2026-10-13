@@ -383,3 +383,14 @@ textarea { resize: vertical; min-height: 70px; }
 
 .chat-row .avatar { position: relative; cursor: pointer; }
 .chat-row .avatar::after { content: "👤"; position: absolute; bottom: -4px; inset-inline-end: -4px; font-size: .7rem; background: var(--night-2); border: 1px solid var(--gold); border-radius: 50%; width: 20px; height: 20px; display: grid; place-items: center; }
+
+.welcome-row { border-color: var(--gold); background: linear-gradient(135deg, rgba(212,169,74,.14), rgba(123,82,181,.18)); }
+.welcome-avatar { background: radial-gradient(circle, #fff3, transparent 70%), var(--plum); }
+/* Onglets : toujours dans la largeur de l'écran, même en français avec un badge */
+.tabs { max-width: 100%; }
+.tab { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.tab { flex: 1 1 auto; padding-inline: 6px; }
+[lang="fr"] .tab, [lang="en"] .tab { font-size: .78rem; letter-spacing: -.2px; padding-inline: 3px; }
+[lang="fr"] .tabs, [lang="en"] .tabs { gap: 3px; }
+.chat-row .welcome-avatar::after { display: none; }
+#chat-view.welcome #chat-title { text-decoration: none; cursor: default; }

@@ -16,6 +16,14 @@ const UI_LANGS = {
 
 const I18N = {
 he: {
+  "welcome_title": "💗 צוות דרך הלב",
+  "welcome_state": "📌 הודעת ברוכים הבאים",
+  "welcome_m1": "היי 👋 ברוכים הבאים לדרך הלב! זו הודעה אוטומטית מצוות האפליקציה 💗",
+  "welcome_m2": "✨ בלשונית ״הצעות״ מחכות לך התאמות. אהבת כרטיס? שלחו 💌 בקשה לשיחה.",
+  "welcome_m3": "💬 אם הצד השני מסכים, נפתחת שיחה אנונימית: בלי שמות ובלי טלפונים. אפשר לראות את הכרטיס שלו/ה בכל רגע 👤",
+  "welcome_m4": "💗 רוצים להכיר באמת? לחצו ״פתיחת המסך״. רק אם שניכם לוחצים, השם והטלפון נחשפים. אם רק אחד לוחץ, השני לא יודע.",
+  "welcome_m5": "📱 טיפ: הוסיפו את האפליקציה למסך הבית וחזרו לבדוק מדי פעם 😉 בהצלחה!",
+  "welcome_note": "🤖 הודעה אוטומטית — אי אפשר לענות כאן",
   "h109": "👤 הכרטיס של הצד השני",
   "profile_gone": "הפרופיל כבר לא זמין",
   "close": "סגירה",
@@ -243,6 +251,14 @@ he: {
   "choose_lang": "בחרו שפה"
 },
 en: {
+  "welcome_title": "💗 The Derekh HaLev team",
+  "welcome_state": "📌 Welcome message",
+  "welcome_m1": "Hi 👋 Welcome to Derekh HaLev! This is an automatic message from the app team 💗",
+  "welcome_m2": "✨ Your matches are waiting in the “Matches” tab. Like a card? Send a 💌 request to chat.",
+  "welcome_m3": "💬 If they accept, an anonymous chat opens: no names, no phone numbers. You can view their card anytime 👤",
+  "welcome_m4": "💗 Want to really meet? Tap “Lift the curtain”. Names and numbers are revealed only if you both tap. If only one of you does, the other never knows.",
+  "welcome_m5": "📱 Tip: add the app to your home screen and check back from time to time 😉 Good luck!",
+  "welcome_note": "🤖 Automatic message — you can't reply here",
   "h109": "👤 Their card",
   "profile_gone": "This profile is no longer available",
   "close": "Close",
@@ -470,6 +486,14 @@ en: {
   "choose_lang": "Choose your language"
 },
 fr: {
+  "welcome_title": "💗 L'équipe Derekh HaLev",
+  "welcome_state": "📌 Message de bienvenue",
+  "welcome_m1": "Bonjour 👋 Bienvenue sur Derekh HaLev ! Ceci est un message automatique de l'équipe 💗",
+  "welcome_m2": "✨ Vos affinités vous attendent dans l'onglet « Propositions ». Une carte vous plaît ? Envoyez une 💌 demande pour discuter.",
+  "welcome_m3": "💬 Si l'autre accepte, une conversation anonyme s'ouvre : sans nom ni téléphone. Vous pouvez revoir sa carte à tout moment 👤",
+  "welcome_m4": "💗 Envie de vraiment vous rencontrer ? Appuyez sur « Lever le rideau ». Prénoms et numéros ne sont révélés que si vous appuyez tous les deux. Si un seul appuie, l'autre n'en sait rien.",
+  "welcome_m5": "📱 Astuce : ajoutez l'app à l'écran d'accueil et revenez voir de temps en temps 😉 Bonne chance !",
+  "welcome_note": "🤖 Message automatique — on ne peut pas répondre ici",
   "h109": "👤 Voir sa carte",
   "profile_gone": "Ce profil n'est plus disponible",
   "close": "Fermer",
@@ -580,7 +604,7 @@ fr: {
   "h103": "C'est parti",
   "h104": "⏸️ Vous êtes en mode pause — votre carte n'est pas affichée",
   "h105": "💌 Demandes",
-  "h106": "💬 Conversations",
+  "h106": "💬 Messages",
   "profile": "Profil {no}",
   "g_m": "Homme",
   "g_f": "Femme",
