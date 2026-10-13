@@ -204,7 +204,7 @@ function cardHTML(p, opts = {}) {
   <div class="mystery-card ${colorClass(p)} ${opts.small ? "small" : ""}">
     <div class="mc-shine"></div>
     <div class="mc-top">
-      <span class="mc-mask">${HEART}</span>
+      <span class="mc-left"><span class="mc-mask">${HEART}</span>${opts.pct != null ? `<span class="mc-pct" title="${esc(t("match_pct", { pct: opts.pct }))}" aria-label="${esc(t("match_pct", { pct: opts.pct }))}">${esc(opts.pct)}%</span>` : ""}</span>
       <span class="mc-ids">
         ${p.gender === "m" || p.gender === "f" ? `<span class="mc-gender ${p.gender}">${p.gender === "f" ? "👩" : "👨"} ${esc(LABELS.gender[p.gender])}</span>` : ""}
         <span class="mc-no">${esc(profileName(p.no))}</span>
