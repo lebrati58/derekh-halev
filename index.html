@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261013b">
+<link rel="stylesheet" href="style.css?v=20261013i">
 </head>
 <body>
 
@@ -237,6 +237,7 @@ if (location.hostname === "lebrati58.github.io") {
           <label class="check"><input type="checkbox" id="f-ok">
             <span data-i18n="h066">אני מעל גיל 18, ומתחייב/ת לשיחה מכבדת. ידוע לי שאין לשתף טלפון או קישורים בצ׳אט — המסך נפתח רק בהסכמה הדדית.</span>
           </label>
+          <button type="button" class="btn link coc-link" data-i18n="h110">📜 קוד ההתנהגות</button>
         </div>
 
         <button type="submit" class="btn gold block" id="reg-btn"><img class="heart-ico" src="logo-heart.png" alt=""> <span data-i18n="h103">יוצאים לדרך</span></button>
@@ -281,6 +282,7 @@ if (location.hostname === "lebrati58.github.io") {
       <button class="btn link" id="pause-toggle" data-i18n="h075">⏸️ מצב השהיה</button>
       ·
       <button class="btn link" id="delete-me" data-i18n="h076">מחיקת הפרופיל שלי</button>
+      <br><button class="btn link coc-link" data-i18n="h110">📜 קוד ההתנהגות</button>
     </div>
   </section>
 </main>
@@ -335,9 +337,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261013b"></script>
-<script src="commun.js?v=20261013b"></script>
-<script src="matching.js?v=20261013b"></script>
+<script src="i18n.js?v=20261013i"></script>
+<script src="commun.js?v=20261013i"></script>
+<script src="matching.js?v=20261013i"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -632,7 +634,9 @@ function setBadge(id, n) { const b = $(id); b.textContent = n; b.classList.toggl
 /* ----- Annonce admin (פעילות היום) ----- */
 function renderAnnounce(a) {
   const el = $("#announce");
-  if (a && a.text) { el.textContent = "📣 " + a.text; el.classList.remove("hidden"); }
+  // Texte dans la langue choisie (text_en / text_fr), sinon l'hébreu
+  const txt = a && (a["text_" + LANG] || a.text);
+  if (txt) { el.textContent = "📣 " + txt; el.classList.remove("hidden"); }
   else el.classList.add("hidden");
 }
 
@@ -855,15 +859,45 @@ async function onChatMeta(id, meta) {
   if (currentChat === id) updateChatView();
 }
 
+/* Conversation de bienvenue officielle (« צוות דרך הלב ») : locale, jamais dans la base.
+   Ce n'est PAS un faux profil : elle est clairement signée par l'équipe et on ne peut pas y répondre. */
+const WELCOME = "welcome";
+const welcomeUnread = () => !store.get("welcome_read") && currentChat !== WELCOME;
+function welcomeRow() {
+  return `<div class="chat-row welcome-row" data-chat="${WELCOME}">
+      <div class="avatar welcome-avatar">${HEART}</div>
+      <div class="info"><div class="title">${esc(t("welcome_title"))}</div>
+        <div class="state ${welcomeUnread() ? "unread" : ""}">${esc(welcomeUnread() ? t("st_unread") : t("welcome_state"))}</div></div>
+      <div>${t("fwd_arrow")}</div>
+    </div>`;
+}
+function openWelcome() {
+  closeChat();
+  currentChat = WELCOME;
+  store.set("welcome_read", 1);
+  $("#chat-view").classList.add("welcome");
+  $("#chat-title").textContent = t("welcome_title");
+  $("#curtain-bar").innerHTML = "";
+  $("#chat-menu-btn").classList.add("hidden");
+  $("#composer").classList.add("hidden");
+  const eb = $("#ended-bar"); eb.textContent = t("welcome_note"); eb.classList.remove("hidden");
+  $("#messages").innerHTML = ["welcome_m1", "welcome_m2", "welcome_m3", "welcome_m4", "welcome_m5", "welcome_m6", "welcome_m7"]
+    .map(k => `<div class="msg theirs">${esc(t(k))}</div>`).join("");
+  $("#chat-view").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  fitChatToViewport();
+  renderChats();
+}
+
 function renderChats() {
   const box = $("#chats");
   const list = Object.entries(myChats).sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
-  setBadge("#badge-chats", list.filter(([id]) => isUnread(id)).length);
+  setBadge("#badge-chats", list.filter(([id]) => isUnread(id)).length + (welcomeUnread() ? 1 : 0));
   if (!list.length) {
-    box.innerHTML = `<div class="empty"><span class="big">💬</span>${esc(t("no_chats"))}</div>`;
+    box.innerHTML = welcomeRow() + `<div class="empty"><span class="big">💬</span>${esc(t("no_chats"))}</div>`;
     return;
   }
-  box.innerHTML = list.map(([id, m]) => {
+  box.innerHTML = welcomeRow() + list.map(([id, m]) => {
     const pn = partnerNo(m);
     const state = isUnread(id) ? `<div class="state unread">${esc(t("st_unread"))}</div>`
       : m.opened ? `<div class="state opened">${esc(t("st_opened"))}</div>`
@@ -892,9 +926,11 @@ $("#chats").addEventListener("click", e => {
 
 /* =================== Vue chat =================== */
 async function openChat(id) {
+  if (id === WELCOME) return openWelcome();
   const m = myChats[id];
   closeChat();
   currentChat = id;
+  $("#ended-bar").textContent = t("h080");
   $("#messages").innerHTML = `<div class="sys">${esc(t("chat_intro"))}</div>`;
   $("#chat-view").classList.remove("hidden");
   document.body.style.overflow = "hidden";
@@ -916,6 +952,8 @@ async function openChat(id) {
 function closeChat() {
   if (msgRef) { msgRef.off(); msgRef = null; }
   currentChat = null;
+  $("#chat-menu-btn").classList.remove("hidden");
+  $("#chat-view").classList.remove("welcome");
   $("#chat-view").classList.add("hidden");
   $("#chat-menu").classList.add("hidden");
   document.body.style.overflow = "";
@@ -982,7 +1020,7 @@ $("#composer").addEventListener("submit", async e => {
   e.preventDefault();
   const input = $("#msg-input");
   const text = input.value.trim();
-  if (!text || !currentChat) return;
+  if (!text || !currentChat || currentChat === WELCOME) return;
   if (hasForbiddenContent(text)) { toast(t("msg_forbidden"), 3500); return; }
   input.value = ""; autoGrow();
   try {
@@ -1068,6 +1106,16 @@ function showPartnerCard(chatId) {
   });
 }
 $("#chat-title").addEventListener("click", () => showPartnerCard());
+
+function showConduct() {
+  const items = [1, 2, 3, 4, 5, 6, 7, 8].map(i => `<span class="coc-item">${esc(t("coc_" + i))}</span>`).join("");
+  showModal({
+    title: t("coc_title"),
+    body: `<span class="coc">${esc(t("coc_intro"))}${items}<b>${esc(t("coc_end"))}</b></span>`,
+    okText: t("close"), cancelText: ""
+  });
+}
+$$(".coc-link").forEach(b => b.addEventListener("click", showConduct));
 $("#act-profile").addEventListener("click", () => { $("#chat-menu").classList.add("hidden"); showPartnerCard(); });
 
 $("#chat-menu-btn").addEventListener("click", e => { e.stopPropagation(); $("#chat-menu").classList.toggle("hidden"); });

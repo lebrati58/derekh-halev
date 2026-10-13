@@ -7,7 +7,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 
 | Fichier | Rôle |
 |---|---|
-| `index.html` | App participant (HTML + tout le JS inline) : inscription (formulaire réutilisé pour ✏️ l'édition du profil), propositions, demandes, chat, ouverture du rideau, pause/blocage/signalement, suppression du profil |
+| `index.html` | App participant (HTML + tout le JS inline) : inscription (formulaire réutilisé pour ✏️ l'édition du profil), conversation de bienvenue « 💗 צוות דרך הלב » (locale, jamais en base, clairement signée par l'équipe — **pas un faux profil**), propositions, demandes, chat, ouverture du rideau, pause/blocage/signalement, suppression du profil, 📜 code de conduite (modale, lien sous la case 18 ans et en bas de l'accueil) |
 | `admin.html` | Tableau de bord admin (connexion par PIN) : stats, signalements, bannissement, 🗑️ suppression d'un profil par numéro, annonce du jour |
 | `commun.js` | Config Firebase, schéma de la base en commentaire, helpers partagés (auth anonyme, `nextProfileNo`, filtre anti-téléphone/liens `hasForbiddenContent`, `cardHTML`, modale, toast) |
 | `i18n.js` | Traductions de l'interface he/en/fr (`I18N`, `t(clé, vars)`, `applyI18n()`, `setLang()`), langue choisie au 1er lancement et mémorisée (localStorage `mhm_uiLang`). Textes fixes du HTML : `data-i18n`/`-ph`/`-aria` (clés `hNNN`) ; textes du code : `t("clé")`. **Tout nouveau texte doit être ajouté dans les 3 langues.** `admin.html` reste en hébreu |
@@ -32,7 +32,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 - `private/{uid}` — `firstName`, `phone`.
 - `blocks/{uid}/{targetUid}: true` — blocages personnels.
 - `banned/{uid}: true` — profils bannis.
-- `announcements/current` — `{text, ts}` publié par l'admin.
+- `announcements/current` — `{text, text_en?, text_fr?, ts}` publié par l'admin (hébreu obligatoire ; chaque utilisateur voit sa langue, repli sur l'hébreu).
 - `inbox/{to}/{from}` et `outbox/{from}/{to}` — demandes : `fromNo`/`toNo`, `status` (pending/accepted/declined), `createdAt`, `chatId?`.
 - `chats/{from_to}` — métadonnées : `from`, `to` (uids), `fromNo`, `toNo`, `status` (active/ended), `opened`, `icebreaker` (clé neutre type `weekend.sea`, traduite à l'affichage par `icebreakerText()` ; anciens chats : texte hébreu), `createdAt`.
 - `userChats/{uid}/{chatId}: true` — index des chats de chacun.

@@ -13,7 +13,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta name="robots" content="noindex, nofollow">
 <title>ניהול · דרך הלב</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗝️</text></svg>">
-<link rel="stylesheet" href="style.css?v=20261013b">
+<link rel="stylesheet" href="style.css?v=20261013i">
 </head>
 <body>
 <div class="valance"></div>
@@ -47,7 +47,13 @@ if (location.hostname === "lebrati58.github.io") {
     <h2>📣 פעילות היום</h2>
     <div class="panel">
       <p class="sub" style="margin-top:0">ההודעה תוצג לכל המשתתפים בראש האפליקציה — אתגר, שאלת היום, עידוד…</p>
+      <label class="sub" for="ann-text">🇮🇱 עברית (חובה)</label>
       <textarea id="ann-text" maxlength="300" placeholder="למשל: הערב — שאלו את המאצ׳ שלכם מה הדבר הכי ספונטני שעשו 😉"></textarea>
+      <label class="sub" for="ann-text-en">🇬🇧 English — מוצג למי שבחר/ה אנגלית</label>
+      <textarea id="ann-text-en" maxlength="300" dir="ltr" placeholder="e.g. Tonight — ask your match about the most spontaneous thing they ever did 😉"></textarea>
+      <label class="sub" for="ann-text-fr">🇫🇷 Français — מוצג למי שבחר/ה צרפתית</label>
+      <textarea id="ann-text-fr" maxlength="300" dir="ltr" placeholder="ex. : ce soir — demandez à votre match la chose la plus spontanée qu'il/elle ait faite 😉"></textarea>
+      <p class="sub" style="margin:4px 0 8px">💡 שפה שנשארת ריקה → ההודעה תוצג שם בעברית.</p>
       <div class="item-actions">
         <button class="btn gold small" id="ann-pub">פרסום</button>
         <button class="btn ghost small" id="ann-clear">הסרת ההודעה</button>
@@ -74,9 +80,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261013b"></script>
+<script src="i18n.js?v=20261013i"></script>
 <script>LANG = "he";   // l'admin reste en hébreu</script>
-<script src="commun.js?v=20261013b"></script>
+<script src="commun.js?v=20261013i"></script>
 <script>
 let uid = null;
 let profiles = {}, banned = {}, chats = {}, reports = {};
@@ -122,16 +128,20 @@ function startDash() {
   db.ref("announcements/current").on("value", s => {
     const a = s.val();
     $("#ann-current").textContent = a && a.text ? "מוצג כעת: ״" + a.text + "״" : "אין הודעה פעילה כרגע";
-    if (a && a.text) $("#ann-text").value = a.text;
+    if (a && a.text) { $("#ann-text").value = a.text; $("#ann-text-en").value = a.text_en || ""; $("#ann-text-fr").value = a.text_fr || ""; }
   }, () => { $("#ann-current").textContent = "⚠️ כדי להפעיל הודעות — צריך לפרסם את כללי האבטחה החדשים (database.rules.json)"; });
   $("#ann-pub").addEventListener("click", async () => {
     const text = $("#ann-text").value.trim();
     if (!text) return toast("כתבו הודעה קודם 😉");
-    try { await db.ref("announcements/current").set({ text: text.slice(0, 300), ts: firebase.database.ServerValue.TIMESTAMP }); toast("ההודעה פורסמה 📣"); }
+    const ann = { text: text.slice(0, 300), ts: firebase.database.ServerValue.TIMESTAMP };
+    const en = $("#ann-text-en").value.trim(), fr = $("#ann-text-fr").value.trim();
+    if (en) ann.text_en = en.slice(0, 300);
+    if (fr) ann.text_fr = fr.slice(0, 300);
+    try { await db.ref("announcements/current").set(ann); toast("ההודעה פורסמה 📣"); }
     catch (e) { console.error(e); toast("לא הצלחנו — ייתכן שצריך לפרסם את כללי האבטחה החדשים"); }
   });
   $("#ann-clear").addEventListener("click", async () => {
-    try { await db.ref("announcements/current").remove(); $("#ann-text").value = ""; toast("ההודעה הוסרה"); }
+    try { await db.ref("announcements/current").remove(); $("#ann-text").value = ""; $("#ann-text-en").value = ""; $("#ann-text-fr").value = ""; toast("ההודעה הוסרה"); }
     catch (e) { toast("שגיאה"); }
   });
   db.ref("profiles").on("value", s => { profiles = s.val() || {}; render(); });
