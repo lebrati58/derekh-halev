@@ -399,3 +399,18 @@ textarea { resize: vertical; min-height: 70px; }
 .coc { display: block; text-align: start; line-height: 1.5; }
 .coc-item { display: block; margin: 10px 0; }
 .coc b { display: block; margin-top: 12px; text-align: center; }
+
+/* Un mot très long (sans espace) dans un profil ne doit jamais élargir la page */
+.list { grid-template-columns: minmax(0, 1fr); }
+.mystery-card, .announce, .match-why, .msg { overflow-wrap: anywhere; min-width: 0; }
+body { overflow-x: clip; }
+
+/* % de compatibilité : petit rond doré à côté du cœur */
+.mc-left { display: flex; align-items: center; gap: 10px; }
+.mc-pct {
+  width: 46px; height: 46px; border-radius: 50%; flex: none;
+  display: grid; place-items: center; font-weight: 800; font-size: .95rem; direction: ltr;
+  background: linear-gradient(135deg, #f3d88a, #c9a24a); color: #2d1b4e;
+  box-shadow: 0 3px 10px rgba(0,0,0,.35), inset 0 0 0 2px rgba(255,255,255,.5);
+}
+.mystery-card.small .mc-pct { width: 40px; height: 40px; font-size: .85rem; }
