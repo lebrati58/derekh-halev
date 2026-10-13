@@ -13,7 +13,7 @@ jobs:
       # Seuls les fichiers du site sont publiés (pas les tests, règles, docs…)
       - run: |
           mkdir -p public
-          cp index.html admin.html i18n.js commun.js matching.js style.css logo.png logo-heart.png apple-touch-icon.png public/
+          cp index.html admin.html i18n.js commun.js matching.js stats.js admin-stats.js style.css logo.png logo-heart.png apple-touch-icon.png public/
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
