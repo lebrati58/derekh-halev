@@ -44,6 +44,7 @@
                                         que la création du profil (règles). Illisible par tous.
 
    blocks/{uid}/{targetUid}: true     ← blocage personnel (lisible/éditable par uid seul)
+   hidden/{uid}/{targetUid}: true     ← « pas pour moi » : masqué de mes propositions (lisible/éditable par uid seul)
    announcements/current {text, ts}   ← activité du jour publiée par l'admin, lisible par tous
 
    private/{uid}                      ← PRIVÉ (lisible uniquement par son propriétaire)

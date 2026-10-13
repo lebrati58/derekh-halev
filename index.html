@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261013l">
+<link rel="stylesheet" href="style.css?v=20261013m">
 </head>
 <body>
 
@@ -283,6 +283,7 @@ if (location.hostname === "lebrati58.github.io") {
       ·
       <button class="btn link" id="delete-me" data-i18n="h076">מחיקת הפרופיל שלי</button>
       <br><button class="btn link coc-link" data-i18n="h110">📜 קוד ההתנהגות</button>
+      <span class="hidden" id="unhide-wrap"> · <button class="btn link" id="unhide-all"></button></span>
     </div>
   </section>
 </main>
@@ -337,9 +338,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261013l"></script>
-<script src="commun.js?v=20261013l"></script>
-<script src="matching.js?v=20261013l"></script>
+<script src="i18n.js?v=20261013m"></script>
+<script src="commun.js?v=20261013m"></script>
+<script src="matching.js?v=20261013m"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -348,6 +349,7 @@ let priv = null;        // {firstName, phone}
 let profiles = {};      // uid -> profil
 let banned = {};
 let blocks = {};        // targetUid -> true (mes blocages)
+let hidden = {};        // targetUid -> true (profils « pas pour moi », masqués de mes propositions)
 let inbox = {};         // fromUid -> {fromNo, status, chatId}
 let outbox = {};        // toUid -> {toNo, status, chatId}
 let myChats = {};       // chatId -> meta
@@ -604,6 +606,7 @@ function startHome() {
     renderProposals(); renderRequests(); renderChats();
   });
   db.ref("blocks/" + uid).on("value", s => { blocks = s.val() || {}; renderProposals(); renderRequests(); }, () => {});
+  db.ref("hidden/" + uid).on("value", s => { hidden = s.val() || {}; renderProposals(); updateUnhideLink(); }, () => {});
   db.ref("announcements/current").on("value", s => renderAnnounce(s.val()), () => {});
   db.ref("banned").on("value", s => {
     banned = s.val() || {};
@@ -706,7 +709,7 @@ function computeProposals() {
   Object.values(myChats).forEach(m => excluded.add(partnerOf(m)));                // chats existants
 
   const candidates = Object.entries(profiles)
-    .filter(([u, p]) => u !== uid && !banned[u] && !blocks[u] && !excluded.has(u) && isCompatible(me, p))
+    .filter(([u, p]) => u !== uid && !banned[u] && !blocks[u] && !hidden[u] && !excluded.has(u) && isCompatible(me, p))
     .map(([u, p]) => ({ uid: u, p, pending: !!(outbox[u] && outbox[u].status === "pending"), score: matchScore(me, p) }));
 
   candidates.sort((a, b) => (b.pending - a.pending) || (b.score - a.score) || (a.p.no - b.p.no));
@@ -717,7 +720,7 @@ function computeProposals() {
   // désaccord enfants restent respectés).
   const shown = new Set(list.map(c => c.uid));
   const soft = Object.entries(profiles)
-    .filter(([u, p]) => u !== uid && !banned[u] && !blocks[u] && !excluded.has(u) && !shown.has(u)
+    .filter(([u, p]) => u !== uid && !banned[u] && !blocks[u] && !hidden[u] && !excluded.has(u) && !shown.has(u)
       && isSoftCompatible(me, p))
     .map(([u, p]) => ({ uid: u, p, pending: !!(outbox[u] && outbox[u].status === "pending"), score: matchScore(me, p), soft: true }));
   soft.sort((a, b) => (b.pending - a.pending) || (b.score - a.score) || (a.p.no - b.p.no));
@@ -748,13 +751,21 @@ function renderProposals() {
       <div class="item-actions">
         ${c.pending
           ? `<button class="btn ghost" disabled>${esc(t("req_waiting"))}</button>`
-          : `<button class="btn gold" data-send="${esc(c.uid)}">${esc(t("req_send"))}</button>`}
+          : `<button class="btn gold" data-send="${esc(c.uid)}">${esc(t("req_send"))}</button>
+             <button class="btn ghost hide-btn" data-hide="${esc(c.uid)}">${esc(t("hide_btn"))}</button>`}
       </div>
     </div>`;
   }).join("");
 }
 
 $("#proposals").addEventListener("click", async e => {
+  const h = e.target.closest("[data-hide]");
+  if (h) {
+    h.disabled = true;
+    try { await db.ref(`hidden/${uid}/${h.dataset.hide}`).set(true); toast(t("hidden_toast")); }
+    catch (err) { console.error(err); toast(t("send_fail")); h.disabled = false; }
+    return;
+  }
   const b = e.target.closest("[data-send]");
   if (!b) return;
   b.disabled = true;
@@ -1151,6 +1162,19 @@ $("#act-report").addEventListener("click", async () => {
 });
 
 /* ----- Supprimer mon profil ----- */
+/* ----- Profils masqués (« pas pour moi ») ----- */
+function updateUnhideLink() {
+  const n = Object.keys(hidden).length;
+  $("#unhide-wrap").classList.toggle("hidden", !n);
+  $("#unhide-all").textContent = t("unhide_link", { n });
+}
+$("#unhide-all").addEventListener("click", async () => {
+  const ok = await showModal({ title: t("unhide_title"), body: esc(t("unhide_body")), okText: t("unhide_ok"), cancelText: t("cancel") });
+  if (!ok) return;
+  try { await db.ref("hidden/" + uid).remove(); toast(t("unhide_done")); }
+  catch (err) { console.error(err); toast(t("send_fail")); }
+});
+
 $("#delete-me").addEventListener("click", async () => {
   const ok = await showModal({ title: t("del_title"), body: esc(t("del_body")), okText: t("del_ok"), cancelText: t("cancel"), danger: true });
   if (!ok) return;

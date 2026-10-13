@@ -414,3 +414,6 @@ body { overflow-x: clip; }
   box-shadow: 0 3px 10px rgba(0,0,0,.35), inset 0 0 0 2px rgba(255,255,255,.5);
 }
 .mystery-card.small .mc-pct { width: 40px; height: 40px; font-size: .85rem; }
+
+/* Bouton « pas pour moi » : discret, à côté de la demande */
+.item-actions .btn.hide-btn { flex: 0 0 auto; font-size: .85rem; padding-inline: 12px; }
