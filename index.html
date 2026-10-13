@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261013g">
+<link rel="stylesheet" href="style.css?v=20261013h">
 </head>
 <body>
 
@@ -335,9 +335,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261013g"></script>
-<script src="commun.js?v=20261013g"></script>
-<script src="matching.js?v=20261013g"></script>
+<script src="i18n.js?v=20261013h"></script>
+<script src="commun.js?v=20261013h"></script>
+<script src="matching.js?v=20261013h"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -879,7 +879,7 @@ function openWelcome() {
   $("#chat-menu-btn").classList.add("hidden");
   $("#composer").classList.add("hidden");
   const eb = $("#ended-bar"); eb.textContent = t("welcome_note"); eb.classList.remove("hidden");
-  $("#messages").innerHTML = ["welcome_m1", "welcome_m2", "welcome_m3", "welcome_m4", "welcome_m5"]
+  $("#messages").innerHTML = ["welcome_m1", "welcome_m2", "welcome_m3", "welcome_m4", "welcome_m5", "welcome_m6", "welcome_m7"]
     .map(k => `<div class="msg theirs">${esc(t(k))}</div>`).join("");
   $("#chat-view").classList.remove("hidden");
   document.body.style.overflow = "hidden";
