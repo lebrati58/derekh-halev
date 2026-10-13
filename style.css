@@ -380,3 +380,6 @@ textarea { resize: vertical; min-height: 70px; }
 #chat-title { cursor: pointer; text-decoration: underline dotted rgba(243,216,138,.5); text-underline-offset: 4px; }
 .modal { max-height: 90vh; overflow-y: auto; }
 .modal .mystery-card { margin: 4px 0 10px; }
+
+.chat-row .avatar { position: relative; cursor: pointer; }
+.chat-row .avatar::after { content: "👤"; position: absolute; bottom: -4px; inset-inline-end: -4px; font-size: .7rem; background: var(--night-2); border: 1px solid var(--gold); border-radius: 50%; width: 20px; height: 20px; display: grid; place-items: center; }
