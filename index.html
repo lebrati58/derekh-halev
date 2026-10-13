@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261013m">
+<link rel="stylesheet" href="style.css?v=20261013n">
 </head>
 <body>
 
@@ -338,9 +338,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261013m"></script>
-<script src="commun.js?v=20261013m"></script>
-<script src="matching.js?v=20261013m"></script>
+<script src="i18n.js?v=20261013n"></script>
+<script src="commun.js?v=20261013n"></script>
+<script src="matching.js?v=20261013n"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -897,6 +897,13 @@ function openWelcome() {
   renderChats();
 }
 
+/* Prénom de l'autre une fois le rideau levé (secrets lisibles seulement si opened), sinon null */
+function partnerFirstName(id, m) {
+  const sec = m && m.opened && secretsCache[id];
+  const p = sec && sec[partnerOf(m)];
+  return (p && p.firstName) || null;
+}
+
 function renderChats() {
   const box = $("#chats");
   const list = Object.entries(myChats).sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
@@ -908,12 +915,12 @@ function renderChats() {
   box.innerHTML = welcomeRow() + list.map(([id, m]) => {
     const pn = partnerNo(m);
     const state = isUnread(id) ? `<div class="state unread">${esc(t("st_unread"))}</div>`
-      : m.opened ? `<div class="state opened">${esc(t("st_opened"))}</div>`
+      : m.opened ? `<div class="state opened">${esc(t("st_opened"))}${partnerFirstName(id, m) ? " · " + esc(profileName(pn)) : ""}</div>`
       : m.status === "ended" ? `<div class="state">${esc(t("st_ended"))}</div>`
       : `<div class="state">${esc(t("st_active"))}</div>`;
     return `<div class="chat-row" data-chat="${esc(id)}">
       <div class="avatar ${colorClass(profiles[partnerOf(m)] || { no: pn })}" data-card="${esc(id)}" role="button" aria-label="${esc(t("h109"))}">${HEART}</div>
-      <div class="info"><div class="title">${esc(profileName(pn))}</div>${state}</div>
+      <div class="info"><div class="title">${esc(partnerFirstName(id, m) || profileName(pn))}</div>${state}</div>
       <div>${t("fwd_arrow")}</div>
     </div>`;
   }).join("");
@@ -997,7 +1004,7 @@ function updateChatView() {
   const id = currentChat, m = myChats[id];
   if (!m) return;
   ensureIcebreaker();
-  $("#chat-title").textContent = `${profileName(myNo(m))} ↔ 👤 ${profileName(partnerNo(m))}`;
+  $("#chat-title").textContent = `${profileName(myNo(m))} ↔ 👤 ${partnerFirstName(id, m) || profileName(partnerNo(m))}`;
   const ended = m.status === "ended";
   $("#composer").classList.toggle("hidden", ended);
   $("#ended-bar").classList.toggle("hidden", !ended);
