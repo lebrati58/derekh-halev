@@ -176,6 +176,16 @@ async function denied(name, fn) {
   await denied ("langues : valeur ≠ true",                 () => set(ref(A, "profiles/alice/langs"), { en: "oui" }));
   await allowed("modifier son propre profil (update ciblé)", () => update(ref(A, "profiles/alice"), { city: "יפו", cantLiveWithout: null }));
 
+  /* ---------- Profils masqués (« pas pour moi ») ---------- */
+  await allowed("masquer un profil de ses propositions",    () => set(ref(A, "hidden/alice/charlie"), true));
+  await allowed("lire ses propres profils masqués",         () => get(ref(A, "hidden/alice")));
+  await denied ("lire les profils masqués d'un AUTRE",      () => get(ref(B, "hidden/alice")));
+  await denied ("ADMIN : lire les profils masqués",         () => get(ref(ADMIN, "hidden/alice")));
+  await denied ("masquer pour le compte d'un AUTRE",        () => set(ref(B, "hidden/alice/dave"), true));
+  await denied ("masqué : valeur ≠ true",                   () => set(ref(A, "hidden/alice/dave"), "oui"));
+  await denied ("masqués : valeur simple à la place de la liste", () => set(ref(A, "hidden/alice"), "x"));
+  await allowed("tout ré-afficher (supprimer sa liste)",    () => remove(ref(A, "hidden/alice")));
+
   /* ---------- Signalements ---------- */
   await allowed("membre signale son interlocuteur",        () => push(ref(A, "reports"), { chatId: "alice_bob", reporterUid: "alice", reportedUid: "bob", reportedNo: 2, reason: "טקסט", createdAt: 1 }));
   await denied ("signaler quelqu'un HORS de ses chats",    () => push(ref(C, "reports"), { chatId: "alice_bob", reporterUid: "charlie", reportedUid: "bob", reportedNo: 2, reason: "x", createdAt: 1 }));

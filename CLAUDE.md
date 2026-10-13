@@ -31,6 +31,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 - `profileNos/{no}: uid` — index d'unicité des numéros, réservé une fois à la création du profil.
 - `private/{uid}` — `firstName`, `phone`.
 - `blocks/{uid}/{targetUid}: true` — blocages personnels.
+- `hidden/{uid}/{targetUid}: true` — profils « 🙈 pas pour moi » masqués de mes propositions (l'autre peut toujours m'envoyer une demande) ; lien « profils masqués (N) » en bas de l'accueil pour tout réafficher.
 - `banned/{uid}: true` — profils bannis.
 - `announcements/current` — `{text, text_en?, text_fr?, ts}` publié par l'admin (hébreu obligatoire ; chaque utilisateur voit sa langue, repli sur l'hébreu).
 - `inbox/{to}/{from}` et `outbox/{from}/{to}` — demandes : `fromNo`/`toNo`, `status` (pending/accepted/declined), `createdAt`, `chatId?`.
@@ -54,6 +55,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `profileNos/{no}` | personne | soi, une seule fois (réécriture identique tolérée), si son profil a ce `no` ; non supprimable |
 | `private/{uid}` | soi (jamais l'admin) | soi ; admin : **suppression seule** |
 | `blocks/{uid}` | soi | soi |
+| `hidden/{uid}` | soi | soi (valeurs `true` uniquement ; suppression de toute la liste permise) |
 | `banned` | tout inscrit | admin |
 | `announcements/current` | tout inscrit | admin |
 | `inbox/{to}` | destinataire | expéditeur (création `pending`, `fromNo` vérifié, ni banni ni bloqué) ; destinataire (mise à jour) |
@@ -67,7 +69,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 
 ## Logique de matching
 
-Toute la compatibilité vit dans `matching.js` (`isCompatible`, `matchScore`, `matchPercent`, `matchReasons`, `pickIcebreaker`, `kidsOk`…), chargé par `index.html` après `commun.js`. Elle tourne **côté client** : `computeProposals()` dans `index.html` charge tous les `profiles`, exclut soi/bannis/bloqués/demandes et chats existants, puis appelle `matching.js` (tous les profils compatibles, triés par score, suivis de tous les profils « découverte » hors préférences). L'icebreaker est calculé à l'acceptation et stocké dans `chats/{id}/icebreaker`.
+Toute la compatibilité vit dans `matching.js` (`isCompatible`, `matchScore`, `matchPercent`, `matchReasons`, `pickIcebreaker`, `kidsOk`…), chargé par `index.html` après `commun.js`. Elle tourne **côté client** : `computeProposals()` dans `index.html` charge tous les `profiles`, exclut soi/bannis/bloqués/masqués/demandes et chats existants, puis appelle `matching.js` (tous les profils compatibles, triés par score, suivis de tous les profils « découverte » hors préférences). L'icebreaker est calculé à l'acceptation et stocké dans `chats/{id}/icebreaker`.
 
 ## Tester en local
 
