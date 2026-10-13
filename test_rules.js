@@ -14,7 +14,7 @@
 
 const fs = require("fs");
 const { initializeTestEnvironment } = require("@firebase/rules-unit-testing");
-const { ref, get, set, update, remove, push } = require("firebase/database");
+const { ref, get, set, update, remove, push, serverTimestamp, runTransaction } = require("firebase/database");
 
 let pass = 0, fail = 0;
 async function allowed(name, fn) {
@@ -189,6 +189,41 @@ async function denied(name, fn) {
   /* ---------- Signalements ---------- */
   await allowed("membre signale son interlocuteur",        () => push(ref(A, "reports"), { chatId: "alice_bob", reporterUid: "alice", reportedUid: "bob", reportedNo: 2, reason: "טקסט", createdAt: 1 }));
   await denied ("signaler quelqu'un HORS de ses chats",    () => push(ref(C, "reports"), { chatId: "alice_bob", reporterUid: "charlie", reportedUid: "bob", reportedNo: 2, reason: "x", createdAt: 1 }));
+
+  /* ---------- Statistiques : collecte (activité, présence, compteurs, réponses) ---------- */
+  await allowed("activité : 1re visite (first + last + mobile)", () => set(ref(E, "activity/eve"), { first: serverTimestamp(), last: serverTimestamp(), mobile: true }));
+  await allowed("activité : +1 visite du jour",              () => runTransaction(ref(E, "activity/eve/d/20261013"), v => (v || 0) + 1).then(r => { if (!r.committed) throw new Error("non commis"); }));
+  await allowed("activité : mise à jour de last",            () => update(ref(E, "activity/eve"), { last: serverTimestamp() }));
+  await denied ("activité : réécrire first (date de 1re visite)", () => update(ref(E, "activity/eve"), { first: 5 }));
+  await denied ("activité : date dans le futur",              () => update(ref(E, "activity/eve"), { last: Date.now() + 864e5 }));
+  await denied ("activité : champ inconnu (ex. page vue avec texte)", () => update(ref(E, "activity/eve"), { note: "x" }));
+  await denied ("activité : écrire celle d'un AUTRE",         () => update(ref(A, "activity/eve"), { last: serverTimestamp() }));
+  await denied ("activité : clé de jour invalide",            () => set(ref(E, "activity/eve/d/hier"), 1));
+  await denied ("inscrit normal : lire l'activité",           () => get(ref(A, "activity")));
+  await allowed("activité : lire SA propre activité",         () => get(ref(E, "activity/eve")));
+  await denied ("activité : lire celle d'un AUTRE",           () => get(ref(E, "activity/alice")));
+  await allowed("ADMIN : lire l'activité (agrégats)",         () => get(ref(ADMIN, "activity")));
+  await allowed("présence : je suis en ligne",                () => set(ref(A, "presence/alice"), true));
+  await denied ("présence : marquer un AUTRE en ligne",       () => set(ref(A, "presence/bob"), true));
+  await denied ("inscrit normal : lire la présence",          () => get(ref(A, "presence")));
+  await allowed("ADMIN : lire la présence",                   () => get(ref(ADMIN, "presence")));
+  let evKey;
+  await allowed("compteur : +1 (entrée anonyme)",             async () => { evKey = (await push(ref(A, "stats/req_sent/20261013"), true)).key; });
+  await allowed("compteur : encore +1 (autre membre)",        () => push(ref(B, "stats/req_sent/20261013"), true));
+  await denied ("compteur : effacer une entrée",              () => remove(ref(A, `stats/req_sent/20261013/${evKey}`)));
+  await denied ("compteur : effacer tout le jour",            () => remove(ref(A, "stats/req_sent/20261013")));
+  await denied ("compteur : valeur ≠ true (ex. du texte)",    () => push(ref(A, "stats/req_sent/20261013"), "bonjour"));
+  await denied ("compteur : nom d'événement libre (texte)",   () => push(ref(A, "stats/Bonjour 0501234567/20261013"), true));
+  await denied ("inscrit normal : lire les compteurs",        () => get(ref(A, "stats")));
+  await allowed("ADMIN : lire les compteurs",                 () => get(ref(ADMIN, "stats")));
+  await allowed("réponse : membre du chat marque qu'il a écrit", () => set(ref(B, "chatActivity/alice_bob/bob"), true));
+  await denied ("réponse : NON-membre du chat",               () => set(ref(C, "chatActivity/alice_bob/charlie"), true));
+  await denied ("réponse : marquer pour l'AUTRE membre",      () => set(ref(B, "chatActivity/alice_bob/alice"), true));
+  await denied ("réponse : valeur ≠ true (ex. texte du message)", () => set(ref(A, "chatActivity/alice_bob/alice"), "salut"));
+  await denied ("inscrit normal : lire chatActivity",         () => get(ref(A, "chatActivity")));
+  await allowed("ADMIN : lire chatActivity",                  () => get(ref(ADMIN, "chatActivity")));
+  await denied ("ADMIN : toujours PAS les messages",          () => get(ref(ADMIN, "messages/alice_bob")));
+  await denied ("ADMIN : toujours PAS les secrets",           () => get(ref(ADMIN, "secrets/alice_dave")));
 
   /* ---------- Compteur vide : la numérotation commence à 100 ---------- */
   await env.withSecurityRulesDisabled(async ctx => { await remove(ref(ctx.database(), "counters/profileNo")); });

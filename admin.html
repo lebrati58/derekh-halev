@@ -13,7 +13,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta name="robots" content="noindex, nofollow">
 <title>ניהול · דרך הלב</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗝️</text></svg>">
-<link rel="stylesheet" href="style.css?v=20261013n">
+<link rel="stylesheet" href="style.css?v=20261013p">
 </head>
 <body>
 <div class="valance"></div>
@@ -43,6 +43,8 @@ if (location.hostname === "lebrati58.github.io") {
   <section id="screen-dash" class="screen">
     <div class="stats" id="stats"></div>
     <p class="sub" style="margin-top:12px">🔒 המנהלים לא יכולים לקרוא שיחות, שמות או טלפונים — רק נתונים כלליים ודיווחים.</p>
+
+    <button class="btn gold block" id="open-stats" style="margin-top:14px">📊 כל הסטטיסטיקות</button>
 
     <h2>📣 פעילות היום</h2>
     <div class="panel">
@@ -75,14 +77,26 @@ if (location.hostname === "lebrati58.github.io") {
 
     <div class="footer"><button class="btn link" id="logout">יציאה ממצב ניהול</button></div>
   </section>
+
+  <!-- Statistiques détaillées (page à part) -->
+  <section id="screen-stats" class="screen">
+    <button class="btn ghost small" id="close-stats">→ חזרה ללוח הניהול</button>
+    <h2>📊 סטטיסטיקות</h2>
+    <p class="sub" style="margin-top:0">🔒 מחושב מהפרופילים, מנתוני השיחות הכלליים ומנתוני שימוש אנונימיים — בלי תוכן שיחות, שמות או טלפונים.</p>
+    <div id="stats-root"></div>
+    <button class="btn ghost block" id="close-stats-2" style="margin-top:14px">→ חזרה ללוח הניהול</button>
+  </section>
 </main>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261013n"></script>
+<script src="i18n.js?v=20261013p"></script>
 <script>LANG = "he";   // l'admin reste en hébreu</script>
-<script src="commun.js?v=20261013n"></script>
+<script src="commun.js?v=20261013p"></script>
+<script src="matching.js?v=20261013p"></script>
+<script src="stats.js?v=20261013p"></script>
+<script src="admin-stats.js?v=20261013p"></script>
 <script>
 let uid = null;
 let profiles = {}, banned = {}, chats = {}, reports = {};
@@ -150,20 +164,23 @@ function startDash() {
   db.ref("reports").on("value", s => { reports = s.val() || {}; render(); });
 }
 $("#search").addEventListener("input", () => renderProfiles());
+$("#open-stats").addEventListener("click", () => { show("screen-stats"); scrollTo(0, 0); StatsUI.open(); });
+["#close-stats", "#close-stats-2"].forEach(b => $(b).addEventListener("click", () => { StatsUI.close(); show("screen-dash"); scrollTo(0, 0); }));
 
-function render() { renderStats(); renderReports(); renderProfiles(); }
+function render() { renderStats(); renderReports(); renderProfiles(); StatsUI.refresh(); }
 
+/* Tableau de bord : 6 chiffres clés (le détail est dans la page 📊, admin-stats.js) */
 function renderStats() {
   const P = Object.values(profiles), C = Object.values(chats), R = Object.values(reports);
-  const stats = [
+  const tile = ([n, l]) => `<div class="stat"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`;
+  $("#stats").innerHTML = [
     [P.length, "נרשמים"],
     [`${P.filter(p => p.gender === "m").length} / ${P.filter(p => p.gender === "f").length}`, "גברים / נשים"],
     [C.filter(c => c.status === "active").length, "שיחות פעילות"],
     [C.filter(c => c.opened).length, "מסכים שנפתחו ✨"],
-    [C.length, "סה״כ שיחות"],
+    [P.filter(p => typeof p.createdAt === "number" && Date.now() - p.createdAt < 7 * 864e5).length, "נרשמו ב־7 ימים"],
     [R.filter(r => !r.resolved).length, "דיווחים פתוחים"]
-  ];
-  $("#stats").innerHTML = stats.map(([n, l]) => `<div class="stat"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`).join("");
+  ].map(tile).join("");
 }
 
 function reportCount(u) { return Object.values(reports).filter(r => r.reportedUid === u).length; }

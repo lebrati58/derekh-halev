@@ -295,6 +295,58 @@
           ".validate": "newData.isString() && newData.val().length <= 300"
         }
       }
+    },
+    "activity": {
+      ".read": "(auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val())",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['first', 'last'])",
+        "first": {
+          ".validate": "newData.isNumber() && newData.val() <= now && (!data.exists() || newData.val() === data.val())"
+        },
+        "last": {
+          ".validate": "newData.isNumber() && newData.val() <= now"
+        },
+        "mobile": {
+          ".validate": "newData.isBoolean()"
+        },
+        "d": {
+          "$day": {
+            ".validate": "$day.matches(/^20[0-9]{6}$/) && newData.isNumber() && newData.val() >= 1 && newData.val() <= 500"
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "presence": {
+      ".read": "(auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val())",
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.val() === true"
+      }
+    },
+    "stats": {
+      ".read": "(auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val())",
+      "$event": {
+        "$day": {
+          "$id": {
+            ".write": "auth != null && !data.exists()",
+            ".validate": "$event.matches(/^[a-z_]{2,30}$/) && $day.matches(/^20[0-9]{6}$/) && newData.val() === true"
+          }
+        }
+      }
+    },
+    "chatActivity": {
+      ".read": "(auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val())",
+      "$chatId": {
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid && (root.child('chats/' + $chatId + '/from').val() === auth.uid || root.child('chats/' + $chatId + '/to').val() === auth.uid)",
+          ".validate": "newData.val() === true"
+        }
+      }
     }
   }
 }

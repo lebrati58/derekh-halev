@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261013n">
+<link rel="stylesheet" href="style.css?v=20261013p">
 </head>
 <body>
 
@@ -338,9 +338,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261013n"></script>
-<script src="commun.js?v=20261013n"></script>
-<script src="matching.js?v=20261013n"></script>
+<script src="i18n.js?v=20261013p"></script>
+<script src="commun.js?v=20261013p"></script>
+<script src="matching.js?v=20261013p"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -381,8 +381,32 @@ $$("#lang-switch [data-lang]").forEach(b => b.addEventListener("click", () => {
   if (big) return big.click();   // écran de choix affiché : même effet que le gros bouton
   if (b.dataset.lang === LANG) return;
   setLang(b.dataset.lang); markLang();
+  track("lang_change");
   if (me) location.reload();   // écran d'accueil / chat : on recharge pour tout retraduire
 }));
+
+/* ----- Statistiques anonymes pour l'admin -----
+   Aucune donnée de contenu : ni texte, ni nom, ni téléphone. Seulement :
+   activity/{uid} (1re et dernière visite, jours de visite, mobile ou non),
+   presence/{uid} (en ligne maintenant), stats/{événement}/{jour}/{id}: true
+   (compteurs d'actions), chatActivity/{chatId}/{uid}: true (« a écrit dans ce chat »).
+   Lisibles par l'admin seulement (règles). Une erreur ici ne bloque jamais l'app. */
+const dayKey = (d = new Date()) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+function track(ev) { if (uid) db.ref(`stats/${ev}/${dayKey()}`).push(true).catch(() => {}); }
+async function trackVisit() {
+  try {
+    const ref = db.ref("activity/" + uid);
+    const mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const known = (await ref.child("first").once("value")).exists();
+    await ref.update(known ? { last: TS, mobile } : { first: TS, last: TS, mobile });
+    await ref.child("d/" + dayKey()).transaction(v => Math.min((v || 0) + 1, 500));
+  } catch (e) { console.warn("stats", e); }
+  db.ref(".info/connected").on("value", c => {
+    if (!c.val()) return;
+    const p = db.ref("presence/" + uid);
+    p.onDisconnect().remove().then(() => p.set(true)).catch(() => {});
+  });
+}
 
 (async function boot() {
   applyI18n(); markLang();
@@ -391,6 +415,7 @@ $$("#lang-switch [data-lang]").forEach(b => b.addEventListener("click", () => {
   try {
     const user = await ensureAuth();
     uid = user.uid;
+    trackVisit();
     const [pS, prS, bS] = await Promise.all([
       db.ref("profiles/" + uid).once("value"),
       db.ref("private/" + uid).once("value"),
@@ -485,6 +510,9 @@ function leaveEdit() {
 $("#edit-cancel").addEventListener("click", leaveEdit);
 
 /* =================== Inscription =================== */
+// Validation refusée → compteur « reg_err_<champ> » (inscription seulement) pour repérer où ça bloque
+function regFail(key, vars) { if (!editMode) track("reg_err_" + key.slice(2)); return toast(t(key, vars)); }
+$("#reg-form").addEventListener("focusin", () => { if (!editMode && !store.get("reg_started")) { store.set("reg_started", 1); track("reg_start"); } });
 $("#reg-form").addEventListener("submit", async e => {
   e.preventDefault();
   const val = n => (document.querySelector(`input[name=${n}]:checked`) || {}).value;
@@ -506,24 +534,24 @@ $("#reg-form").addEventListener("submit", async e => {
   const langs = {};
   $$("input[name=langs]:checked").forEach(i => { langs[i.value] = true; });
 
-  if (!firstName) return toast(t("v_name"));
-  if (!/^\+?[\d\s\-]{9,18}$/.test(phone)) return toast(t("v_phone"));
-  if (!gender) return toast(t("v_gender"));
-  if (!(age >= 18 && age <= 99)) return toast(t("v_age"));
-  if (!city) return toast(t("v_city"));
-  if (!religion) return toast(t("v_religion"));
-  if (!intent) return toast(t("v_intent"));
-  if (!Object.keys(langs).length) return toast(t("v_langs"));
-  if (words.length < 3) return toast(t("v_words"));
-  if (!shabbat) return toast(t("v_shabbat"));
-  if (!kids) return toast(t("v_kids"));
-  if (!shabbatStyle) return toast(t("v_shstyle"));
-  if (!pace) return toast(t("v_pace"));
-  if (!value) return toast(t("v_value"));
-  if (!weekend) return toast(t("v_weekend"));
-  if (!million) return toast(t("v_million"));
-  if ([...words, shabbat, city, cantLiveWithout].some(hasForbiddenContent)) return toast(t("v_forbidden"));
-  if (!$("#f-ok").checked) return toast(t("v_ok"));
+  if (!firstName) return regFail("v_name");
+  if (!/^\+?[\d\s\-]{9,18}$/.test(phone)) return regFail("v_phone");
+  if (!gender) return regFail("v_gender");
+  if (!(age >= 18 && age <= 99)) return regFail("v_age");
+  if (!city) return regFail("v_city");
+  if (!religion) return regFail("v_religion");
+  if (!intent) return regFail("v_intent");
+  if (!Object.keys(langs).length) return regFail("v_langs");
+  if (words.length < 3) return regFail("v_words");
+  if (!shabbat) return regFail("v_shabbat");
+  if (!kids) return regFail("v_kids");
+  if (!shabbatStyle) return regFail("v_shstyle");
+  if (!pace) return regFail("v_pace");
+  if (!value) return regFail("v_value");
+  if (!weekend) return regFail("v_weekend");
+  if (!million) return regFail("v_million");
+  if ([...words, shabbat, city, cantLiveWithout].some(hasForbiddenContent)) return regFail("v_forbidden");
+  if (!$("#f-ok").checked) return regFail("v_ok");
 
   const btn = $("#reg-btn");
   if (editMode) {
@@ -539,6 +567,7 @@ $("#reg-form").addEventListener("submit", async e => {
         cantLiveWithout: cantLiveWithout || null, langs
       });
       toast(t("profile_updated"));
+      track("profile_edit");
       leaveEdit();
     } catch (err) {
       console.error(err); toast(t("save_failed"));
@@ -584,11 +613,13 @@ $("#reg-form").addEventListener("submit", async e => {
     me.createdAt = Date.now();
     store.set("identity", { uid, no });
     toast(t("welcome", { name: profileName(no) }));
+    track("reg_done");
     startHome();
   } catch (err) {
     console.error(err);
     const code = (err && (err.code || err.message)) || "";
     toast(t("reg_error") + (code ? " [" + code + "]" : ""), 6000);
+    track("err_reg");
     btn.disabled = false; btn.innerHTML = HEART + " " + t("h103");
   }
 });
@@ -628,6 +659,7 @@ function startHome() {
 
 $$(".tab").forEach(t => t.addEventListener("click", () => selectTab(t.dataset.tab)));
 function selectTab(name) {
+  if (["proposals", "requests", "chats"].includes(name)) track("tab_" + name);
   $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
   $$(".tabpane").forEach(p => p.classList.toggle("active", p.id === "pane-" + name));
 }
@@ -674,6 +706,7 @@ async function setPaused(v) {
     if (v) me.paused = true; else delete me.paused;
     updatePausedUI(); updateLangsBanner();
     toast(v ? t("paused_on") : t("paused_off"));
+    track(v ? "pause_on" : "pause_off");
   } catch (e) { console.error(e); toast(t("fail_retry")); }
 }
 $("#pause-toggle").addEventListener("click", async () => {
@@ -694,6 +727,7 @@ async function blockUser(target) {
   if (!ok) return false;
   try {
     await db.ref(`blocks/${uid}/${target}`).set(true);
+    track("block");
     if (inbox[target] && inbox[target].status === "pending") await declineRequest(target).catch(() => {});
     toast(t("blocked"));
     return true;
@@ -762,7 +796,7 @@ $("#proposals").addEventListener("click", async e => {
   const h = e.target.closest("[data-hide]");
   if (h) {
     h.disabled = true;
-    try { await db.ref(`hidden/${uid}/${h.dataset.hide}`).set(true); toast(t("hidden_toast")); }
+    try { await db.ref(`hidden/${uid}/${h.dataset.hide}`).set(true); toast(t("hidden_toast")); track("hide"); }
     catch (err) { console.error(err); toast(t("send_fail")); h.disabled = false; }
     return;
   }
@@ -785,8 +819,9 @@ async function sendRequest(toUid) {
       [`outbox/${uid}/${toUid}`]: { toNo: p.no, status: "pending", createdAt: TS }
     });
     toast(t("req_sent", { name: profileName(p.no) }));
+    track(p.no && computeProposals().some(c => c.uid === toUid && c.soft) ? "req_sent_soft" : "req_sent");
   } catch (err) {
-    console.error(err); toast(t("send_fail"));
+    console.error(err); toast(t("send_fail")); track("err_request");
     renderProposals();
   }
 }
@@ -834,10 +869,11 @@ async function acceptRequest(fromUid) {
     await db.ref(`inbox/${uid}/${fromUid}`).update({ status: "accepted", chatId });
     await db.ref(`outbox/${fromUid}/${uid}`).update({ status: "accepted", chatId }).catch(() => {});
     toast(t("chat_opened"));
+    track("req_accepted");
     selectTab("chats");
     openChat(chatId);
   } catch (err) {
-    console.error(err); toast(t("open_fail")); renderRequests();
+    console.error(err); toast(t("open_fail")); track("err_accept"); renderRequests();
   }
 }
 
@@ -846,6 +882,7 @@ async function declineRequest(fromUid) {
     await db.ref(`inbox/${uid}/${fromUid}`).update({ status: "declined" });
     await db.ref(`outbox/${fromUid}/${uid}`).update({ status: "declined" }).catch(() => {});
     toast(t("declined"));
+    track("req_declined");
   } catch (err) { console.error(err); toast(t("error_retry")); }
 }
 
@@ -880,6 +917,7 @@ function welcomeRow() {
     </div>`;
 }
 function openWelcome() {
+  track("welcome_open");
   closeChat();
   currentChat = WELCOME;
   store.set("welcome_read", 1);
@@ -1015,7 +1053,7 @@ function updateChatView() {
   if (m.opened && sec && sec[partnerOf(m)]) {
     const tp = sec[partnerOf(m)];   // (pas « t » : ce nom est la fonction de traduction)
     bar.innerHTML = `<div class="revealed-box">${esc(t("revealed"))} <b>${esc(tp.firstName)}</b> · <span dir="ltr">${esc(tp.phone)}</span>
-      <div class="btns"><a class="btn gold small" href="${esc(waLink(tp.phone))}" rel="noopener">💬 WhatsApp</a>
+      <div class="btns"><a class="btn gold small" href="${esc(waLink(tp.phone))}" rel="noopener" onclick="track('wa_click')">💬 WhatsApp</a>
       <button class="btn ghost small" id="replay-reveal">${HEART} ${esc(t("see_again"))}</button></div></div>`;
     $("#replay-reveal").onclick = () => playReveal(id);
   } else if (ended) {
@@ -1039,8 +1077,11 @@ $("#composer").addEventListener("submit", async e => {
   if (hasForbiddenContent(text)) { toast(t("msg_forbidden"), 3500); return; }
   input.value = ""; autoGrow();
   try {
-    await db.ref("messages/" + currentChat).push({ from: uid, text: text.slice(0, 500), ts: TS });
-  } catch (err) { console.error(err); toast(t("msg_fail")); input.value = text; }
+    const id = currentChat;
+    await db.ref("messages/" + id).push({ from: uid, text: text.slice(0, 500), ts: TS });
+    track("msg_sent");
+    if (!store.get("ca_" + id)) db.ref(`chatActivity/${id}/${uid}`).set(true).then(() => store.set("ca_" + id, 1)).catch(() => {});
+  } catch (err) { console.error(err); toast(t("msg_fail")); track("err_msg"); input.value = text; }
 });
 /* Clavier mobile : la vue chat (position fixed) suit la zone réellement visible,
    sinon le clavier recouvre la zone de saisie (Chrome Android, Safari iOS). */
@@ -1076,6 +1117,7 @@ async function pressReveal() {
     if (!priv) priv = (await db.ref("private/" + uid).once("value")).val();
     await db.ref(`secrets/${id}/${uid}`).set({ firstName: priv.firstName, phone: priv.phone });
     await db.ref(`reveal/${id}/${uid}`).set(true);
+    track("reveal_press");
     pressedCache[id] = true;
     updateChatView();
     tryOpen(id);
@@ -1114,6 +1156,7 @@ function showPartnerCard(chatId) {
   const p = profiles[partnerOf(m)];
   if (!p) return toast(t("profile_gone"));
   const why = me ? matchReasons(me, p, 3, LANG) : [];
+  track("card_view");
   showModal({
     body: cardHTML(p, me ? { pct: matchPercent(me, p) } : {}) +
       (why.length ? `<div class="match-why"><b>${esc(t("why_title"))}</b> ${why.map(w => `<span>${esc(w)}</span>`).join("")}</div>` : ""),
@@ -1123,6 +1166,7 @@ function showPartnerCard(chatId) {
 $("#chat-title").addEventListener("click", () => showPartnerCard());
 
 function showConduct() {
+  track("coc_open");
   const items = [1, 2, 3, 4, 5, 6, 7, 8].map(i => `<span class="coc-item">${esc(t("coc_" + i))}</span>`).join("");
   showModal({
     title: t("coc_title"),
@@ -1165,6 +1209,7 @@ $("#act-report").addEventListener("click", async () => {
       reason: reason.slice(0, 300), createdAt: TS
     });
     toast(t("report_thanks"));
+    track("report");
   } catch (e) { console.error(e); toast(t("report_fail")); }
 });
 
@@ -1178,7 +1223,7 @@ function updateUnhideLink() {
 $("#unhide-all").addEventListener("click", async () => {
   const ok = await showModal({ title: t("unhide_title"), body: esc(t("unhide_body")), okText: t("unhide_ok"), cancelText: t("cancel") });
   if (!ok) return;
-  try { await db.ref("hidden/" + uid).remove(); toast(t("unhide_done")); }
+  try { await db.ref("hidden/" + uid).remove(); toast(t("unhide_done")); track("unhide"); }
   catch (err) { console.error(err); toast(t("send_fail")); }
 });
 
@@ -1189,6 +1234,7 @@ $("#delete-me").addEventListener("click", async () => {
     for (const [id, m] of Object.entries(myChats)) {
       if (m.status === "active") await db.ref(`chats/${id}/status`).set("ended").catch(() => {});
     }
+    track("profile_delete");
     await db.ref("profiles/" + uid).remove();
     await db.ref("private/" + uid).remove();
     Object.values(chatSubs).forEach(r => r.off());

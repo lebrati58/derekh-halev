@@ -45,6 +45,10 @@
 
    blocks/{uid}/{targetUid}: true     ← blocage personnel (lisible/éditable par uid seul)
    hidden/{uid}/{targetUid}: true     ← « pas pour moi » : masqué de mes propositions (lisible/éditable par uid seul)
+   activity/{uid}: {first, last, mobile, d:{AAAAMMJJ: n}}  ← statistiques : 1re/dernière visite, jours de visite (admin seul + soi)
+   presence/{uid}: true               ← en ligne maintenant (onDisconnect) — admin seul
+   stats/{event}/{AAAAMMJJ}/{id}: true ← compteurs anonymes d'actions (req_sent, msg_sent, reg_err_*…) — admin seul, ajout seulement
+   chatActivity/{chatId}/{uid}: true  ← « a écrit au moins un message » (sans contenu) — admin seul
    announcements/current {text, ts}   ← activité du jour publiée par l'admin, lisible par tous
 
    private/{uid}                      ← PRIVÉ (lisible uniquement par son propriétaire)

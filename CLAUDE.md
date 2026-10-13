@@ -8,9 +8,11 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | Fichier | Rôle |
 |---|---|
 | `index.html` | App participant (HTML + tout le JS inline) : inscription (formulaire réutilisé pour ✏️ l'édition du profil), conversation de bienvenue « 💗 צוות דרך הלב » (locale, jamais en base, clairement signée par l'équipe — **pas un faux profil**), propositions, demandes, chat, ouverture du rideau, pause/blocage/signalement, suppression du profil, 📜 code de conduite (modale, lien sous la case 18 ans et en bas de l'accueil) |
-| `admin.html` | Tableau de bord admin (connexion par PIN) : stats, signalements, bannissement, 🗑️ suppression d'un profil par numéro, annonce du jour |
+| `admin.html` | Tableau de bord admin (connexion par PIN) : 6 tuiles clés + bouton « 📊 כל הסטטיסטיקות » vers une page à part (toutes les tuiles + graphiques : inscriptions/chats par jour, âges, villes, religion, intentions, langues, questionnaire, état des chats — calculés uniquement depuis `profiles`, `chats` (métadonnées), `reports`, `banned` ; charge `matching.js` pour les libellés `QUIZ`), signalements, bannissement, 🗑️ suppression d'un profil par numéro, annonce du jour |
 | `commun.js` | Config Firebase, schéma de la base en commentaire, helpers partagés (auth anonyme, `nextProfileNo`, filtre anti-téléphone/liens `hasForbiddenContent`, `cardHTML`, modale, toast) |
 | `i18n.js` | Traductions de l'interface he/en/fr (`I18N`, `t(clé, vars)`, `applyI18n()`, `setLang()`), langue choisie au 1er lancement et mémorisée (localStorage `mhm_uiLang`). Textes fixes du HTML : `data-i18n`/`-ph`/`-aria` (clés `hNNN`) ; textes du code : `t("clé")`. **Tout nouveau texte doit être ajouté dans les 3 langues.** `admin.html` reste en hébreu |
+| `stats.js` | Calcul **pur** des statistiques admin (`computeStats`, `insights`, périodes, rétention, entonnoir, compatibilité via `matching.js`) — testé par `test_stats.js` |
+| `admin-stats.js` | Interface du centre statistique de l'admin (`StatsUI`) : filtres période/segment, onglets, graphiques SVG, export CSV |
 | `matching.js` | Moteur de compatibilité pur (sans Firebase) : filtres durs, score, %, raisons « למה אתם מתאימים », icebreakers |
 | `style.css` | Styles partagés |
 | `logo.png`, `logo-heart.png`, `apple-touch-icon.png` | Logo complet (aperçu WhatsApp `og:image`), cœur seul transparent (en-tête + icône d'onglet), icône écran d'accueil |
@@ -18,6 +20,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `firebase.json` | Règles, Hosting (dossier `public/` généré au déploiement) + émulateurs database (9000) / hosting (5000) |
 | `.github/workflows/firebase-hosting.yml` | Déploiement auto sur dereh-halev.web.app à chaque push sur `main` (secret `FIREBASE_SERVICE_ACCOUNT`) ; copie la **liste blanche** des fichiers du site dans `public/` — tout nouveau fichier du site doit y être ajouté |
 | `test_matching.js` | Tests du moteur de matching (Node, sans dépendance) |
+| `test_stats.js` | Tests des calculs statistiques (Node, sans dépendance ; `npm test` lance les deux) |
 | `test_rules.js` | Tests des règles sur l'émulateur (`@firebase/rules-unit-testing`) |
 | `package.json` | Dépendances et scripts de **test uniquement** |
 | `README.md` | Guide d'installation Firebase, déploiement, checklist de test manuel mobile |
@@ -33,6 +36,11 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 - `blocks/{uid}/{targetUid}: true` — blocages personnels.
 - `hidden/{uid}/{targetUid}: true` — profils « 🙈 pas pour moi » masqués de mes propositions (l'autre peut toujours m'envoyer une demande) ; lien « profils masqués (N) » en bas de l'accueil pour tout réafficher.
 - `banned/{uid}: true` — profils bannis.
+- **Statistiques (collecte sans contenu, écrite par `index.html`, `track()` / `trackVisit()`)** :
+  - `activity/{uid}` — `first`, `last` (timestamps serveur), `mobile`, `d/{AAAAMMJJ}: nb de chargements ce jour-là` (visiteurs non inscrits compris).
+  - `presence/{uid}: true` — en ligne maintenant (supprimé par `onDisconnect`).
+  - `stats/{événement}/{AAAAMMJJ}/{pushId}: true` — compteurs d'actions anonymes : `req_sent`, `req_sent_soft`, `req_accepted`, `req_declined`, `msg_sent`, `reveal_press`, `wa_click`, `hide`, `unhide`, `block`, `report`, `pause_on/off`, `card_view`, `coc_open`, `welcome_open`, `lang_change`, `profile_edit`, `profile_delete`, `reg_start`, `reg_done`, `reg_err_<champ>`, `tab_<onglet>`, `err_<action>`.
+  - `chatActivity/{chatId}/{uid}: true` — ce membre a écrit au moins un message (taux de réponse, sans lire les messages).
 - `announcements/current` — `{text, text_en?, text_fr?, ts}` publié par l'admin (hébreu obligatoire ; chaque utilisateur voit sa langue, repli sur l'hébreu).
 - `inbox/{to}/{from}` et `outbox/{from}/{to}` — demandes : `fromNo`/`toNo`, `status` (pending/accepted/declined), `createdAt`, `chatId?`.
 - `chats/{from_to}` — métadonnées : `from`, `to` (uids), `fromNo`, `toNo`, `status` (active/ended), `opened`, `icebreaker` (clé neutre type `weekend.sea`, traduite à l'affichage par `icebreakerText()` ; anciens chats : texte hébreu), `createdAt`.
@@ -57,6 +65,10 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `blocks/{uid}` | soi | soi |
 | `hidden/{uid}` | soi | soi (valeurs `true` uniquement ; suppression de toute la liste permise) |
 | `banned` | tout inscrit | admin |
+| `activity/{uid}` | admin ; soi | soi (`first` immuable, dates ≤ maintenant, champs connus seulement) |
+| `presence/{uid}` | admin | soi (`true`) |
+| `stats/{event}/{day}/{id}` | admin | tout inscrit : **ajout seul** (`true`), nom d'événement `[a-z_]`, jour `AAAAMMJJ` ; ni modification ni suppression |
+| `chatActivity/{chatId}/{uid}` | admin | soi, membre du chat (`true`) |
 | `announcements/current` | tout inscrit | admin |
 | `inbox/{to}` | destinataire | expéditeur (création `pending`, `fromNo` vérifié, ni banni ni bloqué) ; destinataire (mise à jour) |
 | `outbox/{from}` | expéditeur | expéditeur (création, `toNo` vérifié) ; destinataire (mise à jour) |
@@ -116,5 +128,6 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 11. ~~Duplication partielle du matching~~ — corrigé : le complément « découverte » utilise `isSoftCompatible()` et `softReasons()` de `matching.js`.
 12. `acceptRequest()` enchaîne 5 écritures non atomiques (alors que `sendRequest()` utilise un update multi-path) → demi-états possibles si la connexion lâche.
 13. La suppression de profil ne retire que `profiles/` et `private/` : `secrets/` (prénom + téléphone), `inbox`/`outbox`, `messages`, `blocks`, `reports` restent indéfiniment.
+16. Statistiques : l'admin voit, par uid (donc par numéro de profil), les jours de visite, l'appareil (mobile ou non), la présence en ligne et si la personne a écrit dans un chat donné. Aucun texte, nom ni téléphone, mais ce sont des métadonnées d'usage. Les compteurs `stats/` sont anonymes mais peuvent être gonflés par un inscrit malveillant (ajout libre de `true`). Un même humain sur 2 navigateurs = 2 uids (visiteurs comptés deux fois).
 14. Les numéros de profil et uids sont visibles par tous dans `profiles/` ; `banned/` est lisible par tous les inscrits.
 15. Préfixe localStorage `mhm_` (ancien nom du projet) à ne pas changer sans migration. (README mis à jour : adresse dereh-halev.web.app et déploiement auto.)
