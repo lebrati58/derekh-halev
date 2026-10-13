@@ -417,3 +417,21 @@ body { overflow-x: clip; }
 
 /* Bouton « pas pour moi » : discret, à côté de la demande */
 .item-actions .btn.hide-btn { flex: 0 0 auto; font-size: .85rem; padding-inline: 12px; }
+
+/* Admin : graphiques de statistiques (une seule teinte dorée = quantité) */
+.chart { margin-bottom: 12px; }
+.chart h3 { margin: 0 0 8px; font-size: 1rem; color: var(--gold-2); }
+.chart .sub { margin: -4px 0 8px; font-size: .8rem; }
+.sub-h { color: var(--gold-2); margin: 18px 0 8px; }
+.bar-row { display: grid; grid-template-columns: minmax(0, 7.5em) minmax(0, 1fr) auto; align-items: center; gap: 4px 8px; margin: 6px 0; font-size: .85rem; }
+.bar-l { overflow-wrap: anywhere; }
+.bar-track { height: 12px; background: rgba(255,255,255,.06); border-radius: 4px; overflow: hidden; }
+.bar { display: block; height: 100%; background: var(--gold-2); border-radius: 4px; }
+.bar-n { font-weight: 700; white-space: nowrap; }
+.bar-n small { color: var(--muted); font-weight: 400; }
+.bar-d { grid-column: 2 / -1; color: var(--muted); font-size: .75rem; margin-top: -4px; }
+.cols { display: flex; align-items: flex-end; gap: 3px; height: 130px; direction: ltr; }
+.col { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.col-bar { width: 100%; background: var(--gold-2); border-radius: 4px 4px 0 0; }
+.col-n { font-size: .7rem; font-weight: 700; }
+.col-l { font-size: .55rem; color: var(--muted); margin-top: 3px; white-space: nowrap; transform: rotate(-45deg); transform-origin: center; height: 1.6em; }
