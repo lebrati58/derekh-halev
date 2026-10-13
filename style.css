@@ -399,3 +399,8 @@ textarea { resize: vertical; min-height: 70px; }
 .coc { display: block; text-align: start; line-height: 1.5; }
 .coc-item { display: block; margin: 10px 0; }
 .coc b { display: block; margin-top: 12px; text-align: center; }
+
+/* Un mot très long (sans espace) dans un profil ne doit jamais élargir la page */
+.list { grid-template-columns: minmax(0, 1fr); }
+.mystery-card, .announce, .match-why, .msg { overflow-wrap: anywhere; min-width: 0; }
+body { overflow-x: clip; }
