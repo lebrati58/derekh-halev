@@ -120,6 +120,12 @@
         "ts": {
           ".validate": "newData.isNumber()"
         },
+        "text_en": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 300"
+        },
+        "text_fr": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 300"
+        },
         "$other": {
           ".validate": false
         }

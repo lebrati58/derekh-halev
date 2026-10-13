@@ -157,6 +157,9 @@ async function denied(name, fn) {
   await denied ("inscrit normal : publier une annonce",    () => set(ref(A, "announcements/current"), { text: "spam", ts: 1 }));
   await allowed("bon PIN → admin",                         () => set(ref(ADMIN, "admins/moriah"), "test-pin-123"));
   await allowed("admin : lire les signalements",           () => get(ref(ADMIN, "reports")));
+  await allowed("admin : annonce en 3 langues",             () => set(ref(ADMIN, "announcements/current"), { text: "שאלת היום", text_en: "Question of the day", text_fr: "Question du jour", ts: 1 }));
+  await denied ("annonce : langue inconnue (text_ru)",      () => set(ref(ADMIN, "announcements/current"), { text: "x", text_ru: "x", ts: 1 }));
+  await denied ("inscrit normal : annonce en anglais",      () => set(ref(A, "announcements/current"), { text: "x", text_en: "spam", ts: 1 }));
   await allowed("admin : publier une annonce",             () => set(ref(ADMIN, "announcements/current"), { text: "שאלת היום 😉", ts: 1 }));
   await allowed("admin : bannir un profil",                () => set(ref(ADMIN, "banned/charlie"), true));
 

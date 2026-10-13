@@ -32,7 +32,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 - `private/{uid}` — `firstName`, `phone`.
 - `blocks/{uid}/{targetUid}: true` — blocages personnels.
 - `banned/{uid}: true` — profils bannis.
-- `announcements/current` — `{text, ts}` publié par l'admin.
+- `announcements/current` — `{text, text_en?, text_fr?, ts}` publié par l'admin (hébreu obligatoire ; chaque utilisateur voit sa langue, repli sur l'hébreu).
 - `inbox/{to}/{from}` et `outbox/{from}/{to}` — demandes : `fromNo`/`toNo`, `status` (pending/accepted/declined), `createdAt`, `chatId?`.
 - `chats/{from_to}` — métadonnées : `from`, `to` (uids), `fromNo`, `toNo`, `status` (active/ended), `opened`, `icebreaker` (clé neutre type `weekend.sea`, traduite à l'affichage par `icebreakerText()` ; anciens chats : texte hébreu), `createdAt`.
 - `userChats/{uid}/{chatId}: true` — index des chats de chacun.

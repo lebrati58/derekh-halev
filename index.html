@@ -632,7 +632,9 @@ function setBadge(id, n) { const b = $(id); b.textContent = n; b.classList.toggl
 /* ----- Annonce admin (פעילות היום) ----- */
 function renderAnnounce(a) {
   const el = $("#announce");
-  if (a && a.text) { el.textContent = "📣 " + a.text; el.classList.remove("hidden"); }
+  // Texte dans la langue choisie (text_en / text_fr), sinon l'hébreu
+  const txt = a && (a["text_" + LANG] || a.text);
+  if (txt) { el.textContent = "📣 " + txt; el.classList.remove("hidden"); }
   else el.classList.add("hidden");
 }
 
