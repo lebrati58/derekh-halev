@@ -44,9 +44,7 @@ if (location.hostname === "lebrati58.github.io") {
     <div class="stats" id="stats"></div>
     <p class="sub" style="margin-top:12px">🔒 המנהלים לא יכולים לקרוא שיחות, שמות או טלפונים — רק נתונים כלליים ודיווחים.</p>
 
-    <h2>📊 סטטיסטיקות</h2>
-    <p class="sub" style="margin-top:0">כל המספרים מחושבים מהפרופילים ומנתוני השיחות הכלליים בלבד — בלי תוכן שיחות, שמות או טלפונים.</p>
-    <div id="charts"></div>
+    <button class="btn gold block" id="open-stats" style="margin-top:14px">📊 כל הסטטיסטיקות</button>
 
     <h2>📣 פעילות היום</h2>
     <div class="panel">
@@ -78,6 +76,16 @@ if (location.hostname === "lebrati58.github.io") {
     </div>
 
     <div class="footer"><button class="btn link" id="logout">יציאה ממצב ניהול</button></div>
+  </section>
+
+  <!-- Statistiques détaillées (page à part) -->
+  <section id="screen-stats" class="screen">
+    <button class="btn ghost small" id="close-stats">→ חזרה ללוח הניהול</button>
+    <h2>📊 סטטיסטיקות</h2>
+    <p class="sub" style="margin-top:0">כל המספרים מחושבים מהפרופילים ומנתוני השיחות הכלליים בלבד — בלי תוכן שיחות, שמות או טלפונים.</p>
+    <div class="stats" id="stats-all"></div>
+    <div id="charts" style="margin-top:14px"></div>
+    <button class="btn ghost block" id="close-stats-2" style="margin-top:14px">→ חזרה ללוח הניהול</button>
   </section>
 </main>
 
@@ -155,6 +163,8 @@ function startDash() {
   db.ref("reports").on("value", s => { reports = s.val() || {}; render(); });
 }
 $("#search").addEventListener("input", () => renderProfiles());
+$("#open-stats").addEventListener("click", () => { show("screen-stats"); scrollTo(0, 0); });
+["#close-stats", "#close-stats-2"].forEach(b => $(b).addEventListener("click", () => { show("screen-dash"); scrollTo(0, 0); }));
 
 function render() { renderStats(); renderCharts(); renderReports(); renderProfiles(); }
 
@@ -176,7 +186,7 @@ function renderStats() {
     [P.filter(p => p.paused).length, "במצב השהיה ⏸️"],
     [Object.keys(banned).length, "מורחקים"],
     [ages.length ? Math.round(ages.reduce((a, b) => a + b, 0) / ages.length) : "—", "גיל ממוצע"],
-    [ages.length ? `${Math.min(...ages)}–${Math.max(...ages)}` : "—", "טווח גילאים"],
+    [ages.length ? `\u2066${Math.min(...ages)}–${Math.max(...ages)}\u2069` : "—", "טווח גילאים"],
     [C.length, "סה״כ שיחות"],
     [C.filter(c => c.status === "active").length, "שיחות פעילות"],
     [C.filter(c => now - ts(c) < 7 * DAY).length, "שיחות חדשות ב־7 ימים"],
@@ -186,7 +196,10 @@ function renderStats() {
     [uids.filter(u => !inChat.has(u)).length, "נרשמים בלי אף שיחה"],
     [R.filter(r => !r.resolved).length, "דיווחים פתוחים"]
   ];
-  $("#stats").innerHTML = stats.map(([n, l]) => `<div class="stat"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`).join("");
+  const tile = ([n, l]) => `<div class="stat"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`;
+  const KEY = ["נרשמים", "גברים / נשים", "שיחות פעילות", "מסכים שנפתחו ✨", "נרשמו ב־7 ימים", "דיווחים פתוחים"];
+  $("#stats").innerHTML = KEY.map(k => stats.find(x => x[1] === k)).map(tile).join("");
+  $("#stats-all").innerHTML = stats.map(tile).join("");
 }
 
 /* Barres horizontales (une seule teinte = quantité). rows : [libellé, n, détail?] ;
