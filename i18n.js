@@ -16,6 +16,9 @@ const UI_LANGS = {
 
 const I18N = {
 he: {
+  "h109": "👤 הכרטיס של הצד השני",
+  "profile_gone": "הפרופיל כבר לא זמין",
+  "close": "סגירה",
   "h107": "🆕 הוסיפו את השפות שאתם מדברים — זה עוזר להתאמות! 🇮🇱🇬🇧🇫🇷",
   "h108": "✏️ להוספה",
   "h001": "דרך הלב",
@@ -240,6 +243,9 @@ he: {
   "choose_lang": "בחרו שפה"
 },
 en: {
+  "h109": "👤 Their card",
+  "profile_gone": "This profile is no longer available",
+  "close": "Close",
   "h107": "🆕 Add the languages you speak — it helps your matches! 🇮🇱🇬🇧🇫🇷",
   "h108": "✏️ Add",
   "h001": "Derekh HaLev",
@@ -464,6 +470,9 @@ en: {
   "choose_lang": "Choose your language"
 },
 fr: {
+  "h109": "👤 Voir sa carte",
+  "profile_gone": "Ce profil n'est plus disponible",
+  "close": "Fermer",
   "h107": "🆕 Ajoutez les langues que vous parlez — ça aide vos affinités ! 🇮🇱🇬🇧🇫🇷",
   "h108": "✏️ Ajouter",
   "h001": "Derekh HaLev",
