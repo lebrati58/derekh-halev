@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261013h">
+<link rel="stylesheet" href="style.css?v=20261013i">
 </head>
 <body>
 
@@ -237,6 +237,7 @@ if (location.hostname === "lebrati58.github.io") {
           <label class="check"><input type="checkbox" id="f-ok">
             <span data-i18n="h066">אני מעל גיל 18, ומתחייב/ת לשיחה מכבדת. ידוע לי שאין לשתף טלפון או קישורים בצ׳אט — המסך נפתח רק בהסכמה הדדית.</span>
           </label>
+          <button type="button" class="btn link coc-link" data-i18n="h110">📜 קוד ההתנהגות</button>
         </div>
 
         <button type="submit" class="btn gold block" id="reg-btn"><img class="heart-ico" src="logo-heart.png" alt=""> <span data-i18n="h103">יוצאים לדרך</span></button>
@@ -281,6 +282,7 @@ if (location.hostname === "lebrati58.github.io") {
       <button class="btn link" id="pause-toggle" data-i18n="h075">⏸️ מצב השהיה</button>
       ·
       <button class="btn link" id="delete-me" data-i18n="h076">מחיקת הפרופיל שלי</button>
+      <br><button class="btn link coc-link" data-i18n="h110">📜 קוד ההתנהגות</button>
     </div>
   </section>
 </main>
@@ -335,9 +337,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261013h"></script>
-<script src="commun.js?v=20261013h"></script>
-<script src="matching.js?v=20261013h"></script>
+<script src="i18n.js?v=20261013i"></script>
+<script src="commun.js?v=20261013i"></script>
+<script src="matching.js?v=20261013i"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -1104,6 +1106,16 @@ function showPartnerCard(chatId) {
   });
 }
 $("#chat-title").addEventListener("click", () => showPartnerCard());
+
+function showConduct() {
+  const items = [1, 2, 3, 4, 5, 6, 7, 8].map(i => `<span class="coc-item">${esc(t("coc_" + i))}</span>`).join("");
+  showModal({
+    title: t("coc_title"),
+    body: `<span class="coc">${esc(t("coc_intro"))}${items}<b>${esc(t("coc_end"))}</b></span>`,
+    okText: t("close"), cancelText: ""
+  });
+}
+$$(".coc-link").forEach(b => b.addEventListener("click", showConduct));
 $("#act-profile").addEventListener("click", () => { $("#chat-menu").classList.add("hidden"); showPartnerCard(); });
 
 $("#chat-menu-btn").addEventListener("click", e => { e.stopPropagation(); $("#chat-menu").classList.toggle("hidden"); });

@@ -394,3 +394,8 @@ textarea { resize: vertical; min-height: 70px; }
 [lang="fr"] .tabs, [lang="en"] .tabs { gap: 3px; }
 .chat-row .welcome-avatar::after { display: none; }
 #chat-view.welcome #chat-title { text-decoration: none; cursor: default; }
+
+/* Code de conduite */
+.coc { display: block; text-align: start; line-height: 1.5; }
+.coc-item { display: block; margin: 10px 0; }
+.coc b { display: block; margin-top: 12px; text-align: center; }
