@@ -415,12 +415,13 @@ async function trackVisit() {
   try {
     const user = await ensureAuth();
     uid = user.uid;
-    trackVisit();
     const [pS, prS, bS] = await Promise.all([
       db.ref("profiles/" + uid).once("value"),
       db.ref("private/" + uid).once("value"),
       db.ref("banned/" + uid).once("value")
     ]);
+    // Statistiques APRÈS les lectures du démarrage : elles ne retardent plus l'affichage
+    setTimeout(trackVisit, 1500);
     if (bS.val()) return show("screen-banned");
     if (pS.exists()) {
       me = pS.val(); priv = prS.val();
