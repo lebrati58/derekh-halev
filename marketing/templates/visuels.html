@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>דרך הלב — gabarits visuels</title>
+<!--
+  Gabarits graphiques réutilisables de דרך הלב (Instagram, Stories, à la une).
+  Chaque visuel = un <section class="v" id="..."> à taille réelle (px Instagram).
+  Pour modifier un texte : changer l'objet VISUALS plus bas, puis relancer
+  `node marketing/templates/render.js` (PNG dans marketing/visuels/).
+  Ouvrir ce fichier dans un navigateur permet aussi de les voir tous.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Rubik:wght@400;500;700&display=block" rel="stylesheet">
+<style>
+:root {
+  /* Jour (logo) */
+  --cream: #FEF7F0;
+  --cream-2: #FCEBE1;
+  --peach: #FE947E;
+  --coral: #FD857B;
+  --rose: #E8446E;
+  --raspberry: #DF386B;
+  --ruby: #98114B;
+  --plum: #6D123E;
+  /* Nuit (application) */
+  --night: #140A26;
+  --night-2: #1F1238;
+  --violet: #5B3A8C;
+  --velvet-1: #3A0F4F;
+  --velvet-2: #5E1A6E;
+  --gold: #D4A94A;
+  --gold-2: #F3D88A;
+  --lilac: #B9A8D6;
+  --f-title: "Frank Ruhl Libre", serif;
+  --f-body: "Rubik", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #888; font-family: var(--f-body); display: flex; flex-wrap: wrap; gap: 40px; padding: 40px; }
+.v { position: relative; overflow: hidden; flex: none; direction: rtl; }
+.post { width: 1080px; height: 1350px; }
+.story { width: 1080px; height: 1920px; }
+.square { width: 1080px; height: 1080px; }
+
+/* ---------- Ambiances ---------- */
+.day { background:
+    radial-gradient(900px 700px at 85% -5%, #FFD9CC 0%, transparent 60%),
+    radial-gradient(800px 700px at 0% 105%, #FBD3DD 0%, transparent 60%),
+    var(--cream);
+  color: var(--plum); }
+.night { background:
+    radial-gradient(2px 2px at 12% 18%, #fff9 50%, transparent 51%),
+    radial-gradient(2px 2px at 78% 12%, #fff8 50%, transparent 51%),
+    radial-gradient(3px 3px at 40% 28%, #f3d88aaa 50%, transparent 51%),
+    radial-gradient(2px 2px at 88% 45%, #fff7 50%, transparent 51%),
+    radial-gradient(2px 2px at 22% 62%, #fff6 50%, transparent 51%),
+    radial-gradient(3px 3px at 65% 80%, #f3d88a88 50%, transparent 51%),
+    radial-gradient(2px 2px at 8% 88%, #fff6 50%, transparent 51%),
+    radial-gradient(1100px 800px at 50% -10%, #5b3a8c 0%, transparent 60%),
+    radial-gradient(900px 700px at 100% 100%, #3a0f4f 0%, transparent 55%),
+    var(--night);
+  color: #F7EFE0; }
+.valance { position: absolute; top: 0; left: 0; right: 0; height: 64px;
+  background: radial-gradient(circle at 50% 0, var(--velvet-2) 60%, transparent 62%) 0 0 / 80px 64px repeat-x;
+  border-top: 16px solid var(--velvet-1); filter: drop-shadow(0 8px 6px rgba(0,0,0,.45)); }
+.valance::after { content: ""; position: absolute; left: 0; right: 0; top: -16px; height: 5px; background: var(--gold); }
+
+/* ---------- Typo ---------- */
+.inner { position: absolute; inset: 0; padding: 130px 110px 150px; display: flex; flex-direction: column; justify-content: center; }
+.kicker { font: 500 40px/1.2 var(--f-body); letter-spacing: 1px; margin: 0 0 36px; }
+.day .kicker { color: var(--raspberry); }
+.night .kicker { color: var(--gold); }
+.title { font: 900 128px/1.04 var(--f-title); margin: 0; }
+.title.md { font-size: 104px; }
+.title.sm { font-size: 84px; }
+.day .title { color: var(--plum); }
+.night .title { background: linear-gradient(180deg, var(--gold-2), var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.grad { background: linear-gradient(100deg, var(--peach), var(--raspberry) 60%, var(--ruby)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lead { font: 400 50px/1.45 var(--f-body); margin: 44px 0 0; }
+.day .lead { color: #5a2a43; }
+.night .lead { color: #EADFF7; }
+.small { font: 400 38px/1.5 var(--f-body); }
+.b { font-weight: 700; }
+.gold { color: var(--gold-2); }
+
+/* ---------- Pied de page de marque ---------- */
+.foot { position: absolute; left: 110px; right: 110px; bottom: 70px; display: flex; align-items: center; justify-content: space-between; font: 500 34px var(--f-body); }
+.foot .brand { display: flex; align-items: center; gap: 16px; font: 700 42px var(--f-title); }
+.foot .brand img { width: 58px; height: 58px; }
+.day .foot { color: var(--plum); }
+.night .foot { color: var(--gold-2); }
+.foot .url { direction: ltr; opacity: .85; }
+.pager { position: absolute; top: 90px; left: 110px; font: 500 34px var(--f-body); opacity: .7; direction: ltr; }
+
+/* ---------- Éléments ---------- */
+.heart-big { width: 360px; height: 360px; margin: 0 auto 50px; display: block; filter: drop-shadow(0 24px 40px rgba(152,17,75,.25)); }
+.chips { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 56px; }
+.chip { font: 500 46px var(--f-body); padding: 18px 42px; border-radius: 999px; }
+.day .chip { background: #fff; color: var(--ruby); box-shadow: 0 10px 30px rgba(152,17,75,.12); border: 3px solid #F6C9D3; }
+.night .chip { background: rgba(255,255,255,.07); color: var(--gold-2); border: 3px solid rgba(243,216,138,.4); }
+.frame { width: 440px; height: 440px; border-radius: 40px; border: 8px dashed #E9A8B8; display: grid; place-items: center; margin: 0 auto; position: relative; background: rgba(255,255,255,.55); }
+.frame .x { position: absolute; inset: 0; }
+.frame span { font: 500 40px/1.5 var(--f-body); color: #C77D92; text-align: center; }
+.step-no { font: 900 230px/1 var(--f-title); position: absolute; top: 120px; right: 100px; opacity: .14; color: var(--gold-2); }
+.curtain { position: absolute; top: 0; bottom: 0; width: 250px; }
+.curtain.r { right: 0; background: repeating-linear-gradient(90deg, #4a1260 0 36px, #6a1f7c 36px 64px, #3a0f4f 64px 90px); border-bottom-left-radius: 100% 22%; box-shadow: inset 30px 0 60px rgba(0,0,0,.5); }
+.curtain.l { left: 0; background: repeating-linear-gradient(90deg, #3a0f4f 0 26px, #6a1f7c 26px 54px, #4a1260 54px 90px); border-bottom-right-radius: 100% 22%; box-shadow: inset -30px 0 60px rgba(0,0,0,.5); }
+.bubble { font: 400 48px/1.35 var(--f-body); padding: 26px 40px; border-radius: 40px; max-width: 760px; display: inline-block; }
+.day .bubble { background: #fff; color: #3d1b2c; box-shadow: 0 12px 30px rgba(152,17,75,.10); border-bottom-right-radius: 10px; }
+.rank { display: flex; flex-direction: column; gap: 46px; margin-top: 70px; }
+.rank .row { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.rank .note { font: 500 38px var(--f-body); color: var(--raspberry); padding-right: 14px; }
+.rank .row.win .bubble { background: linear-gradient(100deg, var(--coral), var(--raspberry)); color: #fff; }
+.rank .row.win .note { color: var(--ruby); font-weight: 700; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 70px; }
+.opt { border-radius: 34px; padding: 34px 36px; font: 500 46px/1.25 var(--f-body); background: rgba(255,255,255,.06); border: 3px solid rgba(243,216,138,.35); color: #F7EFE0; }
+.opt b { display: block; font: 900 64px var(--f-title); color: var(--gold-2); margin-bottom: 6px; }
+.rules { list-style: none; padding: 0; margin: 64px 0 0; display: flex; flex-direction: column; gap: 30px; }
+.rules li { font: 400 44px/1.35 var(--f-body); color: #EADFF7; padding-right: 70px; position: relative; }
+.rules li b { color: var(--gold-2); font-weight: 700; }
+.rules li::before { content: ""; position: absolute; right: 0; top: 10px; width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, var(--gold-2), var(--gold)); }
+.phone { width: 600px; height: 980px; border-radius: 80px; background: var(--night); border: 16px solid #2a1c3f; box-shadow: 0 40px 80px rgba(109,18,62,.35); margin: 50px auto 0; position: relative; overflow: hidden; padding: 70px 36px; }
+.phone::before { content: ""; position: absolute; top: 18px; left: 50%; width: 150px; height: 30px; margin-left: -75px; border-radius: 20px; background: #2a1c3f; }
+.card { background: linear-gradient(180deg, #2d1b4e, #1f1238); border: 2px solid rgba(212,169,74,.5); border-radius: 36px; padding: 40px 36px; color: #F7EFE0; text-align: right; }
+.card .no { font: 700 44px var(--f-title); color: var(--gold-2); }
+.card .meta { font: 400 30px var(--f-body); color: var(--lilac); margin: 10px 0 24px; }
+.card .w { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 26px; }
+.card .w span { font: 500 28px var(--f-body); padding: 8px 22px; border-radius: 99px; background: rgba(243,216,138,.12); color: var(--gold-2); }
+.card .q { font: 400 28px/1.45 var(--f-body); color: #EADFF7; }
+.card .q b { color: var(--gold-2); font-weight: 500; }
+.card .pct { margin-top: 26px; font: 700 34px var(--f-body); color: #ff9fbd; }
+.card .btn { margin-top: 30px; text-align: center; font: 700 32px var(--f-body); padding: 22px; border-radius: 22px; background: linear-gradient(180deg, var(--gold-2), var(--gold)); color: #2a1440; }
+.sample { position: absolute; top: 34px; left: 34px; font: 700 24px var(--f-body); background: var(--raspberry); color: #fff; padding: 6px 18px; border-radius: 99px; }
+.cta-pill { display: inline-block; margin-top: 60px; font: 700 48px var(--f-body); padding: 30px 60px; border-radius: 999px; }
+.day .cta-pill { background: linear-gradient(100deg, var(--coral), var(--raspberry)); color: #fff; box-shadow: 0 16px 40px rgba(223,56,107,.35); }
+.night .cta-pill { background: linear-gradient(180deg, var(--gold-2), var(--gold)); color: #2a1440; }
+.center { text-align: center; align-items: center; }
+
+/* ---------- Photo de profil & couvertures à la une ---------- */
+.pp { display: grid; place-items: center; }
+.pp.day { background: radial-gradient(circle at 50% 45%, #fff 0%, var(--cream) 55%, #FCE3DA 100%); }
+.pp.night { background: radial-gradient(circle at 50% 40%, #3a2366 0%, var(--night) 70%); }
+.pp img { width: 640px; height: 640px; margin-top: 30px; filter: drop-shadow(0 30px 50px rgba(152,17,75,.28)); }
+.hl { display: grid; place-items: center; background: linear-gradient(160deg, var(--peach), var(--raspberry) 60%, var(--ruby)); }
+.hl .disc { width: 1080px; height: 1080px; display: grid; place-items: center; }
+.hl svg { width: 470px; height: 470px; }
+
+/* ---------- Story ---------- */
+.story .inner { padding: 260px 110px 300px; }
+.story .title { font-size: 112px; }
+.story .lead { font-size: 54px; }
+.story .foot { bottom: 150px; }
+.story .tag { position: absolute; top: 150px; right: 110px; font: 700 38px var(--f-body); padding: 14px 32px; border-radius: 999px; }
+.day.story .tag { background: #fff; color: var(--raspberry); }
+.night.story .tag { background: rgba(243,216,138,.14); color: var(--gold-2); }
+</style>
+</head>
+<body>
+<script>
+const HEART = "logo-heart.svg";
+const URL_TXT = "dereh-halev.web.app";
+const foot = (pager) => `<div class="foot"><div class="brand"><img src="${HEART}" alt="">דרך הלב</div><div class="url">${URL_TXT}</div></div>${pager ? `<div class="pager">${pager}</div>` : ""}`;
+const valance = `<div class="valance"></div>`;
+
+/* Icônes à la une (traits crème, viewBox 100) */
+const S = 'fill="none" stroke="#FEF7F0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"';
+const ICONS = {
+  about: `<svg viewBox="0 0 100 100"><path ${S} d="M50 84 C 26 67 12 54 12 36 C 12 24 21 16 32 16 C 40 16 46 20 50 27 C 54 20 60 16 68 16 C 79 16 88 24 88 36 C 88 54 74 67 50 84 Z"/></svg>`,
+  how: `<svg viewBox="0 0 100 100"><path ${S} d="M16 24 h56 a8 8 0 0 1 8 8 v26 a8 8 0 0 1 -8 8 h-30 l-16 14 v-14 h-10 a8 8 0 0 1 -8 -8 v-26 a8 8 0 0 1 8 -8 z"/><circle cx="32" cy="45" r="3.5" fill="#FEF7F0"/><circle cx="46" cy="45" r="3.5" fill="#FEF7F0"/><circle cx="60" cy="45" r="3.5" fill="#FEF7F0"/></svg>`,
+  stories: `<svg viewBox="0 0 100 100"><path ${S} d="M50 12 L 57 38 L 84 44 L 57 52 L 50 82 L 43 52 L 16 44 L 43 38 Z"/><path ${S} d="M80 14 v12 M74 20 h12 M22 70 v10 M17 75 h10"/></svg>`,
+  faq: `<svg viewBox="0 0 100 100"><circle ${S} cx="50" cy="50" r="36"/><path ${S} d="M38 40 C 38 30 46 26 51 26 C 59 26 64 31 64 38 C 64 48 51 48 51 58"/><circle cx="51" cy="71" r="4" fill="#FEF7F0"/></svg>`,
+  events: `<svg viewBox="0 0 100 100"><rect ${S} x="16" y="22" width="68" height="62" rx="10"/><path ${S} d="M16 40 h68 M34 14 v16 M66 14 v16"/><path ${S} d="M50 74 C 40 67 36 62 36 57 C 36 53 39 50 43 50 C 46 50 48 52 50 54 C 52 52 54 50 57 50 C 61 50 64 53 64 57 C 64 62 60 67 50 74 Z"/></svg>`,
+  safety: `<svg viewBox="0 0 100 100"><path ${S} d="M50 12 L 82 24 V 48 C 82 68 68 80 50 88 C 32 80 18 68 18 48 V 24 Z"/><path ${S} d="M36 50 L 46 60 L 66 40"/></svg>`
+};
+
+/* ======================================================================
+   CONTENU — tous les textes publics sont ici (hébreu, RTL)
+   ====================================================================== */
+const VISUALS = [
+  /* ----- Photo de profil ----- */
+  { id: "profil-jour", cls: "square pp day", html: `<img src="${HEART}" alt="">` },
+  { id: "profil-nuit", cls: "square pp night", html: `<img src="${HEART}" alt="">` },
+
+  /* ----- Couvertures « à la une » ----- */
+  ...Object.keys(ICONS).map(k => ({ id: "une-" + k, cls: "story hl", html: `<div class="disc">${ICONS[k]}</div>` })),
+
+  /* ----- Post 1 : manifeste (Jour) ----- */
+  { id: "post1-manifeste", cls: "post day", html: `
+    <div class="inner center">
+      <img class="heart-big" src="${HEART}" alt="">
+      <p class="kicker">נעים להכיר</p>
+      <h1 class="title">מכל הלב,<br><span class="grad">דרך הלב.</span></h1>
+      <p class="lead">היכרויות שמתחילות בשיחה —<br>לא בתמונה.</p>
+    </div>${foot()}` },
+
+  /* ----- Post 2 : comment ça marche, carrousel (Nuit) ----- */
+  { id: "post2-1", cls: "post night", html: `${valance}
+    <div class="inner">
+      <p class="kicker">דרך הלב · מדריך קצר</p>
+      <h1 class="title">איך זה<br>עובד?</h1>
+      <p class="lead">5 צעדים.<br><span class="gold b">אף תמונה.</span></p>
+      <p class="lead small" style="margin-top:80px">החליקו ←</p>
+    </div>${foot("1/7")}` },
+  { id: "post2-2", cls: "post night", html: `${valance}<div class="step-no">1</div>
+    <div class="inner">
+      <p class="kicker">צעד 1</p>
+      <h1 class="title md">כרטיס<br>מסתורי</h1>
+      <p class="lead">גיל, עיר, אורח חיים, <span class="gold">3 מילים שמתארות אותך</span> והשבת האידיאלית שלך.</p>
+      <p class="lead small">בלי שם. בלי תמונה. בלי טלפון.</p>
+    </div>${foot("2/7")}` },
+  { id: "post2-3", cls: "post night", html: `${valance}<div class="step-no">2</div>
+    <div class="inner">
+      <p class="kicker">צעד 2</p>
+      <h1 class="title md">הצעות<br>בשבילך</h1>
+      <p class="lead">התאמות לפי מה שחשוב לך, עם <span class="gold">אחוז התאמה</span> ו<span class="gold">״למה אתם מתאימים״</span>.</p>
+    </div>${foot("3/7")}` },
+  { id: "post2-4", cls: "post night", html: `${valance}<div class="step-no">3</div>
+    <div class="inner">
+      <p class="kicker">צעד 3</p>
+      <h1 class="title md">בקשה<br>לשיחה</h1>
+      <p class="lead">כרטיס נגע ללב? שולחים בקשה.<br>אם הצד השני מסכים — נפתחת <span class="gold">שיחה אנונימית</span>, עם שאלת פתיחה כדי לשבור את הקרח.</p>
+    </div>${foot("4/7")}` },
+  { id: "post2-5", cls: "post night", html: `${valance}<div class="step-no">4</div>
+    <div class="inner">
+      <p class="kicker">צעד 4</p>
+      <h1 class="title md">מדברים</h1>
+      <p class="lead">בלי שמות ובלי טלפונים.<br>רק מילים, הומור וסקרנות.</p>
+      <p class="lead small">לא מתאים? סוגרים בעדינות. מישהו לא מכבד? חסימה ודיווח בלחיצה.</p>
+    </div>${foot("5/7")}` },
+  { id: "post2-6", cls: "post night", html: `${valance}<div class="step-no">5</div>
+    <div class="inner">
+      <p class="kicker">צעד 5</p>
+      <h1 class="title md">פתיחת<br>המסך</h1>
+      <p class="lead">מרגישים שיש משהו? לוחצים.<br><span class="gold">רק אם שניכם לחצתם</span> — השם והטלפון נחשפים.</p>
+      <p class="lead small">לחצת והצד השני עוד לא? הוא לא יודע. בלי מבוכה.</p>
+    </div>${foot("6/7")}` },
+  { id: "post2-7", cls: "post night", html: `${valance}
+    <div class="inner center">
+      <img class="heart-big" src="${HEART}" alt="" style="width:280px;height:280px">
+      <h1 class="title md">הכרטיס שלך<br>מחכה</h1>
+      <p class="lead">בחינם · 18+ · עברית, English, Français</p>
+      <div class="cta-pill">הקישור בביו</div>
+    </div>${foot("7/7")}` },
+
+  /* ----- Post 3 : sans photo (Jour) ----- */
+  { id: "post3-sans-photo", cls: "post day", html: `
+    <div class="inner">
+      <div class="frame"><span>אין כאן תמונה.<br>ויש הרבה מה להגיד.</span></div>
+      <h1 class="title sm" style="margin-top:80px">תמונה שווה אלף מילים.</h1>
+      <h1 class="title sm grad">אנחנו מעדיפים את המילים.</h1>
+      <div class="chips"><span class="chip">סקרנית</span><span class="chip">מצחיק</span><span class="chip">רגישה</span><span class="chip">אוהב ים</span></div>
+    </div>${foot()}` },
+
+  /* ----- Post 4 : le rideau (Nuit) ----- */
+  { id: "post4-rideau", cls: "post night", html: `${valance}<div class="curtain r"></div><div class="curtain l"></div>
+    <div class="inner center" style="padding-left:270px;padding-right:270px">
+      <p class="kicker">פתיחת המסך</p>
+      <h1 class="title sm">המסך נפתח<br>רק כששניכם<br>רוצים.</h1>
+      <p class="lead small" style="margin-top:50px">רק אחד לחץ?<br>השני לא יודע.<br>בלי מבוכה.</p>
+    </div>${foot()}` },
+
+  /* ----- Post 5 : humour, messages d'ouverture (Jour) ----- */
+  { id: "post5-premiers-messages", cls: "post day", html: `
+    <div class="inner" style="justify-content:flex-start;padding-top:150px">
+      <p class="kicker">דירוג לא רשמי</p>
+      <h1 class="title sm">הודעות פתיחה,<br><span class="grad">מהגרועה לטובה</span></h1>
+      <div class="rank">
+        <div class="row"><span class="bubble">היי</span><span class="note">3. קלאסי. מרדים.</span></div>
+        <div class="row"><span class="bubble">מה נשמע? 🙂</span><span class="note">2. מנומס. אולי מדי.</span></div>
+        <div class="row win"><span class="bubble">סופ״ש חלומי — ים או סרט ושמיכה?</span><span class="note">1. זה! ככה מתחילה שיחה ✓</span></div>
+      </div>
+    </div>${foot()}` },
+
+  /* ----- Post 6 : quiz du million (Nuit) ----- */
+  { id: "post6-quiz-million", cls: "post night", html: `${valance}
+    <div class="inner">
+      <p class="kicker">שאלה מהשאלון של דרך הלב</p>
+      <h1 class="title sm">מיליון ש״ח נפל עליכם<br>משמיים. לאן הוא הולך?</h1>
+      <div class="opts">
+        <div class="opt"><b>א</b>טיול גדול בעולם</div>
+        <div class="opt"><b>ב</b>דירה והשקעה</div>
+        <div class="opt"><b>ג</b>פינוקים לאהובים</div>
+        <div class="opt"><b>ד</b>חוסכים, שיהיה</div>
+      </div>
+      <p class="lead small" style="margin-top:60px">ענו בתגובות: א, ב, ג או ד 👇</p>
+    </div>${foot()}` },
+
+  /* ----- Post 7 : présentation de l'app, carte d'exemple (Jour) ----- */
+  { id: "post7-carte-exemple", cls: "post day", html: `
+    <div class="inner" style="justify-content:flex-start;padding-top:110px">
+      <h1 class="title sm center" style="text-align:center">ככה נראה כרטיס<br><span class="grad">בדרך הלב</span></h1>
+      <div class="phone"><div class="sample">כרטיס לדוגמה</div>
+        <div class="card">
+          <div class="no">פרופיל לדוגמה</div>
+          <div class="meta">אישה · 29 · חיפה · מסורתית</div>
+          <div class="w"><span>סקרנית</span><span>מצחיקה</span><span>רגישה</span></div>
+          <div class="q"><b>השבת האידיאלית:</b> ארוחה ארוכה עם חברים, ואז שנ״צ של שלוש שעות</div>
+          <div class="q" style="margin-top:14px"><b>לא חיה בלי:</b> קפה של בוקר וים</div>
+          <div class="pct">💘 87% התאמה</div>
+          <div class="btn">💌 בקשה לשיחה</div>
+        </div>
+      </div>
+    </div>${foot()}` },
+
+  /* ----- Post 8 : règles de la maison (Nuit) ----- */
+  { id: "post8-regles", cls: "post night", html: `${valance}
+    <div class="inner">
+      <p class="kicker">כללי הבית</p>
+      <h1 class="title sm">מקום נעים<br>לא קורה במקרה.</h1>
+      <ul class="rules">
+        <li><b>כבוד ונימוס</b> — מדברים כמו שהייתם רוצים שידברו אליכם.</li>
+        <li><b>אמת</b> — פנויים באמת, פרטים נכונים, פרופיל אחד.</li>
+        <li><b>״לא״ זו תשובה</b> — לא מתעקשים ולא מחפשים מחוץ לאפליקציה.</li>
+        <li><b>דיסקרטיות</b> — מה שנאמר בשיחה, נשאר בה.</li>
+        <li><b>חסימה ודיווח</b> — בלחיצה, בדיסקרטיות.</li>
+      </ul>
+    </div>${foot()}` },
+
+  /* ----- Post 9 : rejoindre (Jour) ----- */
+  { id: "post9-trois-mots", cls: "post day", html: `
+    <div class="inner center">
+      <h1 class="title" style="font-size:200px"><span class="grad">3 מילים.</span></h1>
+      <p class="lead" style="font-size:60px">זה כל מה שצריך כדי להתחיל.</p>
+      <div class="chips" style="justify-content:center"><span class="chip">___</span><span class="chip">___</span><span class="chip">___</span></div>
+      <p class="lead small">איך הייתם מתארים את עצמכם? כתבו בתגובות 👇</p>
+      <div class="cta-pill">הכרטיס שלך מחכה · הקישור בביו</div>
+    </div>${foot()}` },
+];
+
+/* ----- Stories des « à la une » (9:16) ----- */
+const STORIES = [
+  // מי אנחנו
+  ["about-1", "day", "מי אנחנו", "נעים להכיר,<br><span class='grad'>דרך הלב.</span>", "אפליקציית היכרויות שנולדה מתוך קהילת רווקים ורווקות בוואטסאפ."],
+  ["about-2", "day", "מי אנחנו", "קודם שיחה.<br>אחר כך פנים.", "בלי תמונות ובלי שיפוט ממבט ראשון. מכירים את האדם — דרך המילים שלו."],
+  ["about-3", "night", "מי אנחנו", "כאילו כל יום<br>ט״ו באב.", "דתיים, מסורתיים וחילוניים. בעברית, English ו־Français.<br><span class='gold'>מכל הלב, דרך הלב.</span>"],
+  // איך זה עובד
+  ["how-1", "night", "איך זה עובד", "1. כרטיס מסתורי", "גיל, עיר, אורח חיים, 3 מילים והשבת האידיאלית שלך. בלי שם, תמונה או טלפון."],
+  ["how-2", "night", "איך זה עובד", "2. הצעות ובקשה", "מקבלים הצעות עם אחוז התאמה. כרטיס נגע ללב? שולחים 💌 בקשה לשיחה."],
+  ["how-3", "night", "איך זה עובד", "3. שיחה אנונימית", "אם הצד השני מסכים, נפתחת שיחה — עם שאלת פתיחה כדי לשבור את הקרח."],
+  ["how-4", "night", "איך זה עובד", "4. פתיחת המסך", "רק אם שניכם לוחצים, השם והטלפון נחשפים. אם רק אחד לחץ — השני לא יודע."],
+  // שאלות נפוצות
+  ["faq-1", "day", "שאלות נפוצות", "כמה זה עולה?", "כרגע דרך הלב בחינם. אין מנוי ואין תשלום באפליקציה."],
+  ["faq-2", "day", "שאלות נפוצות", "צריך להוריד משהו?", "לא. זה אתר שעובד כמו אפליקציה. טיפ: הוסיפו אותו למסך הבית."],
+  ["faq-3", "day", "שאלות נפוצות", "מי רואה את השם והטלפון שלי?", "אף אחד — עד ששניכם לוחצים ״פתיחת המסך״. גם הצוות לא רואה אותם, ולא יכול לקרוא את השיחות."],
+  ["faq-4", "day", "שאלות נפוצות", "יש התראות?", "עדיין לא. כדאי להיכנס פעם ביום ולבדוק אם מחכה לכם בקשה או הודעה."],
+  ["faq-5", "day", "שאלות נפוצות", "נכנסתי מאינסטגרם והפרופיל נעלם?", "פתחו את הקישור בדפדפן (Safari / Chrome) ותמיד חזרו מאותו דפדפן."],
+  // בטיחות
+  ["safety-1", "night", "בטיחות", "הפרטים שלך<br>נשארים שלך.", "שם וטלפון נחשפים רק בהסכמה הדדית. בצ׳אט אי אפשר לשלוח טלפון או קישורים."],
+  ["safety-2", "night", "בטיחות", "חסימה ודיווח<br>בלחיצה.", "⋯ ← חסימה או דיווח. הצוות מטפל בדיסקרטיות, ומי שלא שומר על הכללים מוסר."],
+  ["safety-3", "night", "בטיחות", "פגישה ראשונה?", "במקום ציבורי, מספרים לחבר/ה, וסומכים על התחושה שלכם."],
+];
+for (const [id, mood, tag, title, lead] of STORIES) {
+  VISUALS.push({ id: "story-" + id, cls: `story ${mood}`, html: `${mood === "night" ? valance : ""}<div class="tag">${tag}</div>
+    <div class="inner"><h1 class="title">${title}</h1><p class="lead">${lead}</p></div>${foot()}` });
+}
+
+for (const v of VISUALS) {
+  const s = document.createElement("section");
+  s.className = "v " + v.cls; s.id = v.id; s.innerHTML = v.html;
+  document.body.appendChild(s);
+}
+</script>
+</body>
+</html>
