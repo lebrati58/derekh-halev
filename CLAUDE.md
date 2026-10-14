@@ -107,6 +107,7 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 - Lire uniquement les fichiers nécessaires à la tâche en cours.
 - Faire des modifications ciblées plutôt que réécrire des fichiers entiers.
 - Ne jamais dire qu'une chose est testée si elle ne l'a pas été.
+- « **yallah** » = « **fusionne** » : les deux mots veulent dire « ouvre la PR vers `main` et fusionne-la » (puis vérifier le déploiement).
 
 ## Points d'attention (constatés, non corrigés)
 
