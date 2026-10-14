@@ -22,6 +22,8 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `test_matching.js` | Tests du moteur de matching (Node, sans dépendance) |
 | `test_stats.js` | Tests des calculs statistiques (Node, sans dépendance ; `npm test` lance les deux) |
 | `test_rules.js` | Tests des règles sur l'émulateur (`@firebase/rules-unit-testing`) |
+| `poc_audit.js` | Preuves de concept de l'audit sécurité (émulateur uniquement) : affiche quelles attaques passent encore |
+| `SECURITY_AUDIT.md` | Rapport d'audit sécurité (14/10/2026) : vulnérabilités SEC-01…23, corrections, risques ouverts, priorités |
 | `package.json` | Dépendances et scripts de **test uniquement** |
 | `README.md` | Guide d'installation Firebase, déploiement, checklist de test manuel mobile |
 
@@ -113,15 +115,15 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 **Confidentialité / règle absolue**
 1. L'admin lit tout `chats/` : il voit qui parle avec qui (`from`/`to`, `fromNo`/`toNo`), l'icebreaker et si le rideau s'est ouvert. Ce ne sont pas les messages, mais ce sont des métadonnées de conversation.
 2. L'admin, comme tout inscrit, lit `profiles/` en entier (âge, ville, genre, textes libres), pas seulement le numéro. Les `reports` lui exposent aussi des uids et une `reason` libre où le signaleur peut recopier des messages.
-3. Les profils publics contiennent du texte libre (`words`, `shabbat`, `city`, `cantLiveWithout`) : le filtre anti-téléphone/liens est uniquement côté client, les règles ne vérifient que la longueur. Un téléphone ou un nom peut donc atterrir dans un profil public.
+3. Les profils publics contiennent du texte libre (`words`, `shabbat`, `city`, `cantLiveWithout`). ~~Filtre uniquement côté client~~ — les règles refusent désormais 7+ chiffres (séparateurs, chiffres arabes/persans/pleine largeur) et les liens (`http:`, `www.`, `wa.me`, `t.me`…) dans ces champs **et dans les messages** (filtre client aligné). Un nom ou un pseudo peut encore y figurer.
 4. ~~Rideau asymétrique~~ — corrigé dans les règles : `opened` exige désormais les deux `reveal` **et** les deux `secrets` (test « reveal SANS secret » dans `test_rules.js`). À republier dans la console Firebase.
 5. `secrets` n'est pas lié à `private/` : on peut y déposer n'importe quel prénom/téléphone.
-6. Un chat peut être créé directement avec `opened: true` (la règle de `opened` n'est vérifiée qu'en mise à jour). Pas de fuite constatée, mais incohérent.
+6. ~~Chat créé directement avec `opened: true`~~ — corrigé : à la création `status === 'active'`, `opened === false`, champs inconnus refusés.
 
 **Intégrité**
 7. ~~Numéro de profil non unique~~ — corrigé : index `profileNos/{no}` réservé à la création du profil (tests « Numéro de profil unique »). **Reste ouvert tant que l'index n'est pas rempli pour les profils créés avant** : leurs numéros ne sont pas réservés et peuvent encore être pris.
-8. `reports` : `reporterNo`/`reportedNo` non vérifiés, champs inconnus acceptés. `chats` accepte aussi des champs inconnus à la création.
-9. Le PIN admin est attaquable par force brute (la validation sert d'oracle) — limite déjà notée dans le README.
+8. ~~`reports`/`chats` : numéros non vérifiés, champs inconnus~~ — corrigé (numéros vérifiés contre `chats/{chatId}`). Aussi corrigé (audit 10/2026) : `userChats` d'un autre non supprimable, `outbox` (`toNo` immuable, `chatId` = `{from}_{to}`), `hidden` limité aux profils existants, `messages.ts <= now`.
+9. **CRITIQUE (SEC-01)** : le PIN admin (4 chiffres) est cassé par force brute en ~9 s sur l'émulateur (la validation sert d'oracle, `poc_audit.js` V1). Mitigation immédiate : PIN aléatoire de 20+ caractères dans la console. Correction de fond proposée (liste `config/adminUids`) en attente de validation — voir `SECURITY_AUDIT.md`.
 10. Un banni peut encore écrire dans `private/`, `blocks/`, `reveal/` et `secrets/`. Tout inscrit non banni peut faire grimper `counters/profileNo` sans créer de profil.
 
 **Code / données**

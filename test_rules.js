@@ -177,7 +177,7 @@ async function denied(name, fn) {
   await allowed("modifier son propre profil (update ciblé)", () => update(ref(A, "profiles/alice"), { city: "יפו", cantLiveWithout: null }));
 
   /* ---------- Profils masqués (« pas pour moi ») ---------- */
-  await allowed("masquer un profil de ses propositions",    () => set(ref(A, "hidden/alice/charlie"), true));
+  await allowed("masquer un profil de ses propositions",    () => set(ref(A, "hidden/alice/dave"), true));
   await allowed("lire ses propres profils masqués",         () => get(ref(A, "hidden/alice")));
   await denied ("lire les profils masqués d'un AUTRE",      () => get(ref(B, "hidden/alice")));
   await denied ("ADMIN : lire les profils masqués",         () => get(ref(ADMIN, "hidden/alice")));
@@ -224,6 +224,43 @@ async function denied(name, fn) {
   await allowed("ADMIN : lire chatActivity",                  () => get(ref(ADMIN, "chatActivity")));
   await denied ("ADMIN : toujours PAS les messages",          () => get(ref(ADMIN, "messages/alice_bob")));
   await denied ("ADMIN : toujours PAS les secrets",           () => get(ref(ADMIN, "secrets/alice_dave")));
+
+  /* ---------- Audit sécurité 2026-10 : non-régression (voir SECURITY_AUDIT.md) ---------- */
+  await env.withSecurityRulesDisabled(async ctx => { await set(ref(ctx.database(), "inbox/eve/alice"), { fromNo: 1, status: "pending", createdAt: 1 }); });
+  const chatAE = { from: "alice", to: "eve", fromNo: 1, toNo: 6, status: "active", opened: false, createdAt: 1 };
+  // V2 — chat créé déjà « ouvert », déjà terminé, ou avec des champs inconnus
+  await denied ("V2 chat créé directement avec opened:true",  () => set(ref(E, "chats/alice_eve"), { ...chatAE, opened: true }));
+  await denied ("V2 chat créé directement en status ended",   () => set(ref(E, "chats/alice_eve"), { ...chatAE, status: "ended" }));
+  await denied ("V2 chat avec champ inconnu (stockage libre)", () => set(ref(E, "chats/alice_eve"), { ...chatAE, junk: "x".repeat(1000) }));
+  await allowed("V2 chat normal (active, fermé)",             () => set(ref(E, "chats/alice_eve"), { ...chatAE, icebreaker: "weekend.sea" }));
+  await denied ("V2 chat terminé → réactivé",                 () => set(ref(A, "chats/alice_bob/status"), "active"));
+  // V3 — le destinataire ne peut plus falsifier l'outbox de l'expéditeur
+  await denied ("V3 bob change le toNo de l'outbox d'alice",  () => update(ref(B, "outbox/alice/bob"), { toNo: 999 }));
+  await denied ("V3 bob met un chatId piégé dans l'outbox",   () => update(ref(B, "outbox/alice/bob"), { chatId: "evil" }));
+  await denied ("V3 chatId piégé dans sa propre inbox",       () => update(ref(E, "inbox/eve/alice"), { chatId: "evil" }));
+  await allowed("V3 bob accepte : status + bon chatId",       () => update(ref(B, "outbox/alice/bob"), { status: "accepted", chatId: "alice_bob" }));
+  // V4 — effacer la conversation de la liste de l'autre (preuve d'un harcèlement)
+  await denied ("V4 bob retire le chat de la liste d'alice",  () => remove(ref(B, "userChats/alice/alice_bob")));
+  await allowed("V4 bob retire le chat de SA liste",          () => remove(ref(B, "userChats/bob/alice_bob")));
+  // V5 — signalements : numéros vérifiés, champs connus seulement
+  const rep = { chatId: "alice_bob", reporterUid: "alice", reporterNo: 1, reportedUid: "bob", reportedNo: 2, reason: "x", createdAt: 1 };
+  await denied ("V5 signalement avec reportedNo falsifié",    () => push(ref(A, "reports"), { ...rep, reportedNo: 999 }));
+  await denied ("V5 signalement avec reporterNo falsifié",    () => push(ref(A, "reports"), { ...rep, reporterNo: 777 }));
+  await denied ("V5 signalement avec champ inconnu",          () => push(ref(A, "reports"), { ...rep, junk: "x".repeat(1000) }));
+  await allowed("V5 signalement correct (avec reporterNo)",   () => push(ref(A, "reports"), rep));
+  // V6 — « pas pour moi » : uniquement des profils existants (stockage borné)
+  await denied ("V6 masquer une cible inexistante",           () => set(ref(A, "hidden/alice/n_existe_pas_" + "x".repeat(500)), true));
+  await allowed("V6 masquer un profil existant",              () => set(ref(A, "hidden/alice/bob"), true));
+  // V9 — téléphones / liens refusés côté serveur (profil public et messages)
+  await denied ("V9 profil : téléphone dans shabbat",         () => update(ref(A, "profiles/alice"), { shabbat: "appelle-moi 050-123-4567" }));
+  await denied ("V9 profil : téléphone espacé dans city",     () => update(ref(A, "profiles/alice"), { city: "05 01 23 45 67" }));
+  await denied ("V9 profil : chiffres arabes (٠٥٠١٢٣٤٥٦٧)",   () => update(ref(A, "profiles/alice"), { cantLiveWithout: "٠٥٠١٢٣٤٥٦٧" }));
+  await denied ("V9 profil : lien wa.me dans un mot",         () => set(ref(A, "profiles/alice/words/0"), "WA.ME/972"));
+  await allowed("V9 profil : quelques chiffres restent permis", () => update(ref(A, "profiles/alice"), { shabbat: "2 ילדים, 1985 ו-2020" }));
+  await denied ("V9 message : téléphone (contourne le rideau)", () => push(ref(A, "messages/alice_eve"), { from: "alice", text: "0501234567", ts: serverTimestamp() }));
+  await denied ("V9 message : lien https",                    () => push(ref(A, "messages/alice_eve"), { from: "alice", text: "https://x.co", ts: serverTimestamp() }));
+  await denied ("V9 message : daté dans le futur",            () => push(ref(A, "messages/alice_eve"), { from: "alice", text: "hi", ts: Date.now() + 864e5 }));
+  await allowed("V9 message normal (horodatage serveur)",     () => push(ref(A, "messages/alice_eve"), { from: "alice", text: "שלום, יש לי 2 ילדים", ts: serverTimestamp() }));
 
   /* ---------- Compteur vide : la numérotation commence à 100 ---------- */
   await env.withSecurityRulesDisabled(async ctx => { await remove(ref(ctx.database(), "counters/profileNo")); });

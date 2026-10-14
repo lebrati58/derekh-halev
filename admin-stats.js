@@ -152,7 +152,11 @@ const StatsUI = (() => {
   let csvData = {};
   function downloadCSV(name) {
     const d = csvData[name]; if (!d) return;
-    const cell = v => { const s = v == null ? "" : String(v); return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+    const cell = v => {
+      let s = v == null ? "" : String(v);
+      if (typeof v === "string" && /^[=+\-@\t\r]/.test(s)) s = "'" + s;   // anti-injection de formules (Excel/Sheets)
+      return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
     const text = "﻿" + [d.head, ...d.rows].map(r => r.map(cell).join(",")).join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([text], { type: "text/csv;charset=utf-8" }));

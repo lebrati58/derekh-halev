@@ -164,8 +164,8 @@ async function nextProfileNo() {
 /* ---------- Anti-fuite : téléphones & liens ---------- */
 function hasForbiddenContent(text) {
   const s = String(text).normalize("NFKC");
-  if (/(?:\d[\s\-–—.()\/_*,]*){7,}/.test(s)) return true;         // suite de 7+ chiffres (avec séparateurs)
-  if ((s.match(/\d/g) || []).length >= 9) return true;               // chiffres éparpillés
+  if (/(?:[\d٠-٩۰-۹][\s\-–—.()\/_*,]*){7,}/.test(s)) return true;   // suite de 7+ chiffres (avec séparateurs ; aussi vérifié par les règles)
+  if ((s.match(/[\d٠-٩۰-۹]/g) || []).length >= 9) return true;        // chiffres éparpillés
   if (/(https?:\/\/|www\.|wa\.me|t\.me|bit\.ly|chat\.whatsapp)/i.test(s)) return true;
   if (/\b[a-z0-9-]+\s?\.\s?(com|net|org|il|io|me|ly|fr|co|app|link|info|biz|gg|to)\b/i.test(s)) return true;
   if (/[^\s@]+@[^\s@]+\.[a-z]{2,}/i.test(s)) return true;           // email
