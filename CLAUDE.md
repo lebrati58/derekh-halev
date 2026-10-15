@@ -18,7 +18,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `logo.png`, `logo-heart.png`, `apple-touch-icon.png` | Logo complet (aperçu WhatsApp `og:image`), cœur seul transparent (en-tête + icône d'onglet), icône écran d'accueil |
 | `database.rules.json` | Règles de sécurité RTDB (source de vérité de la confidentialité) |
 | `firebase.json` | Règles, Hosting (dossier `public/` généré au déploiement) + émulateurs database (9000) / hosting (5000) |
-| `.github/workflows/firebase-hosting.yml` | Déploiement auto sur dereh-halev.web.app à chaque push sur `main` (secret `FIREBASE_SERVICE_ACCOUNT`) ; copie la **liste blanche** des fichiers du site dans `public/` — tout nouveau fichier du site doit y être ajouté |
+| `.github/workflows/firebase-hosting.yml` | Déploiement auto à chaque push sur `main` : règles (testées puis publiées) puis site dereh-halev.web.app (secret `FIREBASE_SERVICE_ACCOUNT`) ; copie la **liste blanche** des fichiers du site dans `public/` — tout nouveau fichier du site doit y être ajouté |
 | `test_matching.js` | Tests du moteur de matching (Node, sans dépendance) |
 | `test_stats.js` | Tests des calculs statistiques (Node, sans dépendance ; `npm test` lance les deux) |
 | `test_rules.js` | Tests des règles sur l'émulateur (`@firebase/rules-unit-testing`) |
@@ -35,11 +35,12 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 - `private/{uid}` — `firstName`, `phone`.
 - `blocks/{uid}/{targetUid}: true` — blocages personnels.
 - `hidden/{uid}/{targetUid}: true` — profils « 🙈 pas pour moi » masqués de mes propositions (l'autre peut toujours m'envoyer une demande) ; lien « profils masqués (N) » en bas de l'accueil pour tout réafficher.
+- `archived/{uid}/{chatId}: true` — conversations rangées dans « 🗄️ ארכיון » (pour moi seul ; proposé quand la conversation est terminée, réversible).
 - `banned/{uid}: true` — profils bannis.
 - **Statistiques (collecte sans contenu, écrite par `index.html`, `track()` / `trackVisit()`)** :
   - `activity/{uid}` — `first`, `last` (timestamps serveur), `mobile`, `d/{AAAAMMJJ}: nb de chargements ce jour-là` (visiteurs non inscrits compris).
   - `presence/{uid}: true` — en ligne maintenant (supprimé par `onDisconnect`).
-  - `stats/{événement}/{AAAAMMJJ}/{pushId}: true` — compteurs d'actions anonymes : `req_sent`, `req_sent_soft`, `req_accepted`, `req_declined`, `msg_sent`, `reveal_press`, `wa_click`, `hide`, `unhide`, `block`, `report`, `pause_on/off`, `card_view`, `coc_open`, `welcome_open`, `lang_change`, `profile_edit`, `profile_delete`, `reg_start`, `reg_done`, `reg_err_<champ>`, `tab_<onglet>`, `err_<action>`.
+  - `stats/{événement}/{AAAAMMJJ}/{pushId}: true` — compteurs d'actions anonymes : `req_sent`, `req_sent_soft`, `req_accepted`, `req_declined`, `msg_sent`, `reveal_press`, `wa_click`, `hide`, `unhide`, `archive`, `unarchive`, `block`, `report`, `pause_on/off`, `card_view`, `coc_open`, `welcome_open`, `lang_change`, `profile_edit`, `profile_delete`, `reg_start`, `reg_done`, `reg_err_<champ>`, `tab_<onglet>`, `err_<action>`.
   - `chatActivity/{chatId}/{uid}: true` — ce membre a écrit au moins un message (taux de réponse, sans lire les messages).
 - `announcements/current` — `{text, text_en?, text_fr?, ts}` publié par l'admin (hébreu obligatoire ; chaque utilisateur voit sa langue, repli sur l'hébreu).
 - `inbox/{to}/{from}` et `outbox/{from}/{to}` — demandes : `fromNo`/`toNo`, `status` (pending/accepted/declined), `createdAt`, `chatId?`.
@@ -64,6 +65,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `private/{uid}` | soi (jamais l'admin) | soi ; admin : **suppression seule** |
 | `blocks/{uid}` | soi | soi |
 | `hidden/{uid}` | soi | soi (valeurs `true` uniquement ; suppression de toute la liste permise) |
+| `archived/{uid}` | soi | soi (valeurs `true` ; suppression permise) |
 | `banned` | tout inscrit | admin |
 | `activity/{uid}` | admin ; soi | soi (`first` immuable, dates ≤ maintenant, champs connus seulement) |
 | `presence/{uid}` | admin | soi (`true`) |
@@ -96,7 +98,7 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 
 - Front : push sur `main` → GitHub Action → Firebase Hosting (https://dereh-halev.web.app). GitHub Pages publie encore la même chose sur l'ancienne adresse. Pas de build.
 - Cache mobile : `style.css`, `i18n.js`, `commun.js`, `matching.js` sont chargés avec `?v=AAAAMMJJ` (+ lettre si plusieurs fois le même jour) dans `index.html` et `admin.html`. **Changer ce numéro (dans les deux fichiers) à chaque modification de l'un d'eux**, sinon les téléphones gardent l'ancienne version.
-- Règles : **non déployées automatiquement**. Coller `database.rules.json` dans la console Firebase (Realtime Database → Règles → Publier), ou `firebase deploy --only database --project dereh-halev`. À refaire à chaque modification des règles.
+- Règles : **déployées automatiquement** par la même GitHub Action, job `rules` (`npm test` + `npm run test:rules` sur l'émulateur, puis `firebase deploy --only database`) ; le site n'est publié qu'après (`deploy` dépend de `rules`). Le compte de service `FIREBASE_SERVICE_ACCOUNT` doit avoir le rôle **Firebase Realtime Database Admin** (Google Cloud → IAM). Secours manuel : coller `database.rules.json` dans la console (Realtime Database → Règles → Publier).
 - Domaine GitHub Pages à garder dans Firebase Auth → Domaines autorisés.
 
 ## Règles de travail

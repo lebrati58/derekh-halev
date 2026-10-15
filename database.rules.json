@@ -109,6 +109,16 @@
         }
       }
     },
+    "archived": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".validate": "newData.hasChildren()",
+        "$chatId": {
+          ".validate": "newData.val() === true"
+        }
+      }
+    },
     "hidden": {
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",
