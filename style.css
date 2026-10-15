@@ -556,15 +556,27 @@ body { overflow-x: clip; }
 /* Barre de recherche compacte : un numéro = quelques chiffres */
 .no-search .ns-field { flex: 0 0 auto; width: 10.5em; }
 .no-search input { font-size: .95rem; padding-block: 9px; }
-/* En-tête : drapeaux en haut à droite, recherche par numéro en haut à gauche (accueil seulement) */
-.hdr-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: -6px -6px 6px; }
+/* En-tête : drapeaux en haut à droite, recherche par numéro en haut à gauche (accueil seulement),
+   posés dans les coins sans décaler le titre */
+.app-header { position: relative; }
+.hdr-top { position: absolute; top: 22px; left: 8px; right: 8px; display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
+.hdr-top > * { pointer-events: auto; }
 html[dir="ltr"] .hdr-top { flex-direction: row-reverse; }
-.hdr-top .lang-switch { margin: 0; gap: 4px; flex: none; }
-.hdr-top .lang-switch button { font-size: .95rem; padding: 2px 7px; }
-.hdr-top .no-search { margin: 0; gap: 5px; flex: 0 1 auto; min-width: 0; }
-.hdr-top .no-search .ns-field { width: 8.6em; }
-.hdr-top .no-search input { font-size: .85rem; padding: 6px 10px; padding-inline-end: 28px; }
-.hdr-top .no-search-clear { width: 22px; height: 22px; font-size: .75rem; inset-inline-end: 4px; }
-.hdr-top .no-search .btn { min-height: 32px; padding: 5px 10px; font-size: .8rem; }
+.hdr-top .lang-switch { margin: 0; gap: 3px; flex: none; }
+.hdr-top .lang-switch button { font-size: .8rem; padding: 1px 5px; line-height: 1.4; }
+.hdr-top .no-search { margin: 0; gap: 3px; flex: none; }
+.hdr-top .no-search .ns-field { width: 64px; }
+.hdr-top .no-search input { font-size: .75rem; padding: 6px 7px; padding-inline-end: 18px; }
+.hdr-top .no-search-clear { width: 15px; height: 15px; font-size: .55rem; inset-inline-end: 2px; }
+.ns-go { flex: none; width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(243,216,138,.6); background: linear-gradient(180deg, var(--gold-2), var(--gold)); font-size: 1rem; line-height: 1; padding: 0; cursor: pointer; box-shadow: 0 3px 10px rgba(212,169,74,.35); }
+.ns-go:active { transform: scale(.94); }
 body:not(.on-home) .hdr-top .no-search { display: none; }
 #search-result { scroll-margin-top: 84px; }
+/* Titre un peu réduit pour laisser les coins libres (« Derekh HaLev » est plus long que « דרך הלב ») */
+html[dir="ltr"] .app-header h1 { font-size: 1.3rem; line-height: 2.75rem; }
+@media (max-width: 400px) {
+  .app-header h1 { font-size: 1.6rem; }
+  html[dir="ltr"] .app-header h1 { font-size: 1.1rem; line-height: 2.6rem; }
+  .hdr-top { top: 18px; }
+}
+
