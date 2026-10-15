@@ -40,10 +40,10 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 - **Statistiques (collecte sans contenu, écrite par `index.html`, `track()` / `trackVisit()`)** :
   - `activity/{uid}` — `first`, `last` (timestamps serveur), `mobile`, `d/{AAAAMMJJ}: nb de chargements ce jour-là` (visiteurs non inscrits compris).
   - `presence/{uid}: true` — en ligne maintenant (supprimé par `onDisconnect`).
-  - `stats/{événement}/{AAAAMMJJ}/{pushId}: true` — compteurs d'actions anonymes : `req_sent`, `req_sent_soft`, `req_accepted`, `req_declined`, `msg_sent`, `reveal_press`, `wa_click`, `hide`, `unhide`, `archive`, `unarchive`, `block`, `report`, `pause_on/off`, `card_view`, `coc_open`, `welcome_open`, `agetip_open`, `agetip_edit`, `lang_change`, `profile_edit`, `profile_delete`, `reg_start`, `reg_done`, `reg_err_<champ>`, `tab_<onglet>`, `err_<action>`.
+  - `stats/{événement}/{AAAAMMJJ}/{pushId}: true` — compteurs d'actions anonymes : `req_sent`, `req_sent_soft`, `req_note`, `req_accepted`, `req_declined`, `msg_sent`, `reveal_press`, `wa_click`, `hide`, `unhide`, `archive`, `unarchive`, `block`, `report`, `pause_on/off`, `card_view`, `coc_open`, `welcome_open`, `agetip_open`, `agetip_edit`, `lang_change`, `profile_edit`, `profile_delete`, `reg_start`, `reg_done`, `reg_err_<champ>`, `tab_<onglet>`, `err_<action>`.
   - `chatActivity/{chatId}/{uid}: true` — ce membre a écrit au moins un message (taux de réponse, sans lire les messages).
 - `announcements/current` — `{text, text_en?, text_fr?, ts}` publié par l'admin (hébreu obligatoire ; chaque utilisateur voit sa langue, repli sur l'hébreu).
-- `inbox/{to}/{from}` et `outbox/{from}/{to}` — demandes : `fromNo`/`toNo`, `status` (pending/accepted/declined), `createdAt`, `chatId?`.
+- `inbox/{to}/{from}` et `outbox/{from}/{to}` — demandes : `fromNo`/`toNo`, `status` (pending/accepted/declined), `createdAt`, `chatId?`, `note?` (💌 petit mot facultatif ≤ 100 car., immuable, affiché avec la demande puis en tête de la conversation ; jamais dans `chats/`, que l'admin lit).
 - `chats/{from_to}` — métadonnées : `from`, `to` (uids), `fromNo`, `toNo`, `status` (active/ended), `opened`, `icebreaker` (clé neutre type `weekend.sea`, traduite à l'affichage par `icebreakerText()` ; anciens chats : texte hébreu), `createdAt`.
 - `userChats/{uid}/{chatId}: true` — index des chats de chacun.
 - `messages/{chatId}/{msgId}` — `{from, text, ts}`.

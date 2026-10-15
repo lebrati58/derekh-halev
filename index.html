@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261015d">
+<link rel="stylesheet" href="style.css?v=20261016b">
 </head>
 <body>
 
@@ -339,9 +339,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261015d"></script>
-<script src="commun.js?v=20261015d"></script>
-<script src="matching.js?v=20261015d"></script>
+<script src="i18n.js?v=20261016b"></script>
+<script src="commun.js?v=20261016b"></script>
+<script src="matching.js?v=20261016b"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -823,18 +823,28 @@ $("#proposals").addEventListener("click", async e => {
   await sendRequest(b.dataset.send);
 });
 
+const NOTE_MAX = 100;
 async function sendRequest(toUid) {
   const p = profiles[toUid];
   if (!p) return;
   try {
     // Si l'autre m'a déjà écrit → on accepte directement
     if (inbox[toUid] && inbox[toUid].status === "pending") return acceptRequest(toUid);
+    // 💌 Petit mot facultatif joint à la demande (comme une carte avec des fleurs)
+    let note;
+    for (;;) {
+      note = await showModal({ title: t("req_note_title", { name: profileName(p.no) }), body: esc(t("req_note_body")), input: true,
+        placeholder: t("req_note_ph"), okText: t("req_note_send"), cancelText: t("cancel"), allowEmpty: true, maxLength: NOTE_MAX });
+      if (note === null) { renderProposals(); return; }                 // annulé : rien n'est envoyé
+      if (!hasForbiddenContent(note)) break;
+      toast(t("msg_forbidden"), 3500);
+    }
+    const reqIn = { fromNo: me.no, status: "pending", createdAt: TS }, reqOut = { toNo: p.no, status: "pending", createdAt: TS };
+    if (note) { reqIn.note = reqOut.note = note.slice(0, NOTE_MAX); }
     // Écriture atomique (multi-path) : soit les deux passent, soit rien —
     // pas de demi-état si la connexion lâche entre les deux.
-    await db.ref().update({
-      [`inbox/${toUid}/${uid}`]: { fromNo: me.no, status: "pending", createdAt: TS },
-      [`outbox/${uid}/${toUid}`]: { toNo: p.no, status: "pending", createdAt: TS }
-    });
+    await db.ref().update({ [`inbox/${toUid}/${uid}`]: reqIn, [`outbox/${uid}/${toUid}`]: reqOut });
+    if (note) track("req_note");
     toast(t("req_sent", { name: profileName(p.no) }));
     track(p.no && computeProposals().some(c => c.uid === toUid && c.soft) ? "req_sent_soft" : "req_sent");
   } catch (err) {
@@ -854,8 +864,9 @@ function renderRequests() {
     box.innerHTML = `<div class="empty"><span class="big">💌</span>${esc(t("no_requests"))}</div>`;
     return;
   }
-  box.innerHTML = pending.map(([u]) => `
+  box.innerHTML = pending.map(([u, r]) => `
     <div>
+      ${r.note ? `<div class="req-note"><b>${esc(t("req_note_label"))}</b> ${esc(r.note)}</div>` : ""}
       ${cardHTML(profiles[u])}
       <div class="item-actions">
         <button class="btn gold" data-accept="${esc(u)}">${esc(t("accept"))}</button>
@@ -1056,7 +1067,12 @@ async function openChat(id) {
   closeChat();
   currentChat = id;
   $("#ended-bar").textContent = t("h080");
-  $("#messages").innerHTML = `<div class="sys">${esc(t("chat_intro"))}</div>`;
+  // le petit mot joint à la demande ouvre la conversation (lu dans inbox/outbox : jamais visible par l'admin)
+  const pu = m ? partnerOf(m) : null;
+  const noteIn = pu && inbox[pu] && inbox[pu].note, noteOut = pu && outbox[pu] && outbox[pu].note;
+  $("#messages").innerHTML = `<div class="sys">${esc(t("chat_intro"))}</div>` +
+    (noteIn ? `<div class="msg theirs req-note-msg"><b>${esc(t("req_note_label"))}</b> ${esc(noteIn)}</div>` : "") +
+    (noteOut ? `<div class="msg mine req-note-msg"><b>${esc(t("req_note_label"))}</b> ${esc(noteOut)}</div>` : "");
   $("#chat-view").classList.remove("hidden");
   document.body.style.overflow = "hidden";
   fitChatToViewport();

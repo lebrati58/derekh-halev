@@ -527,3 +527,8 @@ body { overflow-x: clip; }
 
 /* Message ciblé de l'équipe (pas de match dans la tranche d'âge) */
 .welcome-sep { align-self: center; margin: 10px 0 2px; font-size: .78rem; color: var(--gold-2); background: rgba(212,169,74,.12); border-radius: 999px; padding: 3px 12px; }
+
+/* 💌 Petit mot joint à une demande */
+.req-note { margin-bottom: 8px; padding: 10px 14px; border-radius: 14px; background: rgba(212,169,74,.12); border: 1px solid rgba(212,169,74,.35); overflow-wrap: anywhere; line-height: 1.5; }
+.req-note b, .req-note-msg b { display: block; font-size: .78rem; color: var(--gold-2); font-weight: 700; }
+.msg.mine.req-note-msg b { color: var(--night); opacity: .7; }
