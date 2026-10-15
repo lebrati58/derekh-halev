@@ -553,3 +553,6 @@ body { overflow-x: clip; }
 .ptable tr.hit td { background: rgba(212,169,74,.18); }
 .admin-copy { width: 26px; height: 26px; font-size: .8rem; vertical-align: middle; }
 .no-search { scroll-margin-top: 96px; }
+/* Barre de recherche compacte : un numéro = quelques chiffres */
+.no-search .ns-field { flex: 0 0 auto; width: 10.5em; }
+.no-search input { font-size: .95rem; padding-block: 9px; }
