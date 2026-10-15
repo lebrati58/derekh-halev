@@ -262,8 +262,82 @@ async function denied(name, fn) {
   await denied ("ADMIN : toujours PAS les messages",          () => get(ref(ADMIN, "messages/alice_bob")));
   await denied ("ADMIN : toujours PAS les secrets",           () => get(ref(ADMIN, "secrets/alice_dave")));
 
+  /* ---------- Photos privées (« קודם הלב, אחר כך הפנים ») ---------- */
+  const JPG = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ==";
+  await env.withSecurityRulesDisabled(async ctx => { const sdb = ctx.database(); 
+    // charlie a été banni puis supprimé plus haut : on le remet en place (no 3)
+    await remove(ref(sdb, "banned/charlie"));
+    await set(ref(sdb, "profiles/charlie"), { no: 3, gender: "m", age: 28, city: "תל אביב", religion: "hiloni", intent: "see", words: ["א", "ב", "ג"], shabbat: "ים", createdAt: 1 });
+    await remove(ref(sdb, "blocks/alice/charlie"));
+    await set(ref(sdb, "chats/alice_charlie"), { from: "alice", to: "charlie", fromNo: 1, toNo: 3, status: "active", opened: false, createdAt: 1 });
+  });
+  const share = (no, active = true, chatId = "alice_charlie") => ({ chatId, no, ts: serverTimestamp(), active });
+  await allowed("A1 : alice ajoute 4 photos (+ miniatures + compteur)", () => update(ref(A), {
+    "photos/alice/1": JPG, "photos/alice/2": JPG, "photos/alice/3": JPG, "photos/alice/4": JPG,
+    "photoThumbs/alice/1": JPG, "photoThumbs/alice/2": JPG, "photoThumbs/alice/3": JPG, "photoThumbs/alice/4": JPG,
+    "photoMeta/alice": { n: 4, ts: serverTimestamp() } }));
+  await allowed("A2 : alice voit ses propres photos",            () => get(ref(A, "photos/alice")));
+  await denied ("F : 5e photo refusée",                          () => set(ref(A, "photos/alice/5"), JPG));
+  await denied ("F : emplacement « 0 » refusé",                  () => set(ref(A, "photos/alice/0"), JPG));
+  await denied ("photo : pas un JPEG (texte libre)",             () => set(ref(A, "photos/alice/1"), "bonjour 0501234567"));
+  await denied ("photo : autre format (data:text/html)",         () => set(ref(A, "photos/alice/1"), "data:text/html;base64,PHNjcmlwdD4="));
+  await denied ("photo : trop lourde (> 300 000 car.)",          () => set(ref(A, "photos/alice/1"), "data:image/jpeg;base64," + "A".repeat(300000)));
+  await denied ("miniature : trop lourde (> 40 000 car.)",       () => set(ref(A, "photoThumbs/alice/1"), "data:image/jpeg;base64," + "A".repeat(40000)));
+  await denied ("compteur photos > 4",                           () => set(ref(A, "photoMeta/alice"), { n: 5, ts: serverTimestamp() }));
+  await denied ("G : bob écrit dans les photos d'alice",          () => set(ref(B, "photos/alice/1"), JPG));
+  await denied ("G : bob supprime les photos d'alice",            () => remove(ref(B, "photos/alice")));
+  await denied ("BANNI : ajouter une photo",                     () => set(ref(M, "photos/mallory/1"), JPG));
+  await denied ("sans profil : ajouter une photo",               () => set(ref(F, "photos/frank/1"), JPG));
+  await denied ("B : charlie (en conversation) lit les photos d'alice avant tout partage", () => get(ref(C, "photos/alice")));
+  await denied ("B : … ni les miniatures",                       () => get(ref(C, "photoThumbs/alice/1")));
+  await denied ("B : bob (hors conversation) lit les photos",    () => get(ref(B, "photos/alice/1")));
+  await denied ("non connecté : lire les photos",                () => get(ref(ANON, "photos/alice")));
+  await denied ("ADMIN : lire les photos (règle absolue)",       () => get(ref(ADMIN, "photos/alice")));
+  await denied ("ADMIN : lire les miniatures",                   () => get(ref(ADMIN, "photoThumbs")));
+  await allowed("ADMIN : lire le NOMBRE de photos (0-4)",        () => get(ref(ADMIN, "photoMeta/alice")));
+  await denied ("inscrit : lire le nombre de photos d'un autre", () => get(ref(C, "photoMeta/alice")));
+  await denied ("C : partage avant échange mutuel (personne n'a écrit)", () => set(ref(A, "photoShares/alice/charlie"), share(3)));
+  await set(ref(A, "chatActivity/alice_charlie/alice"), true);
+  await denied ("C : partage après un échange UNILATÉRAL",       () => set(ref(A, "photoShares/alice/charlie"), share(3)));
+  await set(ref(C, "chatActivity/alice_charlie/charlie"), true);
+  await denied ("partage : numéro du destinataire usurpé",       () => set(ref(A, "photoShares/alice/charlie"), share(2)));
+  await denied ("partage : chat qui n'est pas le leur",          () => set(ref(A, "photoShares/alice/charlie"), share(3, true, "alice_bob")));
+  await denied ("partage : vers bob avec le chat alice_charlie", () => set(ref(A, "photoShares/alice/bob"), share(2)));
+  await denied ("I : charlie partage les photos d'ALICE à sa place", () => set(ref(C, "photoShares/alice/charlie"), share(3)));
+  await denied ("I : bob (tiers) autorise charlie pour alice",   () => set(ref(B, "photoShares/alice/charlie"), share(3)));
+  await denied ("I : l'ADMIN partage les photos d'alice",        () => set(ref(ADMIN, "photoShares/alice/charlie"), share(3)));
+  await allowed("D : alice partage avec charlie après échange mutuel", () => set(ref(A, "photoShares/alice/charlie"), share(3)));
+  await allowed("D : charlie voit les photos d'alice",           () => get(ref(C, "photos/alice")));
+  await allowed("D : charlie voit sa propre autorisation",       () => get(ref(C, "photoShares/alice/charlie")));
+  await denied ("D : charlie ne voit PAS les autres partages d'alice", () => get(ref(C, "photoShares/alice")));
+  await allowed("D : charlie ajoute ses photos",                 () => set(ref(C, "photos/charlie/1"), JPG));
+  await denied ("D : non réciproque — alice ne voit pas celles de charlie", () => get(ref(A, "photos/charlie")));
+  await denied ("G : bob lit les photos d'alice (pas autorisé)", () => get(ref(B, "photos/alice")));
+  await denied ("ADMIN : lire les partages (qui voit qui)",      () => get(ref(ADMIN, "photoShares")));
+  await denied ("partage : champ inconnu",                       () => update(ref(A, "photoShares/alice/charlie"), { hack: 1 }));
+  await allowed("E : alice retire l'accès",                      () => update(ref(A, "photoShares/alice/charlie"), { active: false, ts: serverTimestamp() }));
+  await denied ("E : charlie ne peut plus charger les photos",   () => get(ref(C, "photos/alice/1")));
+  await denied ("E : charlie ne peut pas se ré-autoriser",       () => update(ref(C, "photoShares/alice/charlie"), { active: true }));
+  await allowed("alice re-partage",                              () => set(ref(A, "photoShares/alice/charlie"), share(3)));
+  await allowed("… et charlie voit de nouveau",                  () => get(ref(C, "photos/alice")));
+  await env.withSecurityRulesDisabled(async ctx => { const sdb = ctx.database();  await set(ref(sdb, "blocks/alice/charlie"), true); });
+  await denied ("blocage : partage actif mais charlie bloqué → refusé", () => get(ref(C, "photos/alice")));
+  await env.withSecurityRulesDisabled(async ctx => { const sdb = ctx.database();  await remove(ref(sdb, "blocks/alice/charlie")); await set(ref(sdb, "banned/charlie"), true); });
+  await denied ("bannissement : charlie banni ne voit plus",     () => get(ref(C, "photos/alice")));
+  await env.withSecurityRulesDisabled(async ctx => { const sdb = ctx.database();  await remove(ref(sdb, "banned/charlie")); await set(ref(sdb, "chats/alice_charlie/status"), "ended"); });
+  await allowed("conversation terminée : le partage existant reste (révocable)", () => get(ref(C, "photos/alice")));
+  await allowed("conversation terminée : alice peut encore retirer", () => update(ref(A, "photoShares/alice/charlie"), { active: false, ts: serverTimestamp() }));
+  await denied ("conversation terminée : pas de NOUVEAU partage", () => set(ref(A, "photoShares/alice/charlie"), share(3)));
+  await allowed("H : ancien profil sans photo — bob ajoute sa 1re photo", () => set(ref(B, "photos/bob/1"), JPG));
+  await denied ("ADMIN : remplacer une photo",                   () => set(ref(ADMIN, "photos/alice/1"), JPG));
+  await allowed("ADMIN : retirer les photos (modération)",       () => update(ref(ADMIN), { "photos/alice": null, "photoThumbs/alice": null, "photoMeta/alice": null }));
+  await allowed("ADMIN : journaliser l'opération",               () => push(ref(ADMIN, "adminLog"), { action: "photos_removed", no: 1, ts: serverTimestamp() }));
+  await denied ("inscrit : écrire dans le journal admin",        () => push(ref(A, "adminLog"), { action: "photos_removed", no: 1, ts: serverTimestamp() }));
+  await denied ("inscrit : lire le journal admin",               () => get(ref(A, "adminLog")));
+  await allowed("alice supprime tous ses partages (suppression du profil)", () => remove(ref(A, "photoShares/alice")));
+
   /* ---------- Compteur vide : la numérotation commence à 100 ---------- */
-  await env.withSecurityRulesDisabled(async ctx => { await remove(ref(ctx.database(), "counters/profileNo")); });
+  await env.withSecurityRulesDisabled(async ctx => { const sdb = ctx.database();  await remove(ref(sdb, "counters/profileNo")); });
   await denied ("compteur vide : premier numéro = 1",      () => set(ref(E, "counters/profileNo"), 1));
   await allowed("compteur vide : premier numéro = 100",    () => set(ref(E, "counters/profileNo"), 100));
   await allowed("compteur : 100 → 101",                    () => set(ref(F, "counters/profileNo"), 101));

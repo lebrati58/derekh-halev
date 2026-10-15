@@ -13,12 +13,14 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `i18n.js` | Traductions de l'interface he/en/fr (`I18N`, `t(clé, vars)`, `applyI18n()`, `setLang()`), langue choisie au 1er lancement et mémorisée (localStorage `mhm_uiLang`). Textes fixes du HTML : `data-i18n`/`-ph`/`-aria` (clés `hNNN`) ; textes du code : `t("clé")`. **Tout nouveau texte doit être ajouté dans les 3 langues.** `admin.html` reste en hébreu |
 | `stats.js` | Calcul **pur** des statistiques admin (`computeStats`, `insights`, périodes, rétention, entonnoir, compatibilité via `matching.js`) — testé par `test_stats.js` |
 | `admin-stats.js` | Interface du centre statistique de l'admin (`StatsUI`) : filtres période/segment, onglets, graphiques SVG, export CSV |
+| `photos.js` | Photos privées (« קודם הלב, אחר כך הפנים ») : « 📷 התמונות שלי » (4 emplacements, galerie/appareil, recadrage 4:5, ré-encodage JPEG dans le navigateur = EXIF/GPS supprimés, principale, réorganiser, remplacer, supprimer), « מי יכול לראות את התמונות שלי? » (révocation), barre photo dans le chat (partage débloqué quand les DEUX ont écrit), galerie plein écran avec filigrane « נצפה ע״י פרופיל N ». Jamais de photo dans les cartes, propositions, recherche ou demandes |
 | `matching.js` | Moteur de compatibilité pur (sans Firebase) : filtres durs, score, %, raisons « למה אתם מתאימים », icebreakers |
 | `style.css` | Styles partagés |
 | `logo.png`, `logo-heart.png`, `apple-touch-icon.png` | Logo complet (aperçu WhatsApp `og:image`), cœur seul transparent (en-tête + icône d'onglet), icône écran d'accueil |
 | `database.rules.json` | Règles de sécurité RTDB (source de vérité de la confidentialité) |
 | `firebase.json` | Règles, Hosting (dossier `public/` généré au déploiement) + émulateurs database (9000) / hosting (5000) |
 | `.github/workflows/firebase-hosting.yml` | Déploiement auto à chaque push sur `main` : règles (testées puis publiées) puis site dereh-halev.web.app (secret `FIREBASE_SERVICE_ACCOUNT`) ; copie la **liste blanche** des fichiers du site dans `public/` — tout nouveau fichier du site doit y être ajouté |
+| `.github/workflows/firebase-preview.yml` | **Aperçu d'essai** : chaque PR vers `main` → règles testées puis publiées (même base que la prod) + site sur une adresse temporaire (canal Firebase, 14 jours ; lien commenté sur la PR). Le site principal ne change pas. Retour arrière : fermer la PR + relancer le déploiement de `main` (republie ses règles) |
 | `test_matching.js` | Tests du moteur de matching (Node, sans dépendance) |
 | `test_stats.js` | Tests des calculs statistiques (Node, sans dépendance ; `npm test` lance les deux) |
 | `test_rules.js` | Tests des règles sur l'émulateur (`@firebase/rules-unit-testing`) |
@@ -37,6 +39,8 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 - `hidden/{uid}/{targetUid}: true` — profils « 🙈 pas pour moi » masqués de mes propositions (l'autre peut toujours m'envoyer une demande) ; lien « profils masqués (N) » en bas de l'accueil pour tout réafficher.
 - `archived/{uid}/{chatId}: true` — conversations rangées dans « 🗄️ ארכיון » (pour moi seul ; proposé quand la conversation est terminée, réversible).
 - `banned/{uid}: true` — profils bannis.
+- **Photos privées** : `photos/{uid}/{1..4}` (JPEG data URL ≤ 300 000 car., 1 = principale) et `photoThumbs/{uid}/{1..4}` (≤ 40 000 car.) ; `photoMeta/{uid}` `{n (0-4), ts}` ; `photoShares/{owner}/{viewer}` `{chatId, no (du viewer), ts, active}` — autorisation individuelle, non réciproque, révocable (l'historique reste avec `active: false`).
+- `adminLog/{pushId}` — `{action: photos_removed | profile_deleted, no, ts}` écrit par l'admin.
 - **Statistiques (collecte sans contenu, écrite par `index.html`, `track()` / `trackVisit()`)** :
   - `activity/{uid}` — `first`, `last` (timestamps serveur), `mobile`, `d/{AAAAMMJJ}: nb de chargements ce jour-là` (visiteurs non inscrits compris).
   - `presence/{uid}: true` — en ligne maintenant (supprimé par `onDisconnect`).
@@ -68,6 +72,10 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `hidden/{uid}` | soi | soi (valeurs `true` uniquement ; suppression de toute la liste permise) |
 | `archived/{uid}` | soi | soi (valeurs `true` ; suppression permise) |
 | `banned` | tout inscrit | admin |
+| `photos/{uid}`, `photoThumbs/{uid}` | soi ; **seulement** un viewer avec `photoShares/{uid}/{viewer}/active` == true, non banni, non bloqué par le propriétaire. **Jamais l'admin** | soi (inscrit, non banni ; emplacements 1-4, JPEG, taille max) ; admin : **suppression seule** (modération sans voir) |
+| `photoMeta/{uid}` | soi ; admin (nombre seulement) | soi ; admin : suppression |
+| `photoShares/{owner}/{viewer}` | le propriétaire (tout) ; le viewer (sa ligne) ; **pas l'admin** | le propriétaire seul : activer exige un chat actif entre eux + `chatActivity` des DEUX + ni banni ni blocage ; désactiver/supprimer toujours ; admin : suppression seule |
+| `adminLog` | admin | admin (ajout seul) |
 | `activity/{uid}` | admin ; soi | soi (`first` immuable, dates ≤ maintenant, champs connus seulement) |
 | `presence/{uid}` | admin | soi (`true`) |
 | `stats/{event}/{day}/{id}` | admin | tout inscrit : **ajout seul** (`true`), nom d'événement `[a-z_]`, jour `AAAAMMJJ` ; ni modification ni suppression |
@@ -108,6 +116,7 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 - Règle absolue : aucun admin ne doit pouvoir lire prénom, téléphone, messages, conversations ou secrets de révélation. L'admin ne voit que le numéro anonyme du profil. Cette règle doit être garantie par database.rules.json, pas seulement par l'interface.
 - Ne jamais dupliquer la logique de matching : toujours réutiliser matching.js.
 - Pas de suppression ou migration de données sans confirmation explicite de ma part.
+- Ouvrir un fichier en écriture (`open(f,'w')`) AVANT de l'avoir lu le vide : toujours lire, puis écrire (admin.html a été vidé ainsi une fois).
 - Lire uniquement les fichiers nécessaires à la tâche en cours.
 - Faire des modifications ciblées plutôt que réécrire des fichiers entiers.
 - Ne jamais dire qu'une chose est testée si elle ne l'a pas été.
