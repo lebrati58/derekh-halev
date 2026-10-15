@@ -21,8 +21,9 @@
       }
     },
     "profiles": {
-      ".read": "auth != null",
+      ".read": "auth != null && ((root.child('profiles/' + auth.uid).exists() && !root.child('banned/' + auth.uid).exists()) || (root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))",
       "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
         ".write": "(auth != null && auth.uid === $uid && !root.child('banned/' + auth.uid).exists()) || (!newData.exists() && (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))",
         ".validate": "newData.hasChildren(['no', 'gender', 'age', 'city', 'religion', 'intent', 'words', 'shabbat'])",
         "no": {

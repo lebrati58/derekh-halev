@@ -67,6 +67,11 @@ async function denied(name, fn) {
   /* ---------- Profils & privé ---------- */
   await denied ("non connecté : lire profiles",            () => get(ref(ANON, "profiles")));
   await allowed("inscrit : lire le profil d'un autre",     () => get(ref(A, "profiles/bob")));
+  await denied ("visiteur SANS profil : lire tous les profils (lien partagé)", () => get(ref(E, "profiles")));
+  await denied ("visiteur SANS profil : lire le profil n°2",  () => get(ref(E, "profiles/bob")));
+  await allowed("visiteur sans profil : lire SA propre fiche (vide)", () => get(ref(E, "profiles/eve")));
+  await denied ("BANNI : lire les profils des autres",     () => get(ref(M, "profiles")));
+  await allowed("BANNI : lire sa propre fiche",            () => get(ref(M, "profiles/mallory")));
   await denied ("écrire le profil d'un AUTRE",             () => set(ref(A, "profiles/bob/age"), 99));
   await allowed("lire son propre private",                 () => get(ref(A, "private/alice")));
   await denied ("lire le private (téléphone) d'un autre",  () => get(ref(A, "private/bob")));
@@ -157,6 +162,7 @@ async function denied(name, fn) {
   await denied ("inscrit normal : publier une annonce",    () => set(ref(A, "announcements/current"), { text: "spam", ts: 1 }));
   await allowed("bon PIN → admin",                         () => set(ref(ADMIN, "admins/moriah"), "test-pin-123"));
   await allowed("admin : lire les signalements",           () => get(ref(ADMIN, "reports")));
+  await allowed("ADMIN (sans profil) : lire les profils",   () => get(ref(ADMIN, "profiles")));
   await allowed("admin : annonce en 3 langues",             () => set(ref(ADMIN, "announcements/current"), { text: "שאלת היום", text_en: "Question of the day", text_fr: "Question du jour", ts: 1 }));
   await denied ("annonce : langue inconnue (text_ru)",      () => set(ref(ADMIN, "announcements/current"), { text: "x", text_ru: "x", ts: 1 }));
   await denied ("inscrit normal : annonce en anglais",      () => set(ref(A, "announcements/current"), { text: "x", text_en: "spam", ts: 1 }));

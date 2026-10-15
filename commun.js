@@ -212,7 +212,7 @@ function cardHTML(p, opts = {}) {
       <span class="mc-left"><span class="mc-mask">${HEART}</span>${opts.pct != null ? `<span class="mc-pct" title="${esc(t("match_pct", { pct: opts.pct }))}" aria-label="${esc(t("match_pct", { pct: opts.pct }))}">${esc(opts.pct)}%</span>` : ""}</span>
       <span class="mc-ids">
         ${p.gender === "m" || p.gender === "f" ? `<span class="mc-gender ${p.gender}">${p.gender === "f" ? "👩" : "👨"} ${esc(LABELS.gender[p.gender])}</span>` : ""}
-        <span class="mc-no">${esc(profileName(p.no))}</span>
+        <span class="mc-no">${esc(profileName(p.no))}</span>${opts.tools ? `<button type="button" class="mc-copy" data-copy-no="${esc(p.no)}" aria-label="${esc(t("copy_no_aria", { no: p.no }))}" title="${esc(t("copy_no_aria", { no: p.no }))}">⧉</button>` : ""}
       </span>
     </div>
     <div class="mc-words">${words}</div>
@@ -221,8 +221,24 @@ function cardHTML(p, opts = {}) {
     <div class="mc-intent">${esc(LABELS.intent[p.intent] || "")}</div>
     ${p.shabbat && !opts.noShabbat ? `<div class="mc-shabbat"><b>${esc(t("card_shabbat"))}</b> “${esc(p.shabbat)}”</div>` : ""}
     ${p.cantLiveWithout ? `<div class="mc-shabbat"><b>${esc(t("card_clw"))}</b> ${esc(p.cantLiveWithout)}</div>` : ""}
+    ${opts.tools ? `<button type="button" class="mc-share" data-share-no="${esc(p.no)}">🔗 ${esc(t("share_btn"))}</button>` : ""}
   </div>`;
 }
+
+/* ---------- Presse-papiers ---------- */
+/* Copie réelle : renvoie true seulement si le texte est bien dans le presse-papiers
+   (API moderne, puis repli execCommand pour les navigateurs intégrés de WhatsApp). */
+async function copyText(text) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(String(text)); return true; } } catch (e) {}
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = String(text); ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, ta.value.length);
+    const ok = document.execCommand("copy"); ta.remove(); return !!ok;
+  } catch (e) { return false; }
+}
+/* Numéro de profil saisi : chiffres seulement, recherche EXACTE (125 ≠ 1250) */
+function parseProfileNo(q) { const s = String(q == null ? "" : q).trim().replace(/^#/, ""); return /^\d{1,7}$/.test(s) ? Number(s) : null; }
 
 /* ---------- Toast ---------- */
 function toast(msg, ms = 2800) {
