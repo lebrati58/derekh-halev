@@ -500,3 +500,8 @@ body { overflow-x: clip; }
 .an-filters .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 6px; }
 .an-filters .chips::-webkit-scrollbar { display: none; }
 .an-chip { flex: none; }
+
+/* 🗄️ Archives des conversations */
+.archive-toggle { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px dashed rgba(212,169,74,.35); border-radius: 14px; background: transparent; color: var(--muted); font: inherit; font-size: .88rem; cursor: pointer; }
+.chat-row.archived { opacity: .7; }
+.ended-bar .btn.link { margin-inline-start: 6px; }

@@ -186,6 +186,15 @@ async function denied(name, fn) {
   await denied ("masqués : valeur simple à la place de la liste", () => set(ref(A, "hidden/alice"), "x"));
   await allowed("tout ré-afficher (supprimer sa liste)",    () => remove(ref(A, "hidden/alice")));
 
+  /* ---------- Archives des conversations ---------- */
+  await allowed("archiver une conversation",                () => set(ref(A, "archived/alice/alice_bob"), true));
+  await allowed("lire ses propres archives",                () => get(ref(A, "archived/alice")));
+  await denied ("lire les archives d'un AUTRE",             () => get(ref(B, "archived/alice")));
+  await denied ("ADMIN : lire les archives",                () => get(ref(ADMIN, "archived/alice")));
+  await denied ("archiver pour le compte d'un AUTRE",       () => set(ref(B, "archived/alice/alice_dave"), true));
+  await denied ("archive : valeur ≠ true",                  () => set(ref(A, "archived/alice/alice_dave"), "x"));
+  await allowed("désarchiver",                              () => remove(ref(A, "archived/alice/alice_bob")));
+
   /* ---------- Signalements ---------- */
   await allowed("membre signale son interlocuteur",        () => push(ref(A, "reports"), { chatId: "alice_bob", reporterUid: "alice", reportedUid: "bob", reportedNo: 2, reason: "טקסט", createdAt: 1 }));
   await denied ("signaler quelqu'un HORS de ses chats",    () => push(ref(C, "reports"), { chatId: "alice_bob", reporterUid: "charlie", reportedUid: "bob", reportedNo: 2, reason: "x", createdAt: 1 }));

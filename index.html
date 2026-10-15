@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261014a">
+<link rel="stylesheet" href="style.css?v=20261015a">
 </head>
 <body>
 
@@ -298,6 +298,7 @@ if (location.hostname === "lebrati58.github.io") {
       <button id="act-profile" data-i18n="h109">👤 הכרטיס של הצד השני</button>
       <button id="act-report" data-i18n="h077">🚩 דיווח</button>
       <button id="act-block-chat" data-i18n="h078">🚫 חסימת הפרופיל</button>
+      <button id="act-archive" class="hidden"></button>
       <button id="act-end" class="muted" data-i18n="h079">סיום השיחה</button>
     </div>
   </div>
@@ -338,9 +339,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261014a"></script>
-<script src="commun.js?v=20261014a"></script>
-<script src="matching.js?v=20261014a"></script>
+<script src="i18n.js?v=20261015a"></script>
+<script src="commun.js?v=20261015a"></script>
+<script src="matching.js?v=20261015a"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -350,6 +351,8 @@ let profiles = {};      // uid -> profil
 let banned = {};
 let blocks = {};        // targetUid -> true (mes blocages)
 let hidden = {};        // targetUid -> true (profils « pas pour moi », masqués de mes propositions)
+let archived = {};      // chatId -> true (conversations rangées dans « ארכיון », seulement pour moi)
+let showArchive = false;
 let inbox = {};         // fromUid -> {fromNo, status, chatId}
 let outbox = {};        // toUid -> {toNo, status, chatId}
 let myChats = {};       // chatId -> meta
@@ -638,6 +641,7 @@ function startHome() {
   });
   db.ref("blocks/" + uid).on("value", s => { blocks = s.val() || {}; renderProposals(); renderRequests(); }, () => {});
   db.ref("hidden/" + uid).on("value", s => { hidden = s.val() || {}; renderProposals(); updateUnhideLink(); }, () => {});
+  db.ref("archived/" + uid).on("value", s => { archived = s.val() || {}; renderChats(); if (currentChat && currentChat !== WELCOME) updateChatView(); }, () => {});
   db.ref("announcements/current").on("value", s => renderAnnounce(s.val()), () => {});
   db.ref("banned").on("value", s => {
     banned = s.val() || {};
@@ -942,26 +946,32 @@ function partnerFirstName(id, m) {
   return (p && p.firstName) || null;
 }
 
-function renderChats() {
-  const box = $("#chats");
-  const list = Object.entries(myChats).sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
-  setBadge("#badge-chats", list.filter(([id]) => isUnread(id)).length + (welcomeUnread() ? 1 : 0));
-  if (!list.length) {
-    box.innerHTML = welcomeRow() + `<div class="empty"><span class="big">💬</span>${esc(t("no_chats"))}</div>`;
-    return;
-  }
-  box.innerHTML = welcomeRow() + list.map(([id, m]) => {
-    const pn = partnerNo(m);
-    const state = isUnread(id) ? `<div class="state unread">${esc(t("st_unread"))}</div>`
-      : m.opened ? `<div class="state opened">${esc(t("st_opened"))}${partnerFirstName(id, m) ? " · " + esc(profileName(pn)) : ""}</div>`
-      : m.status === "ended" ? `<div class="state">${esc(t("st_ended"))}</div>`
-      : `<div class="state">${esc(t("st_active"))}</div>`;
-    return `<div class="chat-row" data-chat="${esc(id)}">
+function chatRow([id, m]) {
+  const pn = partnerNo(m);
+  const state = isUnread(id) ? `<div class="state unread">${esc(t("st_unread"))}</div>`
+    : m.opened ? `<div class="state opened">${esc(t("st_opened"))}${partnerFirstName(id, m) ? " · " + esc(profileName(pn)) : ""}</div>`
+    : m.status === "ended" ? `<div class="state">${esc(t("st_ended"))}</div>`
+    : `<div class="state">${esc(t("st_active"))}</div>`;
+  return `<div class="chat-row${archived[id] ? " archived" : ""}" data-chat="${esc(id)}">
       <div class="avatar ${colorClass(profiles[partnerOf(m)] || { no: pn })}" data-card="${esc(id)}" role="button" aria-label="${esc(t("h109"))}">${HEART}</div>
       <div class="info"><div class="title">${esc(partnerFirstName(id, m) || profileName(pn))}</div>${state}</div>
       <div>${t("fwd_arrow")}</div>
     </div>`;
-  }).join("");
+}
+function renderChats() {
+  const box = $("#chats");
+  const all = Object.entries(myChats).sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
+  const list = all.filter(([id]) => !archived[id]), arch = all.filter(([id]) => archived[id]);
+  setBadge("#badge-chats", all.filter(([id]) => isUnread(id)).length + (welcomeUnread() ? 1 : 0));
+  const archBlock = arch.length
+    ? `<button class="archive-toggle" id="archive-toggle" aria-expanded="${showArchive}">${esc(t("archive_section", { n: arch.length }))} ${showArchive ? "▴" : "▾"}</button>` +
+      (showArchive ? arch.map(chatRow).join("") : "")
+    : "";
+  if (!list.length) {
+    box.innerHTML = welcomeRow() + (all.length ? "" : `<div class="empty"><span class="big">💬</span>${esc(t("no_chats"))}</div>`) + archBlock;
+    return;
+  }
+  box.innerHTML = welcomeRow() + list.map(chatRow).join("") + archBlock;
 }
 /* Non-lus : dernier message de l'autre plus récent que la dernière lecture (mémorisée dans ce navigateur) */
 function isUnread(id) {
@@ -972,6 +982,7 @@ function markRead(id, ts) {
   if (typeof ts === "number" && ts > (store.get("read_" + id) || 0)) store.set("read_" + id, ts);
 }
 $("#chats").addEventListener("click", e => {
+  if (e.target.closest("#archive-toggle")) { showArchive = !showArchive; return renderChats(); }
   const c = e.target.closest("[data-card]");          // rond à gauche → voir sa carte, sans ouvrir le chat
   if (c) return showPartnerCard(c.dataset.card);
   const r = e.target.closest("[data-chat]"); if (r) openChat(r.dataset.chat);
@@ -1047,6 +1058,11 @@ function updateChatView() {
   $("#composer").classList.toggle("hidden", ended);
   $("#ended-bar").classList.toggle("hidden", !ended);
   $("#act-end").classList.toggle("hidden", ended);
+  // 🗄️ Archiver : proposé pour les conversations terminées (ou déjà archivées, pour les ressortir)
+  const canArchive = ended || archived[id];
+  $("#act-archive").classList.toggle("hidden", !canArchive);
+  $("#act-archive").textContent = archived[id] ? t("unarchive_btn") : t("archive_btn");
+  if (ended) $("#ended-bar").innerHTML = `${esc(t("h080"))} <button class="btn link small" id="ended-archive">${esc(archived[id] ? t("unarchive_btn") : t("archive_btn"))}</button>`;
 
   const bar = $("#curtain-bar");
   const sec = secretsCache[id];
@@ -1189,6 +1205,19 @@ $("#act-block-chat").addEventListener("click", async () => {
     closeChat();
   }
 });
+
+async function toggleArchive(id) {
+  if (!id || id === WELCOME) return;
+  const on = !archived[id];
+  try {
+    await db.ref(`archived/${uid}/${id}`).set(on ? true : null);
+    track(on ? "archive" : "unarchive");
+    toast(on ? t("archived_toast") : t("unarchived_toast"));
+    if (on) { closeChat(); selectTab("chats"); }
+  } catch (e) { console.error(e); toast(t("error_retry")); }
+}
+$("#act-archive").addEventListener("click", () => { $("#chat-menu").classList.add("hidden"); toggleArchive(currentChat); });
+$("#ended-bar").addEventListener("click", e => { if (e.target.closest("#ended-archive")) toggleArchive(currentChat); });
 
 $("#act-end").addEventListener("click", async () => {
   const id = currentChat;
