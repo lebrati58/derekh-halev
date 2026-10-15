@@ -216,12 +216,14 @@ function cardHTML(p, opts = {}) {
       </span>
     </div>
     <div class="mc-words">${words}</div>
-    <div class="mc-meta">${esc(p.age)} · ${esc(p.city)} · ${esc(religionLabel(p.religion, p.gender))}</div>
+    <div class="mc-meta-row">
+      <div class="mc-meta">${esc(p.age)} · ${esc(p.city)} · ${esc(religionLabel(p.religion, p.gender))}</div>
+      ${opts.tools ? `<button type="button" class="mc-share" data-share-no="${esc(p.no)}">🔗 ${esc(t("share_btn"))}</button>` : ""}
+    </div>
     ${typeof langFlags === "function" && langFlags(p) ? `<div class="mc-langs" title="${esc(t("langs_title"))}">${esc(langFlags(p))}</div>` : ""}
     <div class="mc-intent">${esc(LABELS.intent[p.intent] || "")}</div>
     ${p.shabbat && !opts.noShabbat ? `<div class="mc-shabbat"><b>${esc(t("card_shabbat"))}</b> “${esc(p.shabbat)}”</div>` : ""}
     ${p.cantLiveWithout ? `<div class="mc-shabbat"><b>${esc(t("card_clw"))}</b> ${esc(p.cantLiveWithout)}</div>` : ""}
-    ${opts.tools ? `<button type="button" class="mc-share" data-share-no="${esc(p.no)}">🔗 ${esc(t("share_btn"))}</button>` : ""}
   </div>`;
 }
 
