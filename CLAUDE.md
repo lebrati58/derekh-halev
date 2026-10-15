@@ -47,6 +47,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 - `chats/{from_to}` — métadonnées : `from`, `to` (uids), `fromNo`, `toNo`, `status` (active/ended), `opened`, `icebreaker` (clé neutre type `weekend.sea`, traduite à l'affichage par `icebreakerText()` ; anciens chats : texte hébreu), `createdAt`.
 - `userChats/{uid}/{chatId}: true` — index des chats de chacun.
 - `messages/{chatId}/{msgId}` — `{from, text, ts}`.
+- `readAt/{chatId}/{uid}: ts` — « lu jusqu'à » (timestamp du dernier message lu) → ✓ envoyé / ✓✓ bleus lus, comme WhatsApp ; la liste des conversations affiche aussi le nombre de non-lus (30 derniers messages), l'aperçu et l'heure.
 - `reveal/{chatId}/{uid}: true` — « j'ouvre le rideau ».
 - `secrets/{chatId}/{uid}` — `{firstName, phone}` déposés au moment du reveal.
 - `reports/{pushId}` — `chatId`, `reporterUid`, `reporterNo`, `reportedUid`, `reportedNo`, `reason`, `createdAt`, `resolved?`.
@@ -77,6 +78,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `chats` | les 2 membres **+ admin (tout le nœud)** | création par le destinataire d'une demande ; `status`→ended par membre ou admin ; `opened`→true si les 2 `reveal` sont à true |
 | `userChats/{uid}` | soi | un membre du chat concerné |
 | `messages/{chatId}` | les 2 membres seulement | membre, chat actif, non banni, `from` == soi, ≤ 500 car. |
+| `readAt/{chatId}/{uid}` | les 2 membres seulement (jamais l'admin) | soi, membre, nombre ≤ maintenant |
 | `reveal/{chatId}/{uid}` | soi seulement | soi, membre, chat actif |
 | `secrets/{chatId}` | les 2 membres, **seulement si `opened`** | soi, membre, tant que non `opened` |
 | `reports` | admin | un membre du chat (création) ; admin (tout) |

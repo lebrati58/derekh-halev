@@ -516,3 +516,11 @@ body { overflow-x: clip; }
 .chat-row.has-unread .title { color: #fff; }
 .chat-row.has-unread .time, .chat-row .state.preview.unread { color: var(--gold-2); font-weight: 700; }
 .ubadge { flex: none; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--gold-2); color: var(--night); font-weight: 800; font-size: .78rem; display: grid; place-items: center; }
+
+/* ✓ envoyé · ✓✓ bleu = lu (comme WhatsApp) */
+.ticks { font-size: .8em; letter-spacing: -.25em; margin-inline-start: 2px; opacity: .7; }
+.ticks.read { color: #1565c0; opacity: 1; font-weight: 700; }
+.chat-row .state .ticks.read { color: #4fc3f7; }
+.msg.mine .t { opacity: 1; color: rgba(20,10,38,.6); }
+.msg .t .ticks { font-size: 1.15em; font-weight: 700; opacity: 1; }
+.msg .t .ticks.read { color: #0b63c7; }

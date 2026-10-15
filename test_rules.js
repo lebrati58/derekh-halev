@@ -186,6 +186,16 @@ async function denied(name, fn) {
   await denied ("masqués : valeur simple à la place de la liste", () => set(ref(A, "hidden/alice"), "x"));
   await allowed("tout ré-afficher (supprimer sa liste)",    () => remove(ref(A, "hidden/alice")));
 
+  /* ---------- Accusés de lecture (✓✓ bleus) ---------- */
+  await allowed("membre : « lu jusqu'à » dans son chat",    () => set(ref(A, "readAt/alice_bob/alice"), Date.now() - 1000));
+  await allowed("l'AUTRE membre lit mon « lu jusqu'à »",    () => get(ref(B, "readAt/alice_bob")));
+  await denied ("NON-membre : lire les accusés de lecture", () => get(ref(C, "readAt/alice_bob")));
+  await denied ("ADMIN : lire les accusés de lecture",      () => get(ref(ADMIN, "readAt/alice_bob")));
+  await denied ("écrire le « lu » de l'AUTRE membre",       () => set(ref(B, "readAt/alice_bob/alice"), 1));
+  await denied ("NON-membre : écrire un « lu »",            () => set(ref(C, "readAt/alice_bob/charlie"), 1));
+  await denied ("« lu » dans le futur",                     () => set(ref(A, "readAt/alice_bob/alice"), Date.now() + 864e5));
+  await denied ("« lu » qui n'est pas un nombre",           () => set(ref(A, "readAt/alice_bob/alice"), "oui"));
+
   /* ---------- Archives des conversations ---------- */
   await allowed("archiver une conversation",                () => set(ref(A, "archived/alice/alice_bob"), true));
   await allowed("lire ses propres archives",                () => get(ref(A, "archived/alice")));
