@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261015a">
+<link rel="stylesheet" href="style.css?v=20261015b">
 </head>
 <body>
 
@@ -339,9 +339,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261015a"></script>
-<script src="commun.js?v=20261015a"></script>
-<script src="matching.js?v=20261015a"></script>
+<script src="i18n.js?v=20261015b"></script>
+<script src="commun.js?v=20261015b"></script>
+<script src="matching.js?v=20261015b"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -358,7 +358,9 @@ let outbox = {};        // toUid -> {toNo, status, chatId}
 let myChats = {};       // chatId -> meta
 const chatSubs = {};    // chatId -> ref
 const lastMsgSubs = {}; // chatId -> ref (dernier message, pour les non-lus)
-const lastMsg = {};     // chatId -> {from, ts}
+const lastMsg = {};     // chatId -> {from, ts, text}
+const recentMsgs = {};  // chatId -> 30 derniers messages {from, ts, text} (non-lus + aperçu, comme WhatsApp)
+const RECENT_MAX = 30;
 const secretsCache = {};// chatId -> {uid: {firstName, phone}}
 const pressedCache = {};// chatId -> bool (moi j'ai appuyé)
 let currentChat = null;
@@ -655,8 +657,14 @@ function startHome() {
       if (chatSubs[id]) return;
       chatSubs[id] = db.ref("chats/" + id);
       chatSubs[id].on("value", cs => onChatMeta(id, cs.val()));
-      lastMsgSubs[id] = db.ref("messages/" + id).limitToLast(1);
-      lastMsgSubs[id].on("child_added", ms => { lastMsg[id] = ms.val(); renderChats(); }, () => {});
+      lastMsgSubs[id] = db.ref("messages/" + id).limitToLast(RECENT_MAX);
+      lastMsgSubs[id].on("child_added", ms => {
+        const list = recentMsgs[id] = recentMsgs[id] || [];
+        list.push(ms.val()); list.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+        if (list.length > RECENT_MAX) list.shift();
+        lastMsg[id] = list[list.length - 1];
+        renderChats();
+      }, () => {});
     });
   });
 }
@@ -946,21 +954,32 @@ function partnerFirstName(id, m) {
   return (p && p.firstName) || null;
 }
 
+/* Heure de la ligne, comme WhatsApp : aujourd'hui → 20:51, sinon → 13.10 */
+function rowTime(ts) {
+  if (typeof ts !== "number") return "";
+  const d = new Date(ts);
+  return new Date().toDateString() === d.toDateString()
+    ? d.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })
+    : d.toLocaleDateString("he-IL", { day: "numeric", month: "numeric" });
+}
+const lastActivity = ([id, m]) => (lastMsg[id] && lastMsg[id].ts) || m.createdAt || 0;
 function chatRow([id, m]) {
-  const pn = partnerNo(m);
-  const state = isUnread(id) ? `<div class="state unread">${esc(t("st_unread"))}</div>`
-    : m.opened ? `<div class="state opened">${esc(t("st_opened"))}${partnerFirstName(id, m) ? " · " + esc(profileName(pn)) : ""}</div>`
-    : m.status === "ended" ? `<div class="state">${esc(t("st_ended"))}</div>`
-    : `<div class="state">${esc(t("st_active"))}</div>`;
-  return `<div class="chat-row${archived[id] ? " archived" : ""}" data-chat="${esc(id)}">
+  const pn = partnerNo(m), n = unreadCount(id), l = lastMsg[id], first = partnerFirstName(id, m);
+  const icon = m.opened ? "✨ " : m.status === "ended" ? "🌙 " : "";
+  const line = l
+    ? `<div class="state preview${n ? " unread" : ""}">${icon}${l.from === uid ? esc(t("you_prefix")) : ""}${esc(l.text || "")}</div>`
+    : `<div class="state${m.opened ? " opened" : ""}">${esc(m.opened ? t("st_opened") : m.status === "ended" ? t("st_ended") : t("st_active"))}</div>`;
+  return `<div class="chat-row${archived[id] ? " archived" : ""}${n ? " has-unread" : ""}" data-chat="${esc(id)}">
       <div class="avatar ${colorClass(profiles[partnerOf(m)] || { no: pn })}" data-card="${esc(id)}" role="button" aria-label="${esc(t("h109"))}">${HEART}</div>
-      <div class="info"><div class="title">${esc(partnerFirstName(id, m) || profileName(pn))}</div>${state}</div>
-      <div>${t("fwd_arrow")}</div>
+      <div class="info">
+        <div class="top"><div class="title">${esc(first || profileName(pn))}${first ? ` <small>${esc(profileName(pn))}</small>` : ""}</div><span class="time">${esc(rowTime(lastActivity([id, m])))}</span></div>
+        <div class="bottom">${line}${n ? `<span class="ubadge" aria-label="${esc(t("unread_n", { n }))}">${n >= RECENT_MAX ? RECENT_MAX + "+" : n}</span>` : ""}</div>
+      </div>
     </div>`;
 }
 function renderChats() {
   const box = $("#chats");
-  const all = Object.entries(myChats).sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
+  const all = Object.entries(myChats).sort((a, b) => lastActivity(b) - lastActivity(a));   // dernière activité en haut
   const list = all.filter(([id]) => !archived[id]), arch = all.filter(([id]) => archived[id]);
   setBadge("#badge-chats", all.filter(([id]) => isUnread(id)).length + (welcomeUnread() ? 1 : 0));
   const archBlock = arch.length
@@ -974,10 +993,12 @@ function renderChats() {
   box.innerHTML = welcomeRow() + list.map(chatRow).join("") + archBlock;
 }
 /* Non-lus : dernier message de l'autre plus récent que la dernière lecture (mémorisée dans ce navigateur) */
-function isUnread(id) {
-  const l = lastMsg[id];
-  return !!(l && l.from !== uid && id !== currentChat && (l.ts || 0) > (store.get("read_" + id) || 0));
+function unreadCount(id) {
+  if (id === currentChat) return 0;
+  const read = store.get("read_" + id) || 0;
+  return (recentMsgs[id] || []).filter(x => x && x.from !== uid && (x.ts || 0) > read).length;
 }
+function isUnread(id) { return unreadCount(id) > 0; }
 function markRead(id, ts) {
   if (typeof ts === "number" && ts > (store.get("read_" + id) || 0)) store.set("read_" + id, ts);
 }

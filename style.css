@@ -505,3 +505,14 @@ body { overflow-x: clip; }
 .archive-toggle { display: block; width: 100%; margin-top: 6px; padding: 10px; border: 1px dashed rgba(212,169,74,.35); border-radius: 14px; background: transparent; color: var(--muted); font: inherit; font-size: .88rem; cursor: pointer; }
 .chat-row.archived { opacity: .7; }
 .ended-bar .btn.link { margin-inline-start: 6px; }
+
+/* Liste des conversations façon WhatsApp : heure, aperçu, pastille de non-lus */
+.chat-row .top, .chat-row .bottom { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.chat-row .top .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-row .title small { font-weight: 400; font-size: .75rem; color: var(--muted); }
+.chat-row .time { flex: none; font-size: .75rem; color: var(--muted); }
+.chat-row .bottom .state { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-row .state.preview { color: var(--muted); }
+.chat-row.has-unread .title { color: #fff; }
+.chat-row.has-unread .time, .chat-row .state.preview.unread { color: var(--gold-2); font-weight: 700; }
+.ubadge { flex: none; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--gold-2); color: var(--night); font-weight: 800; font-size: .78rem; display: grid; place-items: center; }
