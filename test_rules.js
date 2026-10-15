@@ -189,7 +189,7 @@ async function denied(name, fn) {
   /* ---------- Petit mot joint à une demande ---------- */
   await env.withSecurityRulesDisabled(async ctx => { const d0 = ctx.database(); await set(ref(d0, "profiles/eve"), { no: 6, gender: "f", age: 31, city: "x", religion: "dati", intent: "serious", words: ["א", "ב", "ג"], shabbat: "x", createdAt: 1 }); await set(ref(d0, "counters/profileNo"), 6); });
   const E2 = E;
-  await denied ("demande : petit mot trop long (> 200)",    () => update(ref(E2), { "inbox/bob/eve": { fromNo: 6, status: "pending", createdAt: 1, note: "x".repeat(201) }, "outbox/eve/bob": { toNo: 2, status: "pending", createdAt: 1, note: "x".repeat(201) } }));
+  await denied ("demande : petit mot trop long (> 100)",     () => update(ref(E2), { "inbox/bob/eve": { fromNo: 6, status: "pending", createdAt: 1, note: "x".repeat(101) }, "outbox/eve/bob": { toNo: 2, status: "pending", createdAt: 1, note: "x".repeat(101) } }));
   await denied ("demande : petit mot vide",                 () => update(ref(E2), { "inbox/bob/eve": { fromNo: 6, status: "pending", createdAt: 1, note: "" }, "outbox/eve/bob": { toNo: 2, status: "pending", createdAt: 1 } }));
   await allowed("demande avec un petit mot",                () => update(ref(E2), { "inbox/bob/eve": { fromNo: 6, status: "pending", createdAt: 1, note: "השבת שלך נשמעת כמו שלי 😊" }, "outbox/eve/bob": { toNo: 2, status: "pending", createdAt: 1, note: "השבת שלך נשמעת כמו שלי 😊" } }));
   await allowed("le destinataire lit le petit mot",         () => get(ref(B, "inbox/bob/eve/note")));

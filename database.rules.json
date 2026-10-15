@@ -196,7 +196,7 @@
             ".validate": "newData.isNumber()"
           },
           "note": {
-            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 200 && (!data.exists() || newData.val() === data.val())"
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 100 && (!data.exists() || newData.val() === data.val())"
           },
           "chatId": {
             ".validate": "newData.isString()"
@@ -223,7 +223,7 @@
             ".validate": "newData.isNumber()"
           },
           "note": {
-            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 200 && (!data.exists() || newData.val() === data.val())"
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 100 && (!data.exists() || newData.val() === data.val())"
           },
           "chatId": {
             ".validate": "newData.isString()"
