@@ -1,12 +1,40 @@
-# Mise en ligne automatique sur https://dereh-halev.web.app à chaque push sur main.
+# Mise en ligne automatique à chaque push sur main :
+#   1) règles de la base (database.rules.json) — testées sur l'émulateur AVANT d'être publiées
+#   2) site sur https://dereh-halev.web.app — seulement si les règles sont passées
 # Secret requis : FIREBASE_SERVICE_ACCOUNT (clé JSON d'un compte de service du projet dereh-halev).
+# Ce compte de service doit avoir le rôle « Firebase Realtime Database Admin » pour publier les règles.
 name: Déploiement Firebase Hosting
 on:
   push:
     branches: [main]
   workflow_dispatch:
 jobs:
+  rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      # Garde-fou : des règles qui cassent un test ne sont jamais publiées
+      - run: npm test
+      - run: npm run test:rules
+      - name: Publier les règles de la base
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json" npx firebase deploy --only database --project dereh-halev --non-interactive
+          rm -f "$RUNNER_TEMP/sa.json"
+
   deploy:
+    needs: rules
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
