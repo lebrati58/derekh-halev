@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261016d">
+<link rel="stylesheet" href="style.css?v=20261016g">
 </head>
 <body>
 
@@ -27,10 +27,19 @@ if (location.hostname === "lebrati58.github.io") {
 <header class="app-header">
   <h1><img class="logo" src="logo-heart.png" alt=""> <span class="tt" data-i18n="h001">דרך הלב</span></h1>
   <p class="tagline" data-i18n="h002">מתאהבים בשיחה — לפני שרואים את הפנים</p>
-  <div class="lang-switch" id="lang-switch">
-    <button type="button" data-lang="he" aria-label="עברית">🇮🇱</button>
-    <button type="button" data-lang="en" aria-label="English">🇬🇧</button>
-    <button type="button" data-lang="fr" aria-label="Français">🇫🇷</button>
+  <div class="hdr-top">
+    <div class="lang-switch" id="lang-switch">
+      <button type="button" data-lang="he" aria-label="עברית">🇮🇱</button>
+      <button type="button" data-lang="en" aria-label="English">🇬🇧</button>
+      <button type="button" data-lang="fr" aria-label="Français">🇫🇷</button>
+    </div>
+    <form class="no-search" id="no-search" role="search" autocomplete="off">
+      <span class="ns-field">
+        <input type="text" id="no-search-input" inputmode="numeric" enterkeyhint="search" maxlength="7" placeholder="🔍 מס׳ פרופיל" data-i18n-ph="h114" aria-label="חיפוש לפי מספר פרופיל" data-i18n-aria="h111">
+        <button type="button" class="no-search-clear hidden" id="no-search-clear" aria-label="ניקוי" data-i18n-aria="h112">✕</button>
+      </span>
+      <button type="submit" class="ns-go" aria-label="חיפוש" data-i18n-aria="h113">❣️</button>
+    </form>
   </div>
 </header>
 
@@ -262,13 +271,6 @@ if (location.hostname === "lebrati58.github.io") {
 
     <div class="tabpane active" id="pane-proposals">
       <p class="sub" data-i18n="h072">התאמות שנבחרו בשבילך. שולחים בקשה — ואם הצד השני מסכים, נפתחת שיחה אנונימית.</p>
-      <form class="no-search" id="no-search" role="search" autocomplete="off">
-        <span class="ns-field">
-          <input type="text" id="no-search-input" inputmode="numeric" enterkeyhint="search" maxlength="7" placeholder="🔍 מס׳ פרופיל" data-i18n-ph="h114" aria-label="חיפוש לפי מספר פרופיל" data-i18n-aria="h111">
-          <button type="button" class="no-search-clear hidden" id="no-search-clear" aria-label="ניקוי" data-i18n-aria="h112">✕</button>
-        </span>
-        <button type="submit" class="btn gold small" data-i18n="h113">חיפוש</button>
-      </form>
       <div id="search-result"></div>
       <div class="list" id="proposals"></div>
     </div>
@@ -348,9 +350,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261016d"></script>
-<script src="commun.js?v=20261016d"></script>
-<script src="matching.js?v=20261016d"></script>
+<script src="i18n.js?v=20261016g"></script>
+<script src="commun.js?v=20261016g"></script>
+<script src="matching.js?v=20261016g"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -378,7 +380,7 @@ const pressedCache = {};// chatId -> bool (moi j'ai appuyé)
 let currentChat = null;
 let msgRef = null;
 
-const show = id => { $$(".screen").forEach(s => s.classList.toggle("active", s.id === id)); window.scrollTo(0, 0); };
+const show = id => { $$(".screen").forEach(s => s.classList.toggle("active", s.id === id)); document.body.classList.toggle("on-home", id === "screen-home"); window.scrollTo(0, 0); };
 const partnerOf = m => (m.from === uid ? m.to : m.from);
 const partnerNo = m => (m.from === uid ? m.toNo : m.fromNo);
 const myNo = m => (m.from === uid ? m.fromNo : m.toNo);
@@ -817,7 +819,7 @@ function runSearch(no) {
   selectTab("proposals");
   searchNo = no; $("#no-search-input").value = no == null ? "" : String(no);
   renderSearch();
-  if (no != null) { track(findByNo(no).state === "ok" ? "search_found" : "search_notfound"); $("#no-search").scrollIntoView({ block: "start", behavior: "smooth" }); }
+  if (no != null) { track(findByNo(no).state === "ok" ? "search_found" : "search_notfound"); $("#search-result").scrollIntoView({ block: "start", behavior: "smooth" }); }
 }
 $("#no-search").addEventListener("submit", e => {
   e.preventDefault();

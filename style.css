@@ -556,3 +556,17 @@ body { overflow-x: clip; }
 /* Barre de recherche compacte : un numéro = quelques chiffres */
 .no-search .ns-field { flex: 0 0 auto; width: 10.5em; }
 .no-search input { font-size: .95rem; padding-block: 9px; }
+/* En-tête : sous le slogan, drapeaux à droite et recherche par numéro à gauche (accueil seulement) */
+.hdr-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+html[dir="ltr"] .hdr-top { flex-direction: row-reverse; }
+.hdr-top .lang-switch { margin: 0; gap: 4px; flex: none; }
+.hdr-top .lang-switch button { font-size: .9rem; padding: 1px 7px; }
+.hdr-top .no-search { margin: 0; gap: 4px; flex: none; }
+.hdr-top .no-search .ns-field { width: 8.4em; }
+.hdr-top .no-search input { font-size: .82rem; padding: 6px 9px; padding-inline-end: 24px; }
+.hdr-top .no-search-clear { width: 18px; height: 18px; font-size: .6rem; inset-inline-end: 4px; }
+.ns-go { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(243,216,138,.6); background: linear-gradient(180deg, var(--gold-2), var(--gold)); font-size: 1rem; line-height: 1; padding: 0; cursor: pointer; box-shadow: 0 3px 10px rgba(212,169,74,.35); }
+.ns-go:active { transform: scale(.94); }
+body:not(.on-home) .hdr-top .no-search { display: none; }
+body:not(.on-home) .hdr-top { justify-content: center; }
+#search-result { scroll-margin-top: 84px; }
