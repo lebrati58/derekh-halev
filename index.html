@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261016b">
+<link rel="stylesheet" href="style.css?v=20261016c">
 </head>
 <body>
 
@@ -78,6 +78,7 @@ if (location.hostname === "lebrati58.github.io") {
       <h2 style="margin-top:0" id="reg-title" data-i18n="h009">הכרטיס המסתורי שלך ✨</h2>
       <p class="sub" data-i18n="h010">כאן אף אחד לא רואה פנים, שם או טלפון. רק מילים ושיחה — כאילו כל יום ט״ו באב ✨</p>
       <p class="sub hidden" id="old-identity"></p>
+      <p class="pending-profile hidden" id="pending-profile"></p>
       <div class="iab-banner hidden" id="iab-banner">
         <b data-i18n="h011">🌐 טיפ קטן לפני שמתחילים:</b>
         <span data-i18n="h097">נראה שנכנסתם מהדפדפן הפנימי של וואטסאפ. הוא לפעמים «שוכח» אתכם — ואז הפרופיל נעלם.</span>
@@ -261,6 +262,14 @@ if (location.hostname === "lebrati58.github.io") {
 
     <div class="tabpane active" id="pane-proposals">
       <p class="sub" data-i18n="h072">התאמות שנבחרו בשבילך. שולחים בקשה — ואם הצד השני מסכים, נפתחת שיחה אנונימית.</p>
+      <form class="no-search" id="no-search" role="search" autocomplete="off">
+        <span class="ns-field">
+          <input type="text" id="no-search-input" inputmode="numeric" enterkeyhint="search" maxlength="8" placeholder="🔍 חיפוש לפי מספר פרופיל" data-i18n-ph="h111" aria-label="חיפוש לפי מספר פרופיל" data-i18n-aria="h111">
+          <button type="button" class="no-search-clear hidden" id="no-search-clear" aria-label="ניקוי" data-i18n-aria="h112">✕</button>
+        </span>
+        <button type="submit" class="btn gold small" data-i18n="h113">חיפוש</button>
+      </form>
+      <div id="search-result"></div>
       <div class="list" id="proposals"></div>
     </div>
     <div class="tabpane" id="pane-requests">
@@ -339,9 +348,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261016b"></script>
-<script src="commun.js?v=20261016b"></script>
-<script src="matching.js?v=20261016b"></script>
+<script src="i18n.js?v=20261016c"></script>
+<script src="commun.js?v=20261016c"></script>
+<script src="matching.js?v=20261016c"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -416,6 +425,16 @@ async function trackVisit() {
   });
 }
 
+/* ----- Lien direct vers un profil : https://dereh-halev.web.app/?p=125 -----
+   Le numéro est public ; il n'ouvre RIEN de plus que ce qu'un membre voit déjà
+   (règles : seuls les inscrits non bannis lisent les profils). Retenu jusqu'à l'inscription si besoin. */
+(function readProfileLink() {
+  const n = parseProfileNo(new URLSearchParams(location.search).get("p"));
+  if (n != null) store.set("pending_profile", n);
+  if (new URLSearchParams(location.search).has("p")) history.replaceState(null, "", location.pathname + location.hash);
+})();
+const profileLink = no => `${location.origin}/?p=${no}`;
+
 (async function boot() {
   applyI18n(); markLang();
   await chooseLangIfNeeded();
@@ -442,6 +461,8 @@ async function trackVisit() {
         el.classList.remove("hidden");
       }
       setupIabBanner();
+      const pend = store.get("pending_profile");
+      if (pend) { const el = $("#pending-profile"); el.textContent = t("link_need_reg", { name: profileName(pend) }); el.classList.remove("hidden"); }
       show("screen-register");
     }
   } catch (e) {
@@ -634,16 +655,17 @@ $("#reg-form").addEventListener("submit", async e => {
 
 /* =================== Accueil =================== */
 function startHome() {
-  $("#my-card").innerHTML = cardHTML(me);
+  $("#my-card").innerHTML = cardHTML(me, { tools: true });
   show("screen-home");
   updatePausedUI(); updateLangsBanner();
 
   db.ref("profiles").on("value", s => {
     profiles = s.val() || {};
-    if (profiles[uid]) { me = profiles[uid]; $("#my-card").innerHTML = cardHTML(me); updatePausedUI(); updateLangsBanner(); }
+    if (profiles[uid]) { me = profiles[uid]; $("#my-card").innerHTML = cardHTML(me, { tools: true }); updatePausedUI(); updateLangsBanner(); }
     else if (me) { location.reload(); return; }   // profil supprimé (par l'admin) → écran d'inscription
-    renderProposals(); renderRequests(); renderChats();
-  });
+    renderProposals(); renderRequests(); renderChats(); renderSearch();
+    openPendingProfile();                          // lien partagé (?p=125) reçu avant l'inscription
+  }, () => { if (me) location.reload(); });       // lecture refusée (profil supprimé / banni) → on recharge
   db.ref("blocks/" + uid).on("value", s => { blocks = s.val() || {}; renderProposals(); renderRequests(); }, () => {});
   db.ref("hidden/" + uid).on("value", s => { hidden = s.val() || {}; renderProposals(); updateUnhideLink(); }, () => {});
   db.ref("archived/" + uid).on("value", s => { archived = s.val() || {}; renderChats(); if (currentChat && currentChat !== WELCOME) updateChatView(); }, () => {});
@@ -751,6 +773,126 @@ async function blockUser(target) {
   } catch (e) { console.error(e); toast(t("block_fail")); return false; }
 }
 
+/* ----- 🔍 Recherche exacte par numéro de profil -----
+   Mêmes règles de visibilité que les listes : pas soi-même, pas banni, pas en pause, pas bloqué,
+   genre opposé et pas de désaccord sur les enfants (isSoftCompatible de matching.js).
+   Recherche dans les profils déjà chargés : aucune requête en plus, résultat instantané. */
+let searchNo = null;
+function findByNo(no) {
+  const hit = Object.entries(profiles).find(([, p]) => p && Number(p.no) === no);
+  if (!hit) return { state: "none" };
+  const [u, p] = hit;
+  if (u === uid) return { state: "self", u, p };
+  if (banned[u] || blocks[u] || !isSoftCompatible(me, p)) return { state: "none" };
+  if (hidden[u]) return { state: "hidden", u, p };
+  return { state: "ok", u, p };
+}
+function profileActions(u) {
+  const chatId = Object.keys(myChats).find(id => partnerOf(myChats[id]) === u);
+  if (chatId) return `<button class="btn gold" data-open-chat="${esc(chatId)}">${esc(t("open_chat"))}</button>`;
+  if (inbox[u] && inbox[u].status === "pending") return `<button class="btn gold" data-accept-s="${esc(u)}">${esc(t("accept"))}</button>`;
+  if (outbox[u] && outbox[u].status === "pending") return `<button class="btn ghost" disabled>${esc(t("req_waiting"))}</button>`;
+  return `<button class="btn gold" data-send="${esc(u)}">${esc(t("req_send"))}</button>
+          <button class="btn ghost hide-btn" data-hide="${esc(u)}">${esc(t("hide_btn"))}</button>`;
+}
+function profileBlock(u, p) {
+  const strict = isCompatible(me, p);
+  const why = strict ? matchReasons(me, p, 3, LANG) : softReasons(me, p, LANG);
+  return `${!strict ? `<div class="match-pct soft">${esc(t("soft_banner"))}</div>` : ""}
+    ${cardHTML(p, { pct: matchPercent(me, p), tools: true })}
+    ${why.length ? `<div class="match-why"><b>${esc(t("why_title"))}</b> ${why.map(w => `<span>${esc(w)}</span>`).join("")}</div>` : ""}
+    <div class="item-actions">${profileActions(u)}</div>`;
+}
+function renderSearch() {
+  const box = $("#search-result");
+  if (!box) return;
+  $("#no-search-clear").classList.toggle("hidden", searchNo == null && !$("#no-search-input").value);
+  $("#proposals").classList.toggle("hidden", searchNo != null);
+  if (searchNo == null) { box.innerHTML = ""; return; }
+  const r = findByNo(searchNo);
+  box.innerHTML = r.state === "ok" ? profileBlock(r.u, r.p)
+    : `<div class="empty search-empty"><span class="big">🔍</span>${esc(t(r.state === "self" ? "search_self" : r.state === "hidden" ? "search_hidden" : "search_notfound", { name: profileName(searchNo) }))}</div>`;
+}
+function runSearch(no) {
+  selectTab("proposals");
+  searchNo = no; $("#no-search-input").value = no == null ? "" : String(no);
+  renderSearch();
+  if (no != null) { track(findByNo(no).state === "ok" ? "search_found" : "search_notfound"); $("#no-search").scrollIntoView({ block: "start", behavior: "smooth" }); }
+}
+$("#no-search").addEventListener("submit", e => {
+  e.preventDefault();
+  const raw = $("#no-search-input").value;
+  if (!raw.trim()) return runSearch(null);
+  const no = parseProfileNo(raw);
+  if (no == null) { searchNo = -1; renderSearch(); $("#search-result").innerHTML = `<div class="empty search-empty"><span class="big">🔍</span>${esc(t("search_digits"))}</div>`; return; }
+  $("#no-search-input").blur();
+  runSearch(no);
+});
+$("#no-search-input").addEventListener("input", () => {
+  const i = $("#no-search-input"), v = i.value.replace(/[^\d#]/g, "");
+  if (v !== i.value) i.value = v;
+  if (!v && searchNo != null) runSearch(null); else renderSearch();
+});
+$("#no-search-clear").addEventListener("click", () => { runSearch(null); $("#no-search-input").focus(); });
+$("#search-result").addEventListener("click", async e => {
+  const s1 = e.target.closest("[data-send]"), h = e.target.closest("[data-hide]"), oc = e.target.closest("[data-open-chat]"), ac = e.target.closest("[data-accept-s]");
+  if (s1) { s1.disabled = true; await sendRequest(s1.dataset.send); renderSearch(); }
+  if (h) { h.disabled = true; try { await db.ref(`hidden/${uid}/${h.dataset.hide}`).set(true); toast(t("hidden_toast")); track("hide"); } catch (err) { toast(t("send_fail")); } renderSearch(); }
+  if (oc) { selectTab("chats"); openChat(oc.dataset.openChat); }
+  if (ac) { ac.disabled = true; await acceptRequest(ac.dataset.acceptS); }
+});
+/* Lien reçu : ouvre la fiche une fois les profils chargés (après inscription si besoin) */
+function openPendingProfile() {
+  const no = store.get("pending_profile");
+  if (no == null || !me || Object.keys(profiles).length < 2) return;
+  store.set("pending_profile", null);
+  $("#pending-profile").classList.add("hidden");
+  track("link_open");
+  runSearch(Number(no));
+}
+
+/* ----- ⧉ Copier le numéro · 🔗 Partager le profil (sur toutes les cartes) ----- */
+document.addEventListener("click", async e => {
+  const c = e.target.closest("[data-copy-no]");
+  if (c) {
+    e.preventDefault(); e.stopPropagation();
+    const ok = await copyText(c.dataset.copyNo);
+    toast(ok ? t("no_copied") : t("copy_fail", { text: c.dataset.copyNo }), ok ? 2200 : 5000);
+    if (ok) track("copy_no");
+    return;
+  }
+  const sh = e.target.closest("[data-share-no]");
+  if (sh) { e.preventDefault(); e.stopPropagation(); shareProfile(Number(sh.dataset.shareNo)); return; }
+  const act = e.target.closest("[data-share-act]");
+  if (act) {
+    const no = Number(act.dataset.no), url = profileLink(no), text = t("share_text", { no, url });
+    if (act.dataset.shareAct === "copy") {
+      const ok = await copyText(url);
+      toast(ok ? t("link_copied") : t("copy_fail", { text: url }), ok ? 2200 : 6000);
+      if (ok) track("share_link");
+    } else if (act.dataset.shareAct === "wa") {
+      track("share_wa");   // le lien <a> ouvre WhatsApp lui-même
+    } else if (act.dataset.shareAct === "native") {
+      try { await navigator.share({ title: "דרך הלב", text: t("share_text_short", { no }), url }); track("share_native"); }
+      catch (err) { /* partage annulé par l'utilisateur : rien à signaler */ }
+    }
+  }
+});
+function shareProfile(no) {
+  const url = profileLink(no), wa = "https://wa.me/?text=" + encodeURIComponent(t("share_text", { no, url }));
+  showModal({
+    title: `🔗 ${t("share_btn")} · ${profileName(no)}`,
+    body: `<span class="share-box">
+        <span class="share-url" dir="ltr">${esc(url)}</span>
+        <button type="button" class="btn ghost block" data-share-act="copy" data-no="${esc(no)}">🔗 ${esc(t("share_copy_link"))}</button>
+        <a class="btn gold block" data-share-act="wa" data-no="${esc(no)}" href="${esc(wa)}" target="_blank" rel="noopener">💬 ${esc(t("share_whatsapp"))}</a>
+        ${navigator.share ? `<button type="button" class="btn ghost block" data-share-act="native" data-no="${esc(no)}">📤 ${esc(t("share_native"))}</button>` : ""}
+        <span class="share-note">${esc(t("share_privacy"))}</span>
+      </span>`,
+    okText: t("close"), cancelText: ""
+  });
+}
+
 /* ----- Propositions (matching) ----- */
 function computeProposals() {
   if (!me) return [];
@@ -780,6 +922,7 @@ function computeProposals() {
 }
 
 function renderProposals() {
+  renderSearch();
   const box = $("#proposals");
   if (!box || !me) return;
   const list = computeProposals();
@@ -797,7 +940,7 @@ function renderProposals() {
         ? `<div class="match-pct soft">${esc(t("soft_banner"))}
             ${softWhy.length ? `<div class="soft-why">${softWhy.map(w => `<span>${esc(w)}</span>`).join("")}</div>` : ""}</div>`
         : ""}
-      ${cardHTML(c.p, { pct })}
+      ${cardHTML(c.p, { pct, tools: true })}
       ${why.length ? `<div class="match-why"><b>${esc(t("why_title"))}</b> ${why.map(w => `<span>${esc(w)}</span>`).join("")}</div>` : ""}
       <div class="item-actions">
         ${c.pending
@@ -867,7 +1010,7 @@ function renderRequests() {
   box.innerHTML = pending.map(([u, r]) => `
     <div>
       ${r.note ? `<div class="req-note"><b>${esc(t("req_note_label"))}</b> ${esc(r.note)}</div>` : ""}
-      ${cardHTML(profiles[u])}
+      ${cardHTML(profiles[u], { tools: true })}
       <div class="item-actions">
         <button class="btn gold" data-accept="${esc(u)}">${esc(t("accept"))}</button>
         <button class="btn ghost" data-decline="${esc(u)}">${esc(t("decline"))}</button>
@@ -1252,7 +1395,7 @@ function showPartnerCard(chatId) {
   const why = me ? matchReasons(me, p, 3, LANG) : [];
   track("card_view");
   showModal({
-    body: cardHTML(p, me ? { pct: matchPercent(me, p) } : {}) +
+    body: cardHTML(p, me ? { pct: matchPercent(me, p), tools: true } : { tools: true }) +
       (why.length ? `<div class="match-why"><b>${esc(t("why_title"))}</b> ${why.map(w => `<span>${esc(w)}</span>`).join("")}</div>` : ""),
     okText: t("close"), cancelText: ""
   });
