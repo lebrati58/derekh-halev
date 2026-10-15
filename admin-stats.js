@@ -315,7 +315,7 @@ const StatsUI = (() => {
     csvData.features = { head: ["event", "count"], rows: u.features.concat(u.tabs, u.regErrors, u.techErrors) };
     const evLabel = { req_sent: "💌 בקשה (לפי ההעדפות)", req_sent_soft: "💌 בקשה (מחוץ להעדפות)", req_accepted: "✅ קבלת בקשה", req_declined: "❌ דחיית בקשה", msg_sent: "💬 הודעה נשלחה",
       reveal_press: "💗 לחיצה על פתיחת מסך", wa_click: "📱 כפתור WhatsApp", hide: "🙈 לא בשבילי", unhide: "👁️ החזרת מוסתרים", archive: "🗄️ העברה לארכיון", unarchive: "📤 הוצאה מהארכיון", block: "🚫 חסימה", report: "🚩 דיווח",
-      pause_on: "⏸️ השהיה", pause_off: "▶️ חזרה מהשהיה", card_view: "👤 צפייה בכרטיס", coc_open: "📜 קוד התנהגות", welcome_open: "💗 הודעת ברוכים הבאים",
+      pause_on: "⏸️ השהיה", pause_off: "▶️ חזרה מהשהיה", card_view: "👤 צפייה בכרטיס", coc_open: "📜 קוד התנהגות", welcome_open: "💗 הודעת ברוכים הבאים", agetip_open: "💌 הודעת צוות: הרחבת גילאים (נקראה)", agetip_edit: "✏️ לחצו להרחבת גילאים",
       lang_change: "🌐 החלפת שפה", profile_edit: "✏️ עריכת פרופיל", profile_delete: "🗑️ מחיקת פרופיל", reg_start: "📝 התחלת הרשמה", reg_done: "🎉 סיום הרשמה",
       tab_proposals: "✨ הצעות", tab_requests: "💌 בקשות", tab_chats: "💬 שיחות", err_reg: "הרשמה", err_msg: "שליחת הודעה", err_request: "שליחת בקשה", err_accept: "קבלת בקשה" };
     const regField = { name: "שם", phone: "טלפון", gender: "מגדר", age: "גיל", city: "עיר", words: "3 מילים", shabbat: "שבת אידיאלית", religion: "אורח חיים", intent: "כוונה",

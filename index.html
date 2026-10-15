@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261015c">
+<link rel="stylesheet" href="style.css?v=20261015d">
 </head>
 <body>
 
@@ -339,9 +339,9 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261015c"></script>
-<script src="commun.js?v=20261015c"></script>
-<script src="matching.js?v=20261015c"></script>
+<script src="i18n.js?v=20261015d"></script>
+<script src="commun.js?v=20261015d"></script>
+<script src="matching.js?v=20261015d"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -924,7 +924,13 @@ async function onChatMeta(id, meta) {
 /* Conversation de bienvenue officielle (« צוות דרך הלב ») : locale, jamais dans la base.
    Ce n'est PAS un faux profil : elle est clairement signée par l'équipe et on ne peut pas y répondre. */
 const WELCOME = "welcome";
-const welcomeUnread = () => !store.get("welcome_read") && currentChat !== WELCOME;
+/* Message ciblé de l'équipe : aucun profil compatible avec MES préférences (âge…) dans toute la base
+   → on rassure (c'est le début) et on propose d'élargir la fourchette d'âge. Disparaît dès qu'il y a des matchs. */
+function needsAgeTip() {
+  if (!me || Object.keys(profiles).length < 2) return false;
+  return !Object.entries(profiles).some(([u, p]) => u !== uid && !banned[u] && !blocks[u] && isCompatible(me, p));
+}
+const welcomeUnread = () => currentChat !== WELCOME && (!store.get("welcome_read") || (needsAgeTip() && !store.get("agetip_read")));
 function welcomeRow() {
   return `<div class="chat-row welcome-row" data-chat="${WELCOME}">
       <div class="avatar welcome-avatar">${HEART}</div>
@@ -933,11 +939,20 @@ function welcomeRow() {
       <div>${t("fwd_arrow")}</div>
     </div>`;
 }
+$("#messages").addEventListener("click", async e => {
+  if (!e.target.closest("#agetip-edit")) return;
+  track("agetip_edit");
+  closeChat();
+  $("#edit-me").click();
+  setTimeout(() => { const f = $("#f-agemin"); if (f) { f.scrollIntoView({ block: "center", behavior: "smooth" }); f.focus(); } }, 400);
+});
 function openWelcome() {
   track("welcome_open");
   closeChat();
   currentChat = WELCOME;
   store.set("welcome_read", 1);
+  const tip = needsAgeTip();
+  if (tip) { store.set("agetip_read", 1); track("agetip_open"); }
   $("#chat-view").classList.add("welcome");
   $("#chat-title").textContent = t("welcome_title");
   $("#curtain-bar").innerHTML = "";
@@ -945,7 +960,11 @@ function openWelcome() {
   $("#composer").classList.add("hidden");
   const eb = $("#ended-bar"); eb.textContent = t("welcome_note"); eb.classList.remove("hidden");
   $("#messages").innerHTML = ["welcome_m1", "welcome_m2", "welcome_m3", "welcome_m4", "welcome_m5", "welcome_m6", "welcome_m7"]
-    .map(k => `<div class="msg theirs">${esc(t(k))}</div>`).join("");
+    .map(k => `<div class="msg theirs">${esc(t(k))}</div>`).join("") +
+    (tip ? `<div class="welcome-sep">${esc(t("agetip_sep"))}</div>` +
+      ["agetip_m1", "agetip_m2", "agetip_m3"].map(k => `<div class="msg theirs">${esc(t(k))}</div>`).join("") +
+      `<div class="msg theirs"><button class="btn gold small" id="agetip-edit">${esc(t("agetip_btn"))}</button></div>` : "");
+  if (tip) { const box = $("#messages"); setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50); }
   $("#chat-view").classList.remove("hidden");
   document.body.style.overflow = "hidden";
   fitChatToViewport();
