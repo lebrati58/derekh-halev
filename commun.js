@@ -235,7 +235,7 @@ function toast(msg, ms = 2800) {
 }
 
 /* ---------- Modale (remplace alert/confirm/prompt) ---------- */
-function showModal({ title = "", body = "", input = false, placeholder = "", okText = t("ok"), cancelText = t("cancel"), danger = false }) {
+function showModal({ title = "", body = "", input = false, placeholder = "", okText = t("ok"), cancelText = t("cancel"), danger = false, allowEmpty = false, maxLength = 300 }) {
   return new Promise(resolve => {
     const wrap = document.createElement("div");
     wrap.className = "modal-wrap";
@@ -243,7 +243,7 @@ function showModal({ title = "", body = "", input = false, placeholder = "", okT
       <div class="modal" role="dialog" aria-modal="true">
         ${title ? `<h3>${esc(title)}</h3>` : ""}
         ${body ? `<p>${body}</p>` : ""}
-        ${input ? `<textarea rows="3" maxlength="300" placeholder="${esc(placeholder)}"></textarea>` : ""}
+        ${input ? `<textarea rows="3" maxlength="${maxLength}" placeholder="${esc(placeholder)}"></textarea>` : ""}
         <div class="modal-actions">
           ${cancelText ? `<button class="btn ghost" data-a="cancel">${esc(cancelText)}</button>` : ""}
           <button class="btn ${danger ? "danger" : "gold"}" data-a="ok">${esc(okText)}</button>
@@ -256,7 +256,7 @@ function showModal({ title = "", body = "", input = false, placeholder = "", okT
     const close = val => { wrap.classList.remove("show"); setTimeout(() => wrap.remove(), 200); resolve(val); };
     wrap.addEventListener("click", e => {
       const a = e.target.getAttribute && e.target.getAttribute("data-a");
-      if (a === "ok") close(input ? (ta.value.trim() || null) : true);
+      if (a === "ok") close(input ? (ta.value.trim() || (allowEmpty ? "" : null)) : true);
       else if (a === "cancel" || e.target === wrap) close(null);
     });
   });

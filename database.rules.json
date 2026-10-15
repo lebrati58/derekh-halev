@@ -195,6 +195,9 @@
           "createdAt": {
             ".validate": "newData.isNumber()"
           },
+          "note": {
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 200 && (!data.exists() || newData.val() === data.val())"
+          },
           "chatId": {
             ".validate": "newData.isString()"
           },
@@ -218,6 +221,9 @@
           },
           "createdAt": {
             ".validate": "newData.isNumber()"
+          },
+          "note": {
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 200 && (!data.exists() || newData.val() === data.val())"
           },
           "chatId": {
             ".validate": "newData.isString()"
