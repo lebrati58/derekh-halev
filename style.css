@@ -623,3 +623,5 @@ body.ph-open { overflow: hidden; }
 .ph-g-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(0,0,0,.4); color: #fff; font-size: 1.6rem; cursor: pointer; }
 .ph-g-nav.prev { left: 8px; } .ph-g-nav.next { right: 8px; }
 @media (hover: none) { .ph-g-nav { display: none; } }
+.pending-profile .pp-txt { display: block; margin-bottom: 10px; }
+.pending-profile .mystery-card { margin: 0; }
