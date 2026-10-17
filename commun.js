@@ -212,7 +212,7 @@ function cardHTML(p, opts = {}) {
       <span class="mc-left"><span class="mc-mask">${HEART}</span>${opts.pct != null ? `<span class="mc-pct" title="${esc(t("match_pct", { pct: opts.pct }))}" aria-label="${esc(t("match_pct", { pct: opts.pct }))}">${esc(opts.pct)}%</span>` : ""}</span>
       <span class="mc-ids">
         ${p.gender === "m" || p.gender === "f" ? `<span class="mc-gender ${p.gender}">${p.gender === "f" ? "👩" : "👨"} ${esc(LABELS.gender[p.gender])}</span>` : ""}
-        <span class="mc-no">${esc(profileName(p.no))}</span>${opts.tools ? `<button type="button" class="mc-copy" data-copy-no="${esc(p.no)}" aria-label="${esc(t("copy_no_aria", { no: p.no }))}" title="${esc(t("copy_no_aria", { no: p.no }))}">⧉</button>` : ""}
+        ${opts.tools ? `<span class="mc-nochip"><span class="mc-no">${esc(profileName(p.no))}</span><button type="button" class="mc-copy" data-copy-no="${esc(p.no)}" aria-label="${esc(t("copy_no_aria", { no: p.no }))}" title="${esc(t("copy_no_aria", { no: p.no }))}">⧉</button></span>` : `<span class="mc-no">${esc(profileName(p.no))}</span>`}
       </span>
     </div>
     <div class="mc-words">${words}</div>
