@@ -68,7 +68,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `counters/profileNo` | tout inscrit | tout inscrit non banni, +1 strict, non supprimable |
 | `profiles` | liste entière : **membres inscrits non bannis** + admin ; **une seule fiche** (`profiles/{uid}`) : tout connecté, sauf profil banni ou en pause — un visiteur ne connaît un uid que via un lien secret `/?c=CODE` (`showPendingCard`) | admin : **suppression seule** ; soi, si non banni ; `no` immuable, ≤ compteur, et réservé à soi dans `profileNos` à la création ; champs inconnus refusés |
 | `profileNos/{no}` | personne (un numéro se devine) | soi, une seule fois (réécriture identique tolérée), si son profil a ce `no` ; non supprimable |
-| `shareLinks/{code}` | tout connecté, **une entrée à la fois** (code aléatoire 10 car. → uid) ; jamais la liste | soi : créer un code qui pointe vers soi (inscrit, non banni, code libre) ; supprimer le sien ; admin : suppression |
+| `shareLinks/{code}` | tout connecté, **une entrée à la fois** (code aléatoire 10 car. → uid) ; jamais la liste | tout membre inscrit non banni : créer un code libre vers un profil existant non banni (le sien, ou celui qu'il partage si le propriétaire n'a pas encore de code — `ensureCodeFor()`, mémorisé dans `share_codes`) ; jamais réécrire ; supprimer : la personne visée ou l'admin |
 | `private/{uid}` | soi (jamais l'admin) | soi ; admin : **suppression seule** |
 | `blocks/{uid}` | soi | soi |
 | `hidden/{uid}` | soi | soi (valeurs `true` uniquement ; suppression de toute la liste permise) |

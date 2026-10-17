@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261017b">
+<link rel="stylesheet" href="style.css?v=20261017c">
 </head>
 <body>
 
@@ -360,10 +360,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261017b"></script>
-<script src="commun.js?v=20261017b"></script>
-<script src="matching.js?v=20261017b"></script>
-<script src="photos.js?v=20261017b"></script>
+<script src="i18n.js?v=20261017c"></script>
+<script src="commun.js?v=20261017c"></script>
+<script src="matching.js?v=20261017c"></script>
+<script src="photos.js?v=20261017c"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -450,15 +450,31 @@ const SHARE_CODE_RE = /^[A-Za-z0-9]{10}$/;
   if (c && SHARE_CODE_RE.test(c)) store.set("pending_code", c);
   if (q.has("p") || q.has("c")) history.replaceState(null, "", location.pathname + location.hash);
 })();
+const mintedCodes = store.get("share_codes") || {};   // no -> code créé par MOI pour un profil qui n'a pas encore le sien
+const profileByNo = no => Number(no) === Number(me && me.no) ? me : Object.values(profiles).find(x => Number(x.no) === Number(no));
 function profileLink(no) {
-  const p = Number(no) === Number(me && me.no) ? me : Object.values(profiles).find(x => Number(x.no) === Number(no));
-  return p && p.link ? `${location.origin}/?c=${p.link}` : `${location.origin}/?p=${no}`;
+  const p = profileByNo(no), code = (p && p.link) || mintedCodes[no];
+  return code ? `${location.origin}/?c=${code}` : `${location.origin}/?p=${no}`;
+}
+function randomCode() {
+  const A = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", r = crypto.getRandomValues(new Uint8Array(10));
+  return Array.from(r, b => A[b % 62]).join("");
+}
+/* Avant de partager un profil qui n'a pas encore de code (son propriétaire n'est pas revenu depuis la mise à jour),
+   on lui en crée un : le lien partagé est TOUJOURS secret, jamais le numéro */
+async function ensureCodeFor(no) {
+  const p = profileByNo(no);
+  if (!p || p.link || mintedCodes[no]) return;
+  const target = Number(no) === Number(me && me.no) ? uid : Object.keys(profiles).find(k => Number(profiles[k].no) === Number(no));
+  if (!target) return;
+  const code = randomCode();
+  await db.ref("shareLinks/" + code).set(target);
+  mintedCodes[no] = code; store.set("share_codes", mintedCodes);
 }
 /* Mon code de partage : créé une fois (code aléatoire réservé dans shareLinks, puis recopié dans mon profil) */
 async function ensureShareLink() {
   if (!me || me.link) return;
-  const A = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", r = crypto.getRandomValues(new Uint8Array(10));
-  const code = Array.from(r, b => A[b % 62]).join("");
+  const code = randomCode();
   try { await db.ref().update({ ["shareLinks/" + code]: uid, [`profiles/${uid}/link`]: code }); me.link = code; }
   catch (e) { /* collision ou règles pas encore publiées : on réessaiera au prochain chargement */ }
 }
@@ -882,7 +898,7 @@ async function showPendingCard(code) {
     const u = (await db.ref("shareLinks/" + code).once("value")).val();
     if (!u) return;
     const p = (await db.ref("profiles/" + u).once("value")).val();
-    if (!p || p.link !== code || store.get("pending_code") !== code) return;
+    if (!p || store.get("pending_code") !== code) return;
     store.set("pending_profile", p.no);              // pour ouvrir la fiche juste après l'inscription
     const el = $("#pending-profile");
     el.innerHTML = `<span class="pp-txt">${esc(t("link_preview", { name: profileName(p.no) }))}</span>${cardHTML(p)}`;
@@ -891,9 +907,14 @@ async function showPendingCard(code) {
   } catch (e) { /* lecture refusée (pause, banni…) */ }
 }
 
-function openPendingProfile() {
+async function openPendingProfile() {
   if (!me || Object.keys(profiles).length < 2) return;
-  const code = store.get("pending_code"), byCode = code && Object.values(profiles).find(p => p.link === code);
+  const code = store.get("pending_code");
+  let byCode = code && Object.values(profiles).find(p => p.link === code);
+  if (code && !byCode) {   // code créé par quelqu'un d'autre que le propriétaire : on le résout
+    try { const u = (await db.ref("shareLinks/" + code).once("value")).val(); byCode = u && profiles[u]; } catch (e) {}
+    if (store.get("pending_code") !== code) return;   // déjà traité pendant l'attente
+  }
   const no = byCode ? byCode.no : store.get("pending_profile");
   if (no == null) { if (code) store.set("pending_code", null); return; }
   store.set("pending_profile", null); store.set("pending_code", null);
@@ -929,7 +950,8 @@ document.addEventListener("click", async e => {
     }
   }
 });
-function shareProfile(no) {
+async function shareProfile(no) {
+  await ensureCodeFor(no).catch(() => {});      // si ça échoue (hors ligne…), repli sur l'ancien lien par numéro
   const url = profileLink(no), wa = "https://wa.me/?text=" + encodeURIComponent(t("share_text", { no, url }));
   showModal({
     title: `🔗 ${t("share_btn")} · ${profileName(no)}`,
