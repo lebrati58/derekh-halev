@@ -68,7 +68,10 @@ async function denied(name, fn) {
   await denied ("non connecté : lire profiles",            () => get(ref(ANON, "profiles")));
   await allowed("inscrit : lire le profil d'un autre",     () => get(ref(A, "profiles/bob")));
   await denied ("visiteur SANS profil : lire tous les profils (lien partagé)", () => get(ref(E, "profiles")));
-  await denied ("visiteur SANS profil : lire le profil n°2",  () => get(ref(E, "profiles/bob")));
+  await allowed("visiteur SANS profil : lire UNE fiche (lien partagé /?p=2)", () => get(ref(E, "profiles/bob")));
+  await denied ("non connecté : lire une fiche",           () => get(ref(ANON, "profiles/bob")));
+  await denied ("visiteur : lire la fiche d'un BANNI",     () => get(ref(E, "profiles/mallory")));
+  await allowed("visiteur : numéro → profil (index, une entrée)", () => get(ref(E, "profileNos/2")));
   await allowed("visiteur sans profil : lire SA propre fiche (vide)", () => get(ref(E, "profiles/eve")));
   await denied ("BANNI : lire les profils des autres",     () => get(ref(M, "profiles")));
   await allowed("BANNI : lire sa propre fiche",            () => get(ref(M, "profiles/mallory")));
@@ -99,7 +102,15 @@ async function denied(name, fn) {
   await denied ("eve réserve un 2e numéro (pas le sien)",  () => set(ref(E, "profileNos/3"), "eve"));
   await denied ("frank prend le 6 (déjà à eve)",           () => update(ref(F), { "profiles/frank": eveProfile(6), "profileNos/6": "frank" }));
   await denied ("eve supprime sa réservation",             () => remove(ref(E, "profileNos/6")));
-  await denied ("lire l'index des numéros",                () => get(ref(E, "profileNos")));
+  await denied ("lire l'index des numéros (liste entière)", () => get(ref(E, "profileNos")));
+  await denied ("non connecté : lire une entrée de l'index", () => get(ref(ANON, "profileNos/2")));
+  await env.withSecurityRulesDisabled(async ctx => { await set(ref(ctx.database(), "profiles/dave/paused"), true); });
+  const Z = env.authenticatedContext("zoe").database();   // visiteur jamais inscrit
+  await allowed("visiteur (zoe) : fiche normale (bob)",    () => get(ref(Z, "profiles/bob")));
+  await denied ("visiteur (zoe) : lire la fiche d'un profil EN PAUSE", () => get(ref(Z, "profiles/dave")));
+  await denied ("visiteur (zoe) : lire TOUS les profils",  () => get(ref(Z, "profiles")));
+  await allowed("membre : la liste complète reste lisible (matching)", () => get(ref(A, "profiles")));
+  await env.withSecurityRulesDisabled(async ctx => { await remove(ref(ctx.database(), "profiles/dave/paused")); });
 
   /* ---------- Demandes (inbox / outbox) ---------- */
   await allowed("demande alice→bob (fromNo correct)",      () => set(ref(A, "inbox/bob/alice"), { fromNo: 1, status: "pending", createdAt: 1 }));

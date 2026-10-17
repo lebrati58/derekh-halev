@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261016i">
+<link rel="stylesheet" href="style.css?v=20261017a">
 </head>
 <body>
 
@@ -87,7 +87,7 @@ if (location.hostname === "lebrati58.github.io") {
       <h2 style="margin-top:0" id="reg-title" data-i18n="h009">הכרטיס המסתורי שלך ✨</h2>
       <p class="sub" data-i18n="h010">כאן מכירים קודם את הלב: בלי פנים, שם או טלפון. רק מילים ושיחה — כאילו כל יום ט״ו באב ✨</p>
       <p class="sub hidden" id="old-identity"></p>
-      <p class="pending-profile hidden" id="pending-profile"></p>
+      <div class="pending-profile hidden" id="pending-profile"></div>
       <div class="iab-banner hidden" id="iab-banner">
         <b data-i18n="h011">🌐 טיפ קטן לפני שמתחילים:</b>
         <span data-i18n="h097">נראה שנכנסתם מהדפדפן הפנימי של וואטסאפ. הוא לפעמים «שוכח» אתכם — ואז הפרופיל נעלם.</span>
@@ -360,10 +360,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261016i"></script>
-<script src="commun.js?v=20261016i"></script>
-<script src="matching.js?v=20261016i"></script>
-<script src="photos.js?v=20261016i"></script>
+<script src="i18n.js?v=20261017a"></script>
+<script src="commun.js?v=20261017a"></script>
+<script src="matching.js?v=20261017a"></script>
+<script src="photos.js?v=20261017a"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -475,7 +475,7 @@ const profileLink = no => `${location.origin}/?p=${no}`;
       }
       setupIabBanner();
       const pend = store.get("pending_profile");
-      if (pend) { const el = $("#pending-profile"); el.textContent = t("link_need_reg", { name: profileName(pend) }); el.classList.remove("hidden"); }
+      if (pend) { const el = $("#pending-profile"); el.textContent = t("link_need_reg", { name: profileName(pend) }); el.classList.remove("hidden"); showPendingCard(pend); }
       show("screen-register");
     }
   } catch (e) {
@@ -672,6 +672,8 @@ function startHome() {
   show("screen-home");
   updatePausedUI(); updateLangsBanner();
   photosStart();
+  // anciens profils : réserver son numéro dans l'index (sinon un lien /?p=N vers ce profil ne s'ouvre pas avant inscription)
+  if (me && me.no != null && !store.get("pno_ok")) db.ref("profileNos/" + me.no).set(uid).then(() => store.set("pno_ok", 1)).catch(() => {});
 
   db.ref("profiles").on("value", s => {
     profiles = s.val() || {};
@@ -856,6 +858,20 @@ $("#search-result").addEventListener("click", async e => {
   if (ac) { ac.disabled = true; await acceptRequest(ac.dataset.acceptS); }
 });
 /* Lien reçu : ouvre la fiche une fois les profils chargés (après inscription si besoin) */
+/* Lien partagé reçu AVANT l'inscription : on montre directement la carte (une seule fiche, lue par son numéro ;
+   la base refuse la liste, les profils en pause et les bannis) */
+async function showPendingCard(no) {
+  try {
+    const u = (await db.ref("profileNos/" + no).once("value")).val();
+    if (!u) return;
+    const p = (await db.ref("profiles/" + u).once("value")).val();
+    if (!p || Number(p.no) !== Number(no) || store.get("pending_profile") == null) return;
+    const el = $("#pending-profile");
+    el.innerHTML = `<span class="pp-txt">${esc(t("link_preview", { name: profileName(no) }))}</span>${cardHTML(p)}`;
+    track("link_preview");
+  } catch (e) { /* lecture refusée (pause, banni…) : le texte simple reste */ }
+}
+
 function openPendingProfile() {
   const no = store.get("pending_profile");
   if (no == null || !me || Object.keys(profiles).length < 2) return;

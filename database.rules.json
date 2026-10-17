@@ -23,7 +23,7 @@
     "profiles": {
       ".read": "auth != null && ((root.child('profiles/' + auth.uid).exists() && !root.child('banned/' + auth.uid).exists()) || (root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))",
       "$uid": {
-        ".read": "auth != null && auth.uid === $uid",
+        ".read": "auth != null && (auth.uid === $uid || (!root.child('banned/' + $uid).exists() && data.child('paused').val() !== true))",
         ".write": "(auth != null && auth.uid === $uid && !root.child('banned/' + auth.uid).exists()) || (!newData.exists() && (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))",
         ".validate": "newData.hasChildren(['no', 'gender', 'age', 'city', 'religion', 'intent', 'words', 'shabbat'])",
         "no": {
@@ -97,6 +97,7 @@
     },
     "profileNos": {
       "$no": {
+        ".read": "auth != null",
         ".write": "auth != null && newData.exists() && (!data.exists() || data.val() === auth.uid) && !root.child('banned/' + auth.uid).exists()",
         ".validate": "newData.val() === auth.uid && newData.parent().parent().child('profiles/' + auth.uid + '/no').val() + '' === $no"
       }
