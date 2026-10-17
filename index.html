@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261017a">
+<link rel="stylesheet" href="style.css?v=20261017b">
 </head>
 <body>
 
@@ -360,10 +360,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261017a"></script>
-<script src="commun.js?v=20261017a"></script>
-<script src="matching.js?v=20261017a"></script>
-<script src="photos.js?v=20261017a"></script>
+<script src="i18n.js?v=20261017b"></script>
+<script src="commun.js?v=20261017b"></script>
+<script src="matching.js?v=20261017b"></script>
+<script src="photos.js?v=20261017b"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -438,15 +438,30 @@ async function trackVisit() {
   });
 }
 
-/* ----- Lien direct vers un profil : https://dereh-halev.web.app/?p=125 -----
-   Le numéro est public ; il n'ouvre RIEN de plus que ce qu'un membre voit déjà
-   (règles : seuls les inscrits non bannis lisent les profils). Retenu jusqu'à l'inscription si besoin. */
+/* ----- Lien direct vers un profil : https://dereh-halev.web.app/?c=k7Qm2xVb9R -----
+   Chaque profil a un code aléatoire de 10 caractères (shareLinks/{code} → uid), impossible à deviner :
+   un visiteur non inscrit ne voit la carte QUE s'il a reçu ce lien. Les anciens liens /?p=125 restent valables
+   (la fiche s'ouvre après l'inscription, sans aperçu avant). Retenu jusqu'à l'inscription si besoin. */
+const SHARE_CODE_RE = /^[A-Za-z0-9]{10}$/;
 (function readProfileLink() {
-  const n = parseProfileNo(new URLSearchParams(location.search).get("p"));
+  const q = new URLSearchParams(location.search);
+  const n = parseProfileNo(q.get("p")), c = q.get("c");
   if (n != null) store.set("pending_profile", n);
-  if (new URLSearchParams(location.search).has("p")) history.replaceState(null, "", location.pathname + location.hash);
+  if (c && SHARE_CODE_RE.test(c)) store.set("pending_code", c);
+  if (q.has("p") || q.has("c")) history.replaceState(null, "", location.pathname + location.hash);
 })();
-const profileLink = no => `${location.origin}/?p=${no}`;
+function profileLink(no) {
+  const p = Number(no) === Number(me && me.no) ? me : Object.values(profiles).find(x => Number(x.no) === Number(no));
+  return p && p.link ? `${location.origin}/?c=${p.link}` : `${location.origin}/?p=${no}`;
+}
+/* Mon code de partage : créé une fois (code aléatoire réservé dans shareLinks, puis recopié dans mon profil) */
+async function ensureShareLink() {
+  if (!me || me.link) return;
+  const A = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", r = crypto.getRandomValues(new Uint8Array(10));
+  const code = Array.from(r, b => A[b % 62]).join("");
+  try { await db.ref().update({ ["shareLinks/" + code]: uid, [`profiles/${uid}/link`]: code }); me.link = code; }
+  catch (e) { /* collision ou règles pas encore publiées : on réessaiera au prochain chargement */ }
+}
 
 (async function boot() {
   applyI18n(); markLang();
@@ -475,7 +490,8 @@ const profileLink = no => `${location.origin}/?p=${no}`;
       }
       setupIabBanner();
       const pend = store.get("pending_profile");
-      if (pend) { const el = $("#pending-profile"); el.textContent = t("link_need_reg", { name: profileName(pend) }); el.classList.remove("hidden"); showPendingCard(pend); }
+      const pcode = store.get("pending_code");
+      if (pend || pcode) { const el = $("#pending-profile"); el.textContent = pend ? t("link_need_reg", { name: profileName(pend) }) : ""; el.classList.toggle("hidden", !pend); if (pcode) showPendingCard(pcode); }
       show("screen-register");
     }
   } catch (e) {
@@ -674,6 +690,7 @@ function startHome() {
   photosStart();
   // anciens profils : réserver son numéro dans l'index (sinon un lien /?p=N vers ce profil ne s'ouvre pas avant inscription)
   if (me && me.no != null && !store.get("pno_ok")) db.ref("profileNos/" + me.no).set(uid).then(() => store.set("pno_ok", 1)).catch(() => {});
+  ensureShareLink();
 
   db.ref("profiles").on("value", s => {
     profiles = s.val() || {};
@@ -858,24 +875,28 @@ $("#search-result").addEventListener("click", async e => {
   if (ac) { ac.disabled = true; await acceptRequest(ac.dataset.acceptS); }
 });
 /* Lien reçu : ouvre la fiche une fois les profils chargés (après inscription si besoin) */
-/* Lien partagé reçu AVANT l'inscription : on montre directement la carte (une seule fiche, lue par son numéro ;
-   la base refuse la liste, les profils en pause et les bannis) */
-async function showPendingCard(no) {
+/* Lien partagé reçu AVANT l'inscription : avec le code secret du lien, on montre directement la carte
+   (code → uid → une seule fiche ; la base refuse les listes, les profils en pause et les bannis) */
+async function showPendingCard(code) {
   try {
-    const u = (await db.ref("profileNos/" + no).once("value")).val();
+    const u = (await db.ref("shareLinks/" + code).once("value")).val();
     if (!u) return;
     const p = (await db.ref("profiles/" + u).once("value")).val();
-    if (!p || Number(p.no) !== Number(no) || store.get("pending_profile") == null) return;
+    if (!p || p.link !== code || store.get("pending_code") !== code) return;
+    store.set("pending_profile", p.no);              // pour ouvrir la fiche juste après l'inscription
     const el = $("#pending-profile");
-    el.innerHTML = `<span class="pp-txt">${esc(t("link_preview", { name: profileName(no) }))}</span>${cardHTML(p)}`;
+    el.innerHTML = `<span class="pp-txt">${esc(t("link_preview", { name: profileName(p.no) }))}</span>${cardHTML(p)}`;
+    el.classList.remove("hidden");
     track("link_preview");
-  } catch (e) { /* lecture refusée (pause, banni…) : le texte simple reste */ }
+  } catch (e) { /* lecture refusée (pause, banni…) */ }
 }
 
 function openPendingProfile() {
-  const no = store.get("pending_profile");
-  if (no == null || !me || Object.keys(profiles).length < 2) return;
-  store.set("pending_profile", null);
+  if (!me || Object.keys(profiles).length < 2) return;
+  const code = store.get("pending_code"), byCode = code && Object.values(profiles).find(p => p.link === code);
+  const no = byCode ? byCode.no : store.get("pending_profile");
+  if (no == null) { if (code) store.set("pending_code", null); return; }
+  store.set("pending_profile", null); store.set("pending_code", null);
   $("#pending-profile").classList.add("hidden");
   track("link_open");
   runSearch(Number(no));
@@ -1518,7 +1539,8 @@ $("#delete-me").addEventListener("click", async () => {
       if (m.status === "active") await db.ref(`chats/${id}/status`).set("ended").catch(() => {});
     }
     track("profile_delete");
-    await photosWipeMine().catch(() => {});      // photos, miniatures et partages (avant le profil : la règle l'exige)
+    await photosWipeMine().catch(() => {});
+    if (me && me.link) await db.ref("shareLinks/" + me.link).remove().catch(() => {});   // le lien de partage ne mène plus à rien      // photos, miniatures et partages (avant le profil : la règle l'exige)
     await db.ref("profiles/" + uid).remove();
     await db.ref("private/" + uid).remove();
     Object.values(chatSubs).forEach(r => r.off());

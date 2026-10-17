@@ -90,6 +90,9 @@
             ".validate": "($l === 'he' || $l === 'en' || $l === 'fr') && newData.val() === true"
           }
         },
+        "link": {
+          ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9]{10}$/) && newData.parent().parent().parent().child('shareLinks/' + newData.val()).val() === $uid"
+        },
         "$other": {
           ".validate": false
         }
@@ -97,7 +100,6 @@
     },
     "profileNos": {
       "$no": {
-        ".read": "auth != null",
         ".write": "auth != null && newData.exists() && (!data.exists() || data.val() === auth.uid) && !root.child('banned/' + auth.uid).exists()",
         ".validate": "newData.val() === auth.uid && newData.parent().parent().child('profiles/' + auth.uid + '/no').val() + '' === $no"
       }
@@ -461,6 +463,13 @@
         "$other": {
           ".validate": false
         }
+      }
+    },
+    "shareLinks": {
+      "$code": {
+        ".read": "auth != null",
+        ".write": "auth != null && ((newData.exists() && !data.exists() && newData.val() === auth.uid && root.child('profiles/' + auth.uid).exists() && !root.child('banned/' + auth.uid).exists()) || (!newData.exists() && (data.val() === auth.uid || (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))))",
+        ".validate": "$code.matches(/^[A-Za-z0-9]{10}$/) && newData.isString()"
       }
     }
   }

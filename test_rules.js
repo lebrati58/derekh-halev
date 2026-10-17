@@ -63,6 +63,7 @@ async function denied(name, fn) {
   const E = env.authenticatedContext("eve").database();     // sans profil
   const ADMIN = env.authenticatedContext("moriah").database();
   const ANON = env.unauthenticatedContext().database();
+  const Z0 = env.authenticatedContext("visiteur0").database();   // visiteur jamais inscrit
 
   /* ---------- Profils & privé ---------- */
   await denied ("non connecté : lire profiles",            () => get(ref(ANON, "profiles")));
@@ -71,7 +72,7 @@ async function denied(name, fn) {
   await allowed("visiteur SANS profil : lire UNE fiche (lien partagé /?p=2)", () => get(ref(E, "profiles/bob")));
   await denied ("non connecté : lire une fiche",           () => get(ref(ANON, "profiles/bob")));
   await denied ("visiteur : lire la fiche d'un BANNI",     () => get(ref(E, "profiles/mallory")));
-  await allowed("visiteur : numéro → profil (index, une entrée)", () => get(ref(E, "profileNos/2")));
+  await denied ("visiteur : numéro → profil (index) : DEVINABLE, donc refusé", () => get(ref(E, "profileNos/2")));
   await allowed("visiteur sans profil : lire SA propre fiche (vide)", () => get(ref(E, "profiles/eve")));
   await denied ("BANNI : lire les profils des autres",     () => get(ref(M, "profiles")));
   await allowed("BANNI : lire sa propre fiche",            () => get(ref(M, "profiles/mallory")));
@@ -104,6 +105,19 @@ async function denied(name, fn) {
   await denied ("eve supprime sa réservation",             () => remove(ref(E, "profileNos/6")));
   await denied ("lire l'index des numéros (liste entière)", () => get(ref(E, "profileNos")));
   await denied ("non connecté : lire une entrée de l'index", () => get(ref(ANON, "profileNos/2")));
+  /* Lien de partage secret : shareLinks/{code 10 car.} → uid */
+  await allowed("bob crée son code + le recopie dans son profil", () => update(ref(B), { "shareLinks/Ab3dE5gH9k": "bob", "profiles/bob/link": "Ab3dE5gH9k" }));
+  await allowed("visiteur avec le code : code → uid",     () => get(ref(Z0, "shareLinks/Ab3dE5gH9k")));
+  await denied ("visiteur : LISTER les codes",            () => get(ref(Z0, "shareLinks")));
+  await denied ("non connecté : lire un code",            () => get(ref(ANON, "shareLinks/Ab3dE5gH9k")));
+  await denied ("alice vole le code de bob",              () => set(ref(A, "shareLinks/Ab3dE5gH9k"), "alice"));
+  await denied ("alice crée un code qui pointe vers bob", () => set(ref(A, "shareLinks/Zz9yY8xX7w"), "bob"));
+  await denied ("alice met le code de bob dans SON profil", () => set(ref(A, "profiles/alice/link"), "Ab3dE5gH9k"));
+  await denied ("code au mauvais format (court / symboles)", () => update(ref(A), { "shareLinks/abc": "alice", "profiles/alice/link": "abc" }));
+  await denied ("lien dans le profil sans code réservé",  () => set(ref(A, "profiles/alice/link"), "Qq1Ww2Ee3R"));
+  await denied ("alice supprime le code de bob",          () => remove(ref(A, "shareLinks/Ab3dE5gH9k")));
+  await denied ("BANNI : créer un code",                  () => set(ref(M, "shareLinks/Mm1Nn2Bb3V"), "mallory"));
+  await allowed("bob supprime son propre code",           async () => { await set(ref(B, "shareLinks/Cc4dD5eE6f"), "bob"); await remove(ref(B, "shareLinks/Cc4dD5eE6f")); });
   await env.withSecurityRulesDisabled(async ctx => { await set(ref(ctx.database(), "profiles/dave/paused"), true); });
   const Z = env.authenticatedContext("zoe").database();   // visiteur jamais inscrit
   await allowed("visiteur (zoe) : fiche normale (bob)",    () => get(ref(Z, "profiles/bob")));
@@ -172,6 +186,7 @@ async function denied(name, fn) {
   await denied ("inscrit normal : bannir quelqu'un",       () => set(ref(A, "banned/bob"), true));
   await denied ("inscrit normal : publier une annonce",    () => set(ref(A, "announcements/current"), { text: "spam", ts: 1 }));
   await allowed("bon PIN → admin",                         () => set(ref(ADMIN, "admins/moriah"), "test-pin-123"));
+  await allowed("ADMIN : supprimer un code (profil supprimé)", () => remove(ref(ADMIN, "shareLinks/Ab3dE5gH9k")));
   await allowed("admin : lire les signalements",           () => get(ref(ADMIN, "reports")));
   await allowed("ADMIN (sans profil) : lire les profils",   () => get(ref(ADMIN, "profiles")));
   await allowed("admin : annonce en 3 langues",             () => set(ref(ADMIN, "announcements/current"), { text: "שאלת היום", text_en: "Question of the day", text_fr: "Question du jour", ts: 1 }));
