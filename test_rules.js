@@ -111,7 +111,13 @@ async function denied(name, fn) {
   await denied ("visiteur : LISTER les codes",            () => get(ref(Z0, "shareLinks")));
   await denied ("non connecté : lire un code",            () => get(ref(ANON, "shareLinks/Ab3dE5gH9k")));
   await denied ("alice vole le code de bob",              () => set(ref(A, "shareLinks/Ab3dE5gH9k"), "alice"));
-  await denied ("alice crée un code qui pointe vers bob", () => set(ref(A, "shareLinks/Zz9yY8xX7w"), "bob"));
+  await allowed("membre alice crée un code pour partager bob (bob pas encore revenu)", () => set(ref(A, "shareLinks/Zz9yY8xX7w"), "bob"));
+  await denied ("visiteur SANS profil crée un code",       () => set(ref(Z0, "shareLinks/Vv1Vv2Vv3V"), "bob"));
+  await denied ("code vers un profil inexistant",         () => set(ref(A, "shareLinks/Nn1Nn2Nn3N"), "personne"));
+  await denied ("code vers un profil BANNI",              () => set(ref(A, "shareLinks/Bb1Bb2Bb3B"), "mallory"));
+  await denied ("alice réécrit le code qu'elle a créé vers quelqu'un d'autre", () => set(ref(A, "shareLinks/Zz9yY8xX7w"), "charlie"));
+  await denied ("alice supprime le code qui pointe vers bob", () => remove(ref(A, "shareLinks/Zz9yY8xX7w")));
+  await allowed("bob supprime un code qui pointe vers lui", () => remove(ref(B, "shareLinks/Zz9yY8xX7w")));
   await denied ("alice met le code de bob dans SON profil", () => set(ref(A, "profiles/alice/link"), "Ab3dE5gH9k"));
   await denied ("code au mauvais format (court / symboles)", () => update(ref(A), { "shareLinks/abc": "alice", "profiles/alice/link": "abc" }));
   await denied ("lien dans le profil sans code réservé",  () => set(ref(A, "profiles/alice/link"), "Qq1Ww2Ee3R"));

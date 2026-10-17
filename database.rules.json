@@ -468,7 +468,7 @@
     "shareLinks": {
       "$code": {
         ".read": "auth != null",
-        ".write": "auth != null && ((newData.exists() && !data.exists() && newData.val() === auth.uid && root.child('profiles/' + auth.uid).exists() && !root.child('banned/' + auth.uid).exists()) || (!newData.exists() && (data.val() === auth.uid || (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))))",
+        ".write": "auth != null && ((newData.exists() && !data.exists() && root.child('profiles/' + auth.uid).exists() && !root.child('banned/' + auth.uid).exists() && root.child('profiles/' + newData.val()).exists() && !root.child('banned/' + newData.val()).exists()) || (!newData.exists() && (data.val() === auth.uid || (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))))",
         ".validate": "$code.matches(/^[A-Za-z0-9]{10}$/) && newData.isString()"
       }
     }
