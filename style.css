@@ -543,6 +543,10 @@ body { overflow-x: clip; }
 .search-empty { padding: 22px 12px; }
 
 .mc-copy { border: 0; background: rgba(255,255,255,.18); color: inherit; width: 30px; height: 30px; border-radius: 50%; font-size: .95rem; line-height: 1; cursor: pointer; display: inline-grid; place-items: center; }
+/* Numéro + ⧉ dans une seule pastille dorée, jamais coupée en deux lignes */
+.mc-nochip { display: inline-flex; align-items: center; gap: 4px; flex: none; white-space: nowrap; background: rgba(20,10,38,.55); border: 1px solid var(--gold); border-radius: 999px; padding: 2px; padding-inline-start: 12px; }
+.mc-nochip .mc-no { background: none; border: 0; padding: 2px 0; unicode-bidi: isolate; }
+.mc-nochip .mc-copy { width: 26px; height: 26px; font-size: .8rem; color: var(--gold-2); background: rgba(243,216,138,.16); }
 .mc-copy:active { transform: scale(.92); }
 /* 🔗 Partager : sur la ligne âge · ville, dans l'espace libre (carte plus compacte) */
 .mc-meta-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -625,3 +629,11 @@ body.ph-open { overflow: hidden; }
 @media (hover: none) { .ph-g-nav { display: none; } }
 .pending-profile .pp-txt { display: block; margin-bottom: 10px; }
 .pending-profile .mystery-card { margin: 0; }
+/* ---------- Carrousel des propositions : un profil à la fois, défilement horizontal ---------- */
+.pcar-head { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 0 0 10px; }
+.pcar-count { min-width: 4.5em; text-align: center; color: var(--gold-2); font-weight: 700; font-size: .95rem; }
+.pcar-nav { width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(243,216,138,.45); background: rgba(0,0,0,.25); color: var(--gold-2); font-size: 1.4rem; line-height: 1; cursor: pointer; }
+.pcar-nav:disabled { opacity: .3; cursor: default; }
+.pcar { display: flex; align-items: flex-start; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; margin: 0 -16px; }
+.pcar::-webkit-scrollbar { display: none; }
+.pcar-slide { flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always; padding: 2px 16px 4px; box-sizing: border-box; min-width: 0; }
