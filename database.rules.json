@@ -298,6 +298,7 @@
     },
     "reveal": {
       "$chatId": {
+        ".read": "auth != null && (root.child('chats/' + $chatId + '/from').val() === auth.uid || root.child('chats/' + $chatId + '/to').val() === auth.uid)",
         "$uid": {
           ".read": "auth != null && auth.uid === $uid",
           ".write": "auth != null && auth.uid === $uid && (root.child('chats/' + $chatId + '/from').val() === auth.uid || root.child('chats/' + $chatId + '/to').val() === auth.uid) && root.child('chats/' + $chatId + '/status').val() === 'active'",
