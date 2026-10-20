@@ -288,6 +288,8 @@ const TEXTS = {
   "no_proposals": ["עוד אין כאן התאמה חדשה… המסך עוד לא עלה.<br>חזרו בקרוב — הקסם לוקח זמן.", "No new match yet… the curtain hasn't risen.<br>Come back soon — magic takes time.", "Pas encore de nouvelle affinité… le rideau n'est pas levé.<br>Revenez bientôt — la magie prend du temps."],
   "match_pct": ["💘 {pct}% התאמה", "💘 {pct}% match", "💘 {pct}% d'affinité"],
   "soft_banner": ["🔭 מחוץ להעדפות שלך — אבל אולי בכל זאת? ✨", "🔭 Outside your preferences — but maybe still? ✨", "🔭 Hors de vos préférences — mais pourquoi pas ? ✨"],
+  "pcar_prev": ["הפרופיל הקודם", "Previous profile", "Profil précédent"],
+  "pcar_next": ["הפרופיל הבא", "Next profile", "Profil suivant"],
   "why_title": ["למה אתם מתאימים:", "Why you match:", "Pourquoi ça colle :"],
   "req_waiting": ["⏳ הבקשה נשלחה — מחכים בסבלנות", "⏳ Request sent — waiting patiently", "⏳ Demande envoyée — patience"],
   "req_send": ["💌 בקשה לשיחה", "💌 Ask to chat", "💌 Demander à discuter"],
