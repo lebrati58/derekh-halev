@@ -647,3 +647,8 @@ body.ph-open { overflow: hidden; }
 .ptable .mini { width: 34px; padding-inline: 2px; text-align: center; }
 .icon-mini { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(243,216,138,.35); background: rgba(0,0,0,.25); color: var(--cream); font-size: .8rem; line-height: 1; padding: 0; cursor: pointer; display: inline-grid; place-items: center; vertical-align: middle; }
 .icon-mini.danger { border-color: rgba(224,96,120,.6); background: rgba(224,96,120,.18); }
+/* Mini notifications (l'autre a levé le rideau / partagé ses photos) : glissent depuis le côté */
+#notifs { position: fixed; top: calc(12px + env(safe-area-inset-top)); left: 12px; right: 12px; z-index: 260; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+.notif { pointer-events: auto; text-align: start; width: 100%; max-width: 380px; box-sizing: border-box; font: inherit; font-size: .9rem; color: var(--cream); background: linear-gradient(135deg, var(--plum), var(--night-2)); border: 1px solid var(--gold); border-radius: 14px; padding: 10px 14px; box-shadow: var(--shadow); cursor: pointer; opacity: 0; transform: translateY(-16px); transition: opacity .3s, transform .3s; }
+.notif.show { opacity: 1; transform: none; }
+.partner-pressed { color: var(--gold-2); font-weight: 700; font-size: .9rem; margin-bottom: 6px; }

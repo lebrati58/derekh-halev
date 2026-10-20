@@ -166,7 +166,9 @@ async function denied(name, fn) {
   /* ---------- Rideau (reveal / secrets) ---------- */
   await allowed("alice dépose son secret",                 () => set(ref(A, "secrets/alice_bob/alice"), { firstName: "אליס", phone: "0501111111" }));
   await allowed("alice coche reveal",                      () => set(ref(A, "reveal/alice_bob/alice"), true));
-  await denied ("bob lit le reveal d'alice (suspense !)",  () => get(ref(B, "reveal/alice_bob/alice")));
+  await allowed("bob voit qu'alice a levé le rideau (notification)", () => get(ref(B, "reveal/alice_bob")));
+  await denied ("charlie (hors du chat) lit le reveal",    () => get(ref(C, "reveal/alice_bob")));
+  await denied ("bob coche le reveal À LA PLACE d'alice",  () => set(ref(B, "reveal/alice_bob/alice"), true));
   await denied ("opened=true avec UN seul reveal",         () => set(ref(A, "chats/alice_bob/opened"), true));
   await denied ("bob lit le secret d'alice AVANT ouverture", () => get(ref(B, "secrets/alice_bob/alice")));
   await allowed("bob dépose secret + reveal",              async () => { await set(ref(B, "secrets/alice_bob/bob"), { firstName: "בוב", phone: "0502222222" }); await set(ref(B, "reveal/alice_bob/bob"), true); });
@@ -293,6 +295,7 @@ async function denied(name, fn) {
   await allowed("ADMIN : lire chatActivity",                  () => get(ref(ADMIN, "chatActivity")));
   await denied ("ADMIN : toujours PAS les messages",          () => get(ref(ADMIN, "messages/alice_bob")));
   await denied ("ADMIN : toujours PAS les secrets",           () => get(ref(ADMIN, "secrets/alice_dave")));
+  await denied ("ADMIN : PAS qui a levé le rideau",           () => get(ref(ADMIN, "reveal/alice_dave")));
 
   /* ---------- Photos privées (« קודם הלב, אחר כך הפנים ») ---------- */
   const JPG = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ==";

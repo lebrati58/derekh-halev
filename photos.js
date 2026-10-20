@@ -18,7 +18,7 @@ const PH = { MAX: 4, W: 1080, H: 1350, TW: 240, TH: 300, MAXLEN: 300000, TMAXLEN
 let myThumbs = {};            // slot -> miniature (data URL) de MES photos
 let myShares = {};            // viewerUid -> {chatId, no, ts, active}
 let partnerShare = null;      // autorisation que le partenaire du chat ouvert m'a donnée
-let partnerShareRef = null;
+let partnerShareRef = null, partnerShareCb = null;
 const chatSenders = {};       // chatId -> {uid: true} (qui a écrit, vu dans les messages)
 let galleryClose = null;
 
@@ -322,10 +322,11 @@ function photosOpenChat(id) {
   const m = myChats[id];
   if (!m) return;
   partnerShareRef = db.ref(`photoShares/${phPartner(m)}/${uid}`);
-  partnerShareRef.on("value", s => { partnerShare = s.val(); photoBar(); }, () => { partnerShare = null; photoBar(); });
+  partnerShareCb = partnerShareRef.on("value", s => { partnerShare = s.val(); photoBar(); }, () => { partnerShare = null; photoBar(); });
 }
 function photosCloseChat() {
-  if (partnerShareRef) { partnerShareRef.off(); partnerShareRef = null; }
+  // off() avec SON callback : sans argument, Firebase couperait aussi les autres écoutes de cette adresse (notifications)
+  if (partnerShareRef) { partnerShareRef.off("value", partnerShareCb); partnerShareRef = null; }
   partnerShare = null;
   const bar = $("#photo-bar"); if (bar) bar.innerHTML = "";
 }
