@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261020a">
+<link rel="stylesheet" href="style.css?v=20261020b">
 </head>
 <body>
 
@@ -78,6 +78,7 @@ if (location.hostname === "lebrati58.github.io") {
       <div class="loader" style="margin-top:0">🚪</div>
       <h2 data-i18n="h007">הפרופיל הושעה</h2>
       <p class="sub" data-i18n="h008">מנהלי הקבוצה השעו את הפרופיל הזה. לשאלות אפשר לפנות אליהם ישירות.</p>
+      <a class="btn link help-link" href="https://www.instagram.com/dereh_halev/" target="_blank" rel="noopener" data-i18n="h115">🆘 צריכים עזרה? כתבו לנו באינסטגרם</a>
     </div>
   </section>
 
@@ -248,6 +249,7 @@ if (location.hostname === "lebrati58.github.io") {
             <span data-i18n="h066">אני מעל גיל 18, ומתחייב/ת לשיחה מכבדת. ידוע לי שאין לשתף טלפון או קישורים בצ׳אט — המסך נפתח רק בהסכמה הדדית.</span>
           </label>
           <button type="button" class="btn link coc-link" data-i18n="h110">📜 קוד ההתנהגות</button>
+          <a class="btn link help-link" href="https://www.instagram.com/dereh_halev/" target="_blank" rel="noopener" data-i18n="h115">🆘 צריכים עזרה? כתבו לנו באינסטגרם</a>
         </div>
 
         <button type="submit" class="btn gold block" id="reg-btn"><img class="heart-ico" src="logo-heart.png" alt=""> <span data-i18n="h103">יוצאים לדרך</span></button>
@@ -289,7 +291,7 @@ if (location.hostname === "lebrati58.github.io") {
     <!-- 📷 Photos privées : jamais visibles dans les cartes ; partage volontaire depuis une conversation -->
     <section id="my-photos" class="my-photos">
       <h2 data-i18n="ph_title">📷 התמונות שלי</h2>
-      <p class="sub ph-private" data-i18n="ph_private">התמונות שלך פרטיות. רק מי שבחרת לשתף איתו יוכל לראות אותן.</p>
+      <p class="sub ph-private" data-i18n="ph_private">התמונות שלך פרטיות: רק מי שבחרת לשתף איתו יראה אותן, וצוות הניהול — רק לצורך פיקוח ומניעת שימוש לרעה.</p>
       <div class="ph-grid" id="ph-grid"></div>
       <h3 class="ph-h3" data-i18n="ph_shares_title">מי יכול לראות את התמונות שלי?</h3>
       <div id="ph-shares"></div>
@@ -303,6 +305,7 @@ if (location.hostname === "lebrati58.github.io") {
       ·
       <button class="btn link" id="delete-me" data-i18n="h076">מחיקת הפרופיל שלי</button>
       <br><button class="btn link coc-link" data-i18n="h110">📜 קוד ההתנהגות</button>
+      · <a class="btn link help-link" href="https://www.instagram.com/dereh_halev/" target="_blank" rel="noopener" data-i18n="h115">🆘 צריכים עזרה? כתבו לנו באינסטגרם</a>
       <span class="hidden" id="unhide-wrap"> · <button class="btn link" id="unhide-all"></button></span>
     </div>
   </section>
@@ -360,10 +363,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261020a"></script>
-<script src="commun.js?v=20261020a"></script>
-<script src="matching.js?v=20261020a"></script>
-<script src="photos.js?v=20261020a"></script>
+<script src="i18n.js?v=20261020b"></script>
+<script src="commun.js?v=20261020b"></script>
+<script src="matching.js?v=20261020b"></script>
+<script src="photos.js?v=20261020b"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -1526,6 +1529,7 @@ function showConduct() {
   });
 }
 $$(".coc-link").forEach(b => b.addEventListener("click", showConduct));
+$$(".help-link").forEach(b => b.addEventListener("click", () => track("help_click")));
 $("#act-profile").addEventListener("click", () => { $("#chat-menu").classList.add("hidden"); showPartnerCard(); });
 
 $("#chat-menu-btn").addEventListener("click", e => { e.stopPropagation(); $("#chat-menu").classList.toggle("hidden"); });

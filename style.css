@@ -637,3 +637,8 @@ body.ph-open { overflow: hidden; }
 .pcar { display: flex; align-items: flex-start; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; margin: 0 -16px; }
 .pcar::-webkit-scrollbar { display: none; }
 .pcar-slide { flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always; padding: 2px 16px 4px; box-sizing: border-box; min-width: 0; }
+.help-link { color: var(--gold-2); text-decoration: none; }
+.adm-ph-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.adm-ph { display: block; flex: 0 0 calc(50% - 4px); min-width: 0; }
+.adm-ph img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; border: 1px solid rgba(212,169,74,.4); }
+.adm-ph .cap { display: block; font-size: .75rem; color: var(--muted); text-align: center; }
