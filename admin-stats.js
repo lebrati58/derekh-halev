@@ -313,9 +313,9 @@ const StatsUI = (() => {
     const uniq = S.hasActivity ? Object.values(extra.activity || {}).filter(a => a && Object.keys(a.d || {}).some(key => { const t = keyToTs(key); return t + 864e5 - 1 >= S.range.from && t <= S.range.to; })).length : null;
     const FN = { visit: "ביקור ראשון", registered: "נרשמו", complete: "פרופיל מלא", chat: "התאמה (שיחה נפתחה)", answered: "שני הצדדים כתבו", opened: "המסך נפתח ✨" };
     csvData.features = { head: ["event", "count"], rows: u.features.concat(u.tabs, u.regErrors, u.techErrors) };
-    const evLabel = { req_sent: "💌 בקשה (לפי ההעדפות)", req_sent_soft: "💌 בקשה (מחוץ להעדפות)", req_accepted: "✅ קבלת בקשה", req_declined: "❌ דחיית בקשה", msg_sent: "💬 הודעה נשלחה",
-      reveal_press: "💗 לחיצה על פתיחת מסך", wa_click: "📱 כפתור WhatsApp", hide: "🙈 לא בשבילי", unhide: "👁️ החזרת מוסתרים", block: "🚫 חסימה", report: "🚩 דיווח",
-      pause_on: "⏸️ השהיה", pause_off: "▶️ חזרה מהשהיה", card_view: "👤 צפייה בכרטיס", coc_open: "📜 קוד התנהגות", welcome_open: "💗 הודעת ברוכים הבאים",
+    const evLabel = { req_sent: "💌 בקשה (לפי ההעדפות)", req_sent_soft: "💌 בקשה (מחוץ להעדפות)", req_note: "💌 בקשה עם הודעה", search_found: "🔍 חיפוש לפי מספר (נמצא)", search_notfound: "🔍 חיפוש לפי מספר (לא נמצא)", copy_no: "⧉ העתקת מספר פרופיל", share_link: "🔗 העתקת קישור לפרופיל", share_wa: "💬 שיתוף פרופיל בוואטסאפ", share_native: "📤 שיתוף פרופיל (טלפון)", link_open: "🔗 פתיחת קישור לפרופיל", req_accepted: "✅ קבלת בקשה", req_declined: "❌ דחיית בקשה", msg_sent: "💬 הודעה נשלחה",
+      reveal_press: "💗 לחיצה על פתיחת מסך", wa_click: "📱 כפתור WhatsApp", hide: "🙈 לא בשבילי", unhide: "👁️ החזרת מוסתרים", archive: "🗄️ העברה לארכיון", unarchive: "📤 הוצאה מהארכיון", block: "🚫 חסימה", report: "🚩 דיווח",
+      pause_on: "⏸️ השהיה", pause_off: "▶️ חזרה מהשהיה", card_view: "👤 צפייה בכרטיס", coc_open: "📜 קוד התנהגות", welcome_open: "💗 הודעת ברוכים הבאים", agetip_open: "💌 הודעת צוות: הרחבת גילאים (נקראה)", agetip_edit: "✏️ לחצו להרחבת גילאים",
       lang_change: "🌐 החלפת שפה", profile_edit: "✏️ עריכת פרופיל", profile_delete: "🗑️ מחיקת פרופיל", reg_start: "📝 התחלת הרשמה", reg_done: "🎉 סיום הרשמה",
       tab_proposals: "✨ הצעות", tab_requests: "💌 בקשות", tab_chats: "💬 שיחות", err_reg: "הרשמה", err_msg: "שליחת הודעה", err_request: "שליחת בקשה", err_accept: "קבלת בקשה" };
     const regField = { name: "שם", phone: "טלפון", gender: "מגדר", age: "גיל", city: "עיר", words: "3 מילים", shabbat: "שבת אידיאלית", religion: "אורח חיים", intent: "כוונה",

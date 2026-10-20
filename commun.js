@@ -212,17 +212,35 @@ function cardHTML(p, opts = {}) {
       <span class="mc-left"><span class="mc-mask">${HEART}</span>${opts.pct != null ? `<span class="mc-pct" title="${esc(t("match_pct", { pct: opts.pct }))}" aria-label="${esc(t("match_pct", { pct: opts.pct }))}">${esc(opts.pct)}%</span>` : ""}</span>
       <span class="mc-ids">
         ${p.gender === "m" || p.gender === "f" ? `<span class="mc-gender ${p.gender}">${p.gender === "f" ? "👩" : "👨"} ${esc(LABELS.gender[p.gender])}</span>` : ""}
-        <span class="mc-no">${esc(profileName(p.no))}</span>
+        ${opts.tools ? `<span class="mc-nochip"><span class="mc-no">${esc(profileName(p.no))}</span><button type="button" class="mc-copy" data-copy-no="${esc(p.no)}" aria-label="${esc(t("copy_no_aria", { no: p.no }))}" title="${esc(t("copy_no_aria", { no: p.no }))}">⧉</button></span>` : `<span class="mc-no">${esc(profileName(p.no))}</span>`}
       </span>
     </div>
     <div class="mc-words">${words}</div>
-    <div class="mc-meta">${esc(p.age)} · ${esc(p.city)} · ${esc(religionLabel(p.religion, p.gender))}</div>
+    <div class="mc-meta-row">
+      <div class="mc-meta">${esc(p.age)} · ${esc(p.city)} · ${esc(religionLabel(p.religion, p.gender))}</div>
+      ${opts.tools ? `<button type="button" class="mc-share" data-share-no="${esc(p.no)}">🔗 ${esc(t("share_btn"))}</button>` : ""}
+    </div>
     ${typeof langFlags === "function" && langFlags(p) ? `<div class="mc-langs" title="${esc(t("langs_title"))}">${esc(langFlags(p))}</div>` : ""}
     <div class="mc-intent">${esc(LABELS.intent[p.intent] || "")}</div>
     ${p.shabbat && !opts.noShabbat ? `<div class="mc-shabbat"><b>${esc(t("card_shabbat"))}</b> “${esc(p.shabbat)}”</div>` : ""}
     ${p.cantLiveWithout ? `<div class="mc-shabbat"><b>${esc(t("card_clw"))}</b> ${esc(p.cantLiveWithout)}</div>` : ""}
   </div>`;
 }
+
+/* ---------- Presse-papiers ---------- */
+/* Copie réelle : renvoie true seulement si le texte est bien dans le presse-papiers
+   (API moderne, puis repli execCommand pour les navigateurs intégrés de WhatsApp). */
+async function copyText(text) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(String(text)); return true; } } catch (e) {}
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = String(text); ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, ta.value.length);
+    const ok = document.execCommand("copy"); ta.remove(); return !!ok;
+  } catch (e) { return false; }
+}
+/* Numéro de profil saisi : chiffres seulement, recherche EXACTE (125 ≠ 1250) */
+function parseProfileNo(q) { const s = String(q == null ? "" : q).trim().replace(/^#/, ""); return /^\d{1,7}$/.test(s) ? Number(s) : null; }
 
 /* ---------- Toast ---------- */
 function toast(msg, ms = 2800) {
@@ -235,7 +253,7 @@ function toast(msg, ms = 2800) {
 }
 
 /* ---------- Modale (remplace alert/confirm/prompt) ---------- */
-function showModal({ title = "", body = "", input = false, placeholder = "", okText = t("ok"), cancelText = t("cancel"), danger = false }) {
+function showModal({ title = "", body = "", input = false, placeholder = "", okText = t("ok"), cancelText = t("cancel"), danger = false, allowEmpty = false, maxLength = 300 }) {
   return new Promise(resolve => {
     const wrap = document.createElement("div");
     wrap.className = "modal-wrap";
@@ -243,7 +261,7 @@ function showModal({ title = "", body = "", input = false, placeholder = "", okT
       <div class="modal" role="dialog" aria-modal="true">
         ${title ? `<h3>${esc(title)}</h3>` : ""}
         ${body ? `<p>${body}</p>` : ""}
-        ${input ? `<textarea rows="3" maxlength="300" placeholder="${esc(placeholder)}"></textarea>` : ""}
+        ${input ? `<textarea rows="3" maxlength="${maxLength}" placeholder="${esc(placeholder)}"></textarea>` : ""}
         <div class="modal-actions">
           ${cancelText ? `<button class="btn ghost" data-a="cancel">${esc(cancelText)}</button>` : ""}
           <button class="btn ${danger ? "danger" : "gold"}" data-a="ok">${esc(okText)}</button>
@@ -256,7 +274,7 @@ function showModal({ title = "", body = "", input = false, placeholder = "", okT
     const close = val => { wrap.classList.remove("show"); setTimeout(() => wrap.remove(), 200); resolve(val); };
     wrap.addEventListener("click", e => {
       const a = e.target.getAttribute && e.target.getAttribute("data-a");
-      if (a === "ok") close(input ? (ta.value.trim() || null) : true);
+      if (a === "ok") close(input ? (ta.value.trim() || (allowEmpty ? "" : null)) : true);
       else if (a === "cancel" || e.target === wrap) close(null);
     });
   });
