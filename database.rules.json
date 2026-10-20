@@ -387,7 +387,7 @@
     },
     "photos": {
       "$uid": {
-        ".read": "auth != null && (auth.uid === $uid || (root.child('photoShares/' + $uid + '/' + auth.uid + '/active').val() === true && !root.child('banned/' + auth.uid).exists() && !root.child('banned/' + $uid).exists() && !root.child('blocks/' + $uid + '/' + auth.uid).exists()))",
+        ".read": "auth != null && (auth.uid === $uid || (root.child('photoShares/' + $uid + '/' + auth.uid + '/active').val() === true && !root.child('banned/' + auth.uid).exists() && !root.child('banned/' + $uid).exists() && !root.child('blocks/' + $uid + '/' + auth.uid).exists()) || (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))",
         ".write": "(auth != null && auth.uid === $uid && !root.child('banned/' + auth.uid).exists() && root.child('profiles/' + auth.uid).exists()) || (!newData.exists() && (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))",
         "$slot": {
           ".validate": "$slot.matches(/^[1-4]$/) && newData.isString() && newData.val().length <= 300000 && newData.val().matches(/^data:image\\/jpeg;base64,[A-Za-z0-9+\\/]+=*$/)"
@@ -396,7 +396,7 @@
     },
     "photoThumbs": {
       "$uid": {
-        ".read": "auth != null && (auth.uid === $uid || (root.child('photoShares/' + $uid + '/' + auth.uid + '/active').val() === true && !root.child('banned/' + auth.uid).exists() && !root.child('banned/' + $uid).exists() && !root.child('blocks/' + $uid + '/' + auth.uid).exists()))",
+        ".read": "auth != null && (auth.uid === $uid || (root.child('photoShares/' + $uid + '/' + auth.uid + '/active').val() === true && !root.child('banned/' + auth.uid).exists() && !root.child('banned/' + $uid).exists() && !root.child('blocks/' + $uid + '/' + auth.uid).exists()) || (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))",
         ".write": "(auth != null && auth.uid === $uid && !root.child('banned/' + auth.uid).exists() && root.child('profiles/' + auth.uid).exists()) || (!newData.exists() && (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val()))",
         "$slot": {
           ".validate": "$slot.matches(/^[1-4]$/) && newData.isString() && newData.val().length <= 40000 && newData.val().matches(/^data:image\\/jpeg;base64,[A-Za-z0-9+\\/]+=*$/)"
@@ -452,7 +452,7 @@
         ".write": "!data.exists() && (auth != null && root.child('config/adminPin').exists() && root.child('admins/' + auth.uid).val() === root.child('config/adminPin').val())",
         ".validate": "newData.hasChildren(['action', 'no', 'ts'])",
         "action": {
-          ".validate": "newData.val() === 'photos_removed' || newData.val() === 'profile_deleted'"
+          ".validate": "newData.val() === 'photos_removed' || newData.val() === 'profile_deleted' || newData.val() === 'photos_viewed'"
         },
         "no": {
           ".validate": "newData.isNumber()"

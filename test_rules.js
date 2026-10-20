@@ -324,8 +324,11 @@ async function denied(name, fn) {
   await denied ("B : … ni les miniatures",                       () => get(ref(C, "photoThumbs/alice/1")));
   await denied ("B : bob (hors conversation) lit les photos",    () => get(ref(B, "photos/alice/1")));
   await denied ("non connecté : lire les photos",                () => get(ref(ANON, "photos/alice")));
-  await denied ("ADMIN : lire les photos (règle absolue)",       () => get(ref(ADMIN, "photos/alice")));
-  await denied ("ADMIN : lire les miniatures",                   () => get(ref(ADMIN, "photoThumbs")));
+  await allowed("ADMIN : voir les photos (modération)",         () => get(ref(ADMIN, "photos/alice")));
+  await allowed("ADMIN : journaliser la consultation",          () => push(ref(ADMIN, "adminLog"), { action: "photos_viewed", no: 1, ts: serverTimestamp() }));
+  await denied ("journal : action inconnue",                     () => push(ref(ADMIN, "adminLog"), { action: "hack", no: 1, ts: serverTimestamp() }));
+  await denied ("ADMIN : lire TOUTES les miniatures d'un coup",  () => get(ref(ADMIN, "photoThumbs")));
+  await allowed("ADMIN : miniatures d'un profil",                () => get(ref(ADMIN, "photoThumbs/alice")));
   await allowed("ADMIN : lire le NOMBRE de photos (0-4)",        () => get(ref(ADMIN, "photoMeta/alice")));
   await denied ("inscrit : lire le nombre de photos d'un autre", () => get(ref(C, "photoMeta/alice")));
   await denied ("C : partage avant échange mutuel (personne n'a écrit)", () => set(ref(A, "photoShares/alice/charlie"), share(3)));

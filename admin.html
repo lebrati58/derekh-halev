@@ -13,7 +13,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta name="robots" content="noindex, nofollow">
 <title>ניהול · דרך הלב</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗝️</text></svg>">
-<link rel="stylesheet" href="style.css?v=20261020a">
+<link rel="stylesheet" href="style.css?v=20261020b">
 </head>
 <body>
 <div class="valance"></div>
@@ -98,12 +98,12 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261020a"></script>
+<script src="i18n.js?v=20261020b"></script>
 <script>LANG = "he";   // l'admin reste en hébreu</script>
-<script src="commun.js?v=20261020a"></script>
-<script src="matching.js?v=20261020a"></script>
-<script src="stats.js?v=20261020a"></script>
-<script src="admin-stats.js?v=20261020a"></script>
+<script src="commun.js?v=20261020b"></script>
+<script src="matching.js?v=20261020b"></script>
+<script src="stats.js?v=20261020b"></script>
+<script src="admin-stats.js?v=20261020b"></script>
 <script>
 let uid = null;
 let profiles = {}, banned = {}, chats = {}, reports = {}, photoMeta = {};
@@ -230,7 +230,7 @@ function renderProfiles() {
       <td>${esc(p.age)}</td>
       <td>${esc(p.city)}</td>
       <td>${reportCount(u) || ""}</td>
-      <td>${photoMeta[u] && photoMeta[u].n ? `${esc(photoMeta[u].n)} <button class="btn ghost small" data-delphotos="${esc(u)}" title="הסרת התמונות (מודרציה)" aria-label="הסרת התמונות">✕</button>` : ""}</td>
+      <td>${photoMeta[u] && photoMeta[u].n ? `${esc(photoMeta[u].n)} <button class="btn ghost small" data-viewphotos="${esc(u)}" title="צפייה בתמונות (מודרציה)" aria-label="צפייה בתמונות">👁️</button> <button class="btn ghost small" data-delphotos="${esc(u)}" title="הסרת התמונות (מודרציה)" aria-label="הסרת התמונות">✕</button>` : ""}</td>
       <td>${isB ? `<button class="btn ghost small" data-unban="${esc(u)}">ביטול</button>`
                 : `<button class="btn danger small" data-ban="${esc(u)}">הרחקה</button>`}</td>
       <td><button class="btn ghost small" data-del="${esc(u)}" aria-label="מחיקה">🗑️</button></td>
@@ -269,6 +269,17 @@ document.addEventListener("click", async e => {
       db.ref("adminLog").push({ action: "profile_deleted", no: Number(no) || 0, ts: firebase.database.ServerValue.TIMESTAMP }).catch(() => {});
       toast("הפרופיל נמחק");
     } catch (err) { console.error(err); toast("המחיקה נכשלה — ייתכן שצריך לפרסם את כללי האבטחה החדשים"); }
+  }
+  const vp = e.target.closest("[data-viewphotos]");
+  if (vp) {
+    // Modération : l'admin peut voir les photos d'un profil ; chaque consultation est notée dans adminLog
+    const u = vp.dataset.viewphotos, no = (profiles[u] || {}).no;
+    try {
+      const ph = (await db.ref("photos/" + u).once("value")).val() || {};
+      const imgs = [1, 2, 3, 4].filter(k => ph[k]).map(k => `<span class="adm-ph"><img src="${ph[k]}" alt=""><span class="cap">${k === 1 ? "ראשית" : "נוספת " + (k - 1)}</span></span>`).join("");
+      db.ref("adminLog").push({ action: "photos_viewed", no: Number(no) || 0, ts: firebase.database.ServerValue.TIMESTAMP }).catch(() => {});
+      showModal({ title: `📷 התמונות של ${esc(profileName(no || "?"))}`, body: `<span class="adm-ph-grid">${imgs || "אין תמונות"}</span><br><small>הצפייה נרשמת ביומן הניהול. אם יש תמונה פוגענית — ✕ להסרה.</small>`, okText: "סגירה", cancelText: "" });
+    } catch (err) { console.error(err); toast("לא הצלחנו לטעון את התמונות — ייתכן שכללי האבטחה עוד לא עודכנו"); }
   }
   const dp = e.target.closest("[data-delphotos]");
   if (dp) {
