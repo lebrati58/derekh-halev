@@ -199,7 +199,7 @@ const VISUALS = [
     <div class="inner">
       <p class="kicker">דרך הלב · מדריך קצר</p>
       <h1 class="title">איך זה<br>עובד?</h1>
-      <p class="lead">5 צעדים.<br><span class="gold b">אף תמונה.</span></p>
+      <p class="lead">5 צעדים.<br><span class="gold b">התמונות? רק אם תבחרו.</span></p>
       <p class="lead small" style="margin-top:80px">החליקו ←</p>
     </div>${foot("1/7")}` },
   { id: "post2-2", cls: "post night", html: `${valance}<div class="step-no">1</div>
@@ -326,13 +326,42 @@ const VISUALS = [
       <p class="lead small">איך הייתם מתארים את עצמכם? כתבו בתגובות 👇</p>
       <div class="cta-pill">הכרטיס שלך מחכה · הקישור בביו</div>
     </div>${foot()}` },
+  /* ----- Recommandation : carrousel 5 slides (Jour) + statique ----- */
+  { id: "reco-1", cls: "post day", html: `
+    <div class="inner"><p class="kicker">שאלה קטנה</p>
+      <h1 class="title md">תחשבו על הזוג<br>האהוב עליכם.</h1>
+      <p class="lead" style="font-size:64px"><span class="grad b">איך הם הכירו?</span></p>
+      <p class="lead small" style="margin-top:80px">החליקו ←</p></div>${foot("1/5")}` },
+  { id: "reco-2", cls: "post day", html: `
+    <div class="inner"><p class="kicker">לפעמים זה התחיל</p>
+      <h1 class="title sm">במשפט אחד:</h1>
+      <div style="margin-top:60px"><span class="bubble" style="font-size:60px">יש לי מישהו בשבילך 💗</span></div>
+      <p class="lead small" style="margin-top:30px;opacity:.7;direction:ltr;text-align:right">21:47 ✓✓</p></div>${foot("2/5")}` },
+  { id: "reco-3", cls: "post day", html: `
+    <div class="inner"><p class="kicker">כי חבר טוב</p>
+      <h1 class="title sm">רואה מה שתמונה<br>לא מראה.</h1>
+      <div class="chips"><span class="chip">את הצחוק</span><span class="chip">את הלב</span><span class="chip">את הדרך</span></div></div>${foot("3/5")}` },
+  { id: "reco-4", cls: "post night", html: `${valance}
+    <div class="inner"><p class="kicker">בדרך הלב</p>
+      <h1 class="title sm">כל כרטיס אפשר<br>לשלוח בקישור סודי.</h1>
+      <p class="lead">בלי שם, בלי טלפון ובלי תמונות.</p>
+      <p class="lead small">מי שמקבל את הקישור רואה את הכרטיס <span class="gold">גם בלי להירשם</span> — ומחליט לבד.</p></div>${foot("4/5")}` },
+  { id: "reco-5", cls: "post day", html: `
+    <div class="inner center">
+      <img class="heart-big" src="${HEART}" alt="" style="width:260px;height:260px">
+      <h1 class="title sm">מכירים מישהו<br>שמגיע לו מישהו טוב?</h1>
+      <div class="cta-pill">שלחו לו את הפוסט הזה 💌</div></div>${foot("5/5")}` },
+  { id: "reco-statique", cls: "post day", html: `
+    <div class="inner center">
+      <div><span class="bubble" style="font-size:72px;padding:40px 60px;white-space:nowrap;max-width:none">יש לי מישהו בשבילך 💗</span></div>
+      <p class="lead small" style="margin-top:24px;opacity:.65;direction:ltr">21:47 ✓✓</p>
+      <h1 class="title" style="margin-top:110px">החברים שלך<br><span class="grad">כבר יודעים.</span></h1></div>${foot()}` },
 ];
-
 /* ----- Stories des « à la une » (9:16) ----- */
 const STORIES = [
   // מי אנחנו
   ["about-1", "day", "מי אנחנו", "נעים להכיר,<br><span class='grad'>דרך הלב.</span>", "אפליקציית היכרויות שנולדה מתוך קהילת רווקים ורווקות בוואטסאפ."],
-  ["about-2", "day", "מי אנחנו", "קודם שיחה.<br>אחר כך פנים.", "בלי תמונות ובלי שיפוט ממבט ראשון. מכירים את האדם — דרך המילים שלו."],
+  ["about-2", "day", "מי אנחנו", "קודם שיחה.<br>אחר כך פנים.", "בכרטיס אין תמונות, ואין שיפוט ממבט ראשון. מכירים את האדם — דרך המילים שלו."],
   ["about-3", "night", "מי אנחנו", "כאילו כל יום<br>ט״ו באב.", "דתיים, מסורתיים וחילוניים. בעברית, English ו־Français.<br><span class='gold'>מכל הלב, דרך הלב.</span>"],
   // איך זה עובד
   ["how-1", "night", "איך זה עובד", "1. כרטיס מסתורי", "גיל, עיר, אורח חיים, 3 מילים והשבת האידיאלית שלך. בלי שם, תמונה או טלפון."],
@@ -344,6 +373,7 @@ const STORIES = [
   ["faq-2", "day", "שאלות נפוצות", "צריך להוריד משהו?", "לא. זה אתר שעובד כמו אפליקציה. טיפ: הוסיפו אותו למסך הבית."],
   ["faq-3", "day", "שאלות נפוצות", "מי רואה את השם והטלפון שלי?", "אף אחד — עד ששניכם לוחצים ״פתיחת המסך״. גם הצוות לא רואה אותם, ולא יכול לקרוא את השיחות."],
   ["faq-4", "day", "שאלות נפוצות", "יש התראות?", "עדיין לא. כדאי להיכנס פעם ביום ולבדוק אם מחכה לכם בקשה או הודעה."],
+  ["faq-6", "day", "שאלות נפוצות", "ומה עם תמונות?", "אפשר להוסיף עד 4. הן לא מופיעות בכרטיס: אחרי ששניכם כתבתם, כל אחד בוחר אם לשתף, ואפשר לבטל. צוות הניהול יכול לצפות רק כדי למנוע שימוש לרעה."],
   ["faq-5", "day", "שאלות נפוצות", "נכנסתי מאינסטגרם והפרופיל נעלם?", "פתחו את הקישור בדפדפן (Safari / Chrome) ותמיד חזרו מאותו דפדפן."],
   // בטיחות
   ["safety-1", "night", "בטיחות", "הפרטים שלך<br>נשארים שלך.", "שם וטלפון נחשפים רק בהסכמה הדדית. בצ׳אט אי אפשר לשלוח טלפון או קישורים."],

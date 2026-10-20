@@ -1,5 +1,7 @@
 # Phase B — Instagram : profil, à la une, 9 premières publications
 
+> **Mise à jour du 20/10/2026** : le compte **@dereh_halev** existe (l'app y renvoie avec le bouton 🆘). Les **photos privées** sont arrivées dans l'app : elles ne sont jamais sur la carte et chacun choisit de les montrer après la conversation. « בלי תמונות » est donc devenu « **בלי תמונות בכרטיס** » / « **קודם הלב, אחר כך הפנים** » dans les textes ci-dessous.
+
 Tous les visuels sont prêts dans `marketing/visuels/` (aperçu de la grille : `grille-instagram-apercu.jpg`).
 
 ---
@@ -10,10 +12,8 @@ Tous les visuels sont prêts dans `marketing/visuels/` (aperçu de la grille : `
 
 | Priorité | @username | Pourquoi |
 |---|---|---|
-| 1 | **@dereh.halev** | Identique au domaine `dereh-halev.web.app` : une seule orthographe à retenir |
-| 2 | @derehhalev | Même chose sans point (plus facile à dicter) |
-| 3 | @dereh_halev | Variante |
-| 4 | @dereh.halev.app | Si les précédents sont pris |
+| ✅ | **@dereh_halev** | **Compte existant**, déjà lié depuis l'app — à garder |
+| (archive) | @dereh.halev | Ancienne recommandation, avant que le compte ne soit créé |
 | 5 | @derech.halev | Orthographe israélienne la plus courante de « דרך » |
 
 Une fois le nom obtenu, **réserver le même** sur TikTok et Facebook, même sans publier (évite qu'un tiers le prenne).
@@ -21,7 +21,7 @@ Une fois le nom obtenu, **réserver le même** sur TikTok et Facebook, même san
 ## 2. Champ « Nom » (indexé par la recherche Instagram)
 
 ```
-דרך הלב | היכרויות בלי תמונות
+דרך הלב | היכרויות · קודם הלב
 ```
 Le mot « היכרויות » est celui que les gens tapent ; « דרך הלב » fait remonter la marque. (Le nom ne peut être modifié que 2 fois en 14 jours : le choisir une fois pour toutes.)
 
@@ -38,19 +38,19 @@ Décompte exact fait par script ; le 2ᵉ chiffre est le comptage UTF-16 (le plu
 👇 יוצאים לדרך
 ```
 
-**B — 114 caractères (116)**
+**B — 113 caractères (115)**
 ```
-היכרויות בלי תמונות 💗
+היכרויות, קודם הלב 💗
 קודם מילים, אחר כך פנים
 שיחה אנונימית, מכבדת ובחינם
 המסך נפתח רק כששניכם לוחצים ✨
 👇 להצטרפות
 ```
 
-**C — 117 caractères (119)**
+**C — 124 caractères (126)**
 ```
 כאילו כל יום ט״ו באב ✨
-בלי תמונות ובלי שיפוט ממבט ראשון
+בלי תמונות בכרטיס, בלי שיפוט ממבט ראשון
 שיחה אנונימית, ואם שניכם רוצים, המסך נפתח 💗
 👇 הכרטיס שלך מחכה
 ```
@@ -64,10 +64,10 @@ Décompte exact fait par script ; le 2ᵉ chiffre est le comptage UTF-16 (le plu
 👇 יוצאים לדרך
 ```
 
-**E — 127 caractères (129)**
+**E — 117 caractères (119)**
 ```
 רווקים ורווקות שמכירים קודם את הלב 💗
-בלי תמונות · שיחה אנונימית · פתיחת מסך הדדית
+תמונות רק אם תבחרו · שיחה אנונימית
 עברית · English · Français
 👇 מכל הלב, דרך הלב
 ```
@@ -113,7 +113,7 @@ Lancer avec **4 rubriques** (contenu prêt) ; préparer les 2 autres sans les pu
 |---|---|---|---|---|
 | 1 | ❤️ מי אנחנו | `une-about.png` | `story-about-1/2/3.jpg` | — |
 | 2 | 💬 איך זה עובד | `une-how.png` | `story-how-1/2/3/4.jpg` | Plus tard : vidéo écran de l'app (sans vrais profils) |
-| 3 | ❓ שאלות נפוצות | `une-faq.png` | `story-faq-1…5.jpg` | Ajouter un sticker **« Questions »** sur la dernière story pour récolter de nouvelles questions |
+| 3 | ❓ שאלות נפוצות | `une-faq.png` | `story-faq-1…6.jpg` (6 = ״ומה עם תמונות?״) | Ajouter un sticker **« Questions »** sur la dernière story pour récolter de nouvelles questions |
 | 4 | 🛡️ בטיחות | `une-safety.png` | `story-safety-1/2/3.jpg` | — |
 | 5 | ✨ סיפורי היכרות | `une-stories.png` | **Aucune** | Seulement des témoignages réels, avec **accord écrit** des deux personnes, anonymisés par défaut |
 | 6 | 🎉 אירועים | `une-events.png` | **Aucune** | Seulement quand un événement réel est fixé (date, lieu, inscription) |
@@ -124,7 +124,7 @@ Sur chaque story, ajouter dans Instagram un **sticker lien** vers `https://dereh
 
 Textes des stories (déjà dans les images) :
 
-- **מי אנחנו** — 1) « נעים להכיר, דרך הלב. אפליקציית היכרויות שנולדה מתוך קהילת רווקים ורווקות בוואטסאפ. » 2) « קודם שיחה. אחר כך פנים. בלי תמונות ובלי שיפוט ממבט ראשון. » 3) « כאילו כל יום ט״ו באב. דתיים, מסורתיים וחילוניים. בעברית, English ו־Français. מכל הלב, דרך הלב. »
+- **מי אנחנו** — 1) « נעים להכיר, דרך הלב. אפליקציית היכרויות שנולדה מתוך קהילת רווקים ורווקות בוואטסאפ. » 2) « קודם שיחה. אחר כך פנים. בכרטיס אין תמונות, ואין שיפוט ממבט ראשון. » 3) « כאילו כל יום ט״ו באב. דתיים, מסורתיים וחילוניים. בעברית, English ו־Français. מכל הלב, דרך הלב. »
 - **איך זה עובד** — 1) כרטיס מסתורי 2) הצעות ובקשה 3) שיחה אנונימית 4) פתיחת המסך.
 - **שאלות נפוצות** — כמה זה עולה? / צריך להוריד משהו? / מי רואה את השם והטלפון שלי? / יש התראות? / נכנסתי מאינסטגרם והפרופיל נעלם?
 - **בטיחות** — הפרטים שלך נשארים שלך / חסימה ודיווח בלחיצה / פגישה ראשונה במקום ציבורי.
@@ -152,7 +152,7 @@ Lien UTM à mettre dans la bio selon la campagne : `utm_campaign=lancement` pend
 נמאס לכם שמחליטים עליכם לפי תמונה אחת? 💭
 
 נעים להכיר, אנחנו דרך הלב 💗
-אפליקציית היכרויות בלי תמונות, שנולדה מתוך קהילת רווקים ורווקות.
+אפליקציית היכרויות בלי תמונות בכרטיס, שנולדה מתוך קהילת רווקים ורווקות.
 
 אצלנו מכירים קודם את האדם:
 ✨ 3 מילים שמתארות אותו
@@ -175,7 +175,7 @@ Lien UTM à mettre dans la bio selon la campagne : `utm_campaign=lancement` pend
 - **Accroche** : « 5 צעדים. אף תמונה. »
 - **Légende** :
 ```
-איך מכירים בלי תמונות? 5 צעדים 👇
+איך מכירים לפני התמונות? 5 צעדים 👇
 
 1️⃣ כרטיס מסתורי — גיל, עיר, אורח חיים, 3 מילים והשבת האידיאלית שלך
 2️⃣ הצעות בשבילך — עם אחוז התאמה ו״למה אתם מתאימים״
@@ -405,7 +405,7 @@ Programmation : Meta Business Suite (business.facebook.com) permet de programmer
 😄 ותוכן קליל על היכרויות, הודעות פתיחה ומה שביניהן
 
 עקבו, ואם בא לכם — שתפו עם חברים רווקים ורווקות שנמאס להם להחליק 🙏
-👈 https://instagram.com/dereh.halev
+👈 https://instagram.com/dereh_halev
 
 מכל הלב, דרך הלב 💗
 ```

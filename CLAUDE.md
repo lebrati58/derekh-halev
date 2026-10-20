@@ -27,7 +27,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `test_rules.js` | Tests des règles sur l'émulateur (`@firebase/rules-unit-testing`) |
 | `package.json` | Dépendances et scripts de **test uniquement** |
 | `README.md` | Guide d'installation Firebase, déploiement, checklist de test manuel mobile |
-| `marketing/` | Stratégie marketing (audit, identité, plan Instagram) + visuels et gabarits (`templates/visuels.html` → `render.js`). **Non déployé** (hors liste blanche) |
+| `marketing/` | Stratégie marketing (audit, identité, plan Instagram, stratégie virale + calendrier 30 jours) + visuels et gabarits (`templates/visuels.html` → `render.js`). **Non déployé** (hors liste blanche) |
 
 ## Schéma de la base (détail complet en commentaire en tête de `commun.js`)
 
