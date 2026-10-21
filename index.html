@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261021a">
+<link rel="stylesheet" href="style.css?v=20261021b">
 </head>
 <body>
 
@@ -363,10 +363,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261021a"></script>
-<script src="commun.js?v=20261021a"></script>
-<script src="matching.js?v=20261021a"></script>
-<script src="photos.js?v=20261021a"></script>
+<script src="i18n.js?v=20261021b"></script>
+<script src="commun.js?v=20261021b"></script>
+<script src="matching.js?v=20261021b"></script>
+<script src="photos.js?v=20261021b"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -391,7 +391,7 @@ const readSubs = {};
 const sentRead = {};    // chatId -> dernier ts « lu » déjà envoyé (évite les écritures inutiles)
 const secretsCache = {};// chatId -> {uid: {firstName, phone}}
 const pressedCache = {};// chatId -> bool (moi j'ai appuyé)
-const revealState = {}, photoNotifSubs = {};   // chatId -> {uid: true} (qui a levé le rideau) ; partenaires dont on suit le partage photo
+const revealState = {}, photoNotifSubs = {}, sharedWithMe = {};   // + partenaire → m'a partagé ses photos (repère 📷 dans la liste)   // chatId -> {uid: true} (qui a levé le rideau) ; partenaires dont on suit le partage photo
 let currentChat = null;
 let propIdx = 0, propUid = null;   // carrousel des propositions : rang et profil affichés
 let msgRef = null;
@@ -1198,10 +1198,15 @@ function checkNotifs(id) {
   const m = myChats[id];
   if (!m) return;
   const pu = partnerOf(m), name = profileName(partnerNo(m));
-  if (revealState[id] && revealState[id][pu] && !m.opened && m.status === "active") notifyOnce("nr_" + id, t("notif_reveal", { name }), id);
+  // clés « …2_ » : les notifications déjà « consommées » par l'ancienne version (bulle de 7 s) réapparaissent une fois
+  if (revealState[id] && revealState[id][pu] && !m.opened && m.status === "active") notifyOnce("nr2_" + id, t("notif_reveal", { name }), id);
   if (!photoNotifSubs[pu]) {
     photoNotifSubs[pu] = db.ref(`photoShares/${pu}/${uid}`);
-    photoNotifSubs[pu].on("value", ps => { const v = ps.val(); if (v && v.active) notifyOnce(`np_${pu}_${v.ts}`, t("notif_photos", { name }), id); }, () => {});
+    photoNotifSubs[pu].on("value", ps => {
+      const v = ps.val();
+      sharedWithMe[pu] = !!(v && v.active); renderChats();
+      if (v && v.active) notifyOnce(`np2_${pu}_${v.ts}`, t("notif_photos", { name }), id);
+    }, () => {});
   }
 }
 /* La notification RESTE jusqu'à ce qu'on l'ouvre (clic → conversation) ou qu'on la ferme (✕) ;
@@ -1299,7 +1304,7 @@ function chatRow([id, m]) {
   return `<div class="chat-row${archived[id] ? " archived" : ""}${n ? " has-unread" : ""}" data-chat="${esc(id)}">
       <div class="avatar ${colorClass(profiles[partnerOf(m)] || { no: pn })}" data-card="${esc(id)}" role="button" aria-label="${esc(t("h109"))}">${HEART}</div>
       <div class="info">
-        <div class="top"><div class="title">${esc(first || profileName(pn))}${first ? ` <small>${esc(profileName(pn))}</small>` : ""}</div><span class="time">${esc(rowTime(lastActivity([id, m])))}</span></div>
+        <div class="top"><div class="title">${esc(first || profileName(pn))}${first ? ` <small>${esc(profileName(pn))}</small>` : ""}${sharedWithMe[partnerOf(m)] ? ` <span class="row-photos">${esc(t("row_photos"))}</span>` : ""}</div><span class="time">${esc(rowTime(lastActivity([id, m])))}</span></div>
         <div class="bottom">${line}${n ? `<span class="ubadge" aria-label="${esc(t("unread_n", { n }))}">${n >= RECENT_MAX ? RECENT_MAX + "+" : n}</span>` : ""}</div>
       </div>
     </div>`;

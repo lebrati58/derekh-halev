@@ -294,6 +294,7 @@ const TEXTS = {
   "notif_reveal": ["💗 {name} לחץ/ה על ״פתיחת המסך״ — רוצה לפתוח גם?", "💗 {name} tapped “Lift the curtain” — want to open it too?", "💗 {name} a appuyé sur « Lever le rideau » — vous aussi ?"],
   "notif_photos": ["📷 {name} שיתף/ה איתך את התמונות", "📷 {name} shared their photos with you", "📷 {name} a partagé ses photos avec vous"],
   "partner_pressed": ["💗 {name} כבר לחץ/ה על ״פתיחת המסך״", "💗 {name} already tapped “Lift the curtain”", "💗 {name} a déjà appuyé sur « Lever le rideau »"],
+  "row_photos": ["📷 שיתף/ה תמונות", "📷 shared photos", "📷 photos partagées"],
   "why_title": ["למה אתם מתאימים:", "Why you match:", "Pourquoi ça colle :"],
   "req_waiting": ["⏳ הבקשה נשלחה — מחכים בסבלנות", "⏳ Request sent — waiting patiently", "⏳ Demande envoyée — patience"],
   "req_send": ["💌 בקשה לשיחה", "💌 Ask to chat", "💌 Demander à discuter"],
