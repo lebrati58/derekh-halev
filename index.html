@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261022b">
+<link rel="stylesheet" href="style.css?v=20261023a">
 </head>
 <body>
 
@@ -390,10 +390,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261022b"></script>
-<script src="commun.js?v=20261022b"></script>
-<script src="matching.js?v=20261022b"></script>
-<script src="photos.js?v=20261022b"></script>
+<script src="i18n.js?v=20261023a"></script>
+<script src="commun.js?v=20261023a"></script>
+<script src="matching.js?v=20261023a"></script>
+<script src="photos.js?v=20261023a"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -511,19 +511,23 @@ async function ensureShareLink() {
   catch (e) { /* collision ou règles pas encore publiées : on réessaiera au prochain chargement */ }
 }
 
+/* Connexion bloquée (VPN, bloqueur de pubs, réseau filtré…) : Firebase attend sans fin.
+   Au bout de 20 s on arrête d'attendre et on explique quoi faire, au lieu de « המסך עולה… » pour toujours. */
+const BOOT_TIMEOUT = 20000;
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej({ code: "timeout" }), ms))]);
 (async function boot() {
   applyI18n(); markLang();
   await chooseLangIfNeeded();
   show("screen-loading");
   try {
-    const user = await ensureAuth();
+    const user = await withTimeout(ensureAuth(), BOOT_TIMEOUT);
     uid = user.uid;
     trackVisit();
-    const [pS, prS, bS] = await Promise.all([
+    const [pS, prS, bS] = await withTimeout(Promise.all([
       db.ref("profiles/" + uid).once("value"),
       db.ref("private/" + uid).once("value"),
       db.ref("banned/" + uid).once("value")
-    ]);
+    ]), BOOT_TIMEOUT);
     if (bS.val()) return show("screen-banned");
     if (pS.exists()) {
       me = pS.val(); priv = prS.val();
@@ -544,7 +548,7 @@ async function ensureShareLink() {
     }
   } catch (e) {
     console.error(e);
-    $("#error-text").textContent = t("err_connect") + " (" + (e.code || e.message || e) + ")";
+    $("#error-text").textContent = e && e.code === "timeout" ? t("err_slow") : t("err_connect") + " (" + (e.code || e.message || e) + ")";
     show("screen-error");
   }
 })();
