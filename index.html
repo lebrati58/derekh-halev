@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261021c">
+<link rel="stylesheet" href="style.css?v=20261022b">
 </head>
 <body>
 
@@ -147,6 +147,16 @@ if (location.hostname === "lebrati58.github.io") {
         </div>
 
         <div class="field">
+          <span class="label"><span data-i18n="h116">מצב משפחתי</span> <span class="hint" data-i18n="h125">לא חובה</span></span>
+          <div class="chips">
+            <label class="chip"><input type="radio" name="marital" value="single"><span data-i18n="h117">רווק/ה</span></label>
+            <label class="chip"><input type="radio" name="marital" value="divorced"><span data-i18n="h118">גרוש/ה</span></label>
+            <label class="chip"><input type="radio" name="marital" value="widowed"><span data-i18n="h119">אלמן/ה</span></label>
+            <label class="chip"><input type="radio" name="marital" value="na"><span data-i18n="h120">מעדיף/ה לא לציין</span></label>
+          </div>
+        </div>
+
+        <div class="field">
           <span class="label"><span data-i18n="h100">שפות שאני מדבר/ת</span> <span class="hint" data-i18n="h029">אפשר לבחור כמה</span></span>
           <div class="chips">
             <label class="chip"><input type="checkbox" name="langs" value="he"><span data-i18n="h030">🇮🇱 עברית</span></label>
@@ -169,6 +179,11 @@ if (location.hostname === "lebrati58.github.io") {
           <textarea id="f-shabbat" maxlength="200" placeholder="למשל: ארוחה ארוכה עם חברים, ואז שנ״צ של שלוש שעות 😴" data-i18n-ph="h089"></textarea>
         </div>
 
+        <div class="field">
+          <label for="f-about"><span data-i18n="h122">כמה מילים עליי ✍️</span> <span class="hint" data-i18n="h123">לא חובה — בלי טלפון ובלי קישורים</span></label>
+          <textarea id="f-about" maxlength="200" placeholder="מה חשוב לי, מה אני אוהב/ת, מה מחפש/ת…" data-i18n-ph="h124"></textarea>
+        </div>
+
         <div class="q-divider" data-i18n="h033">⚡ השאלון הקצר — כמה קליקים וסיימנו</div>
         <p class="sub" data-i18n="h034">זה מה שעוזר לקסם למצוא לך התאמות. קליל, מבטיחים 😉</p>
 
@@ -177,6 +192,15 @@ if (location.hostname === "lebrati58.github.io") {
           <div class="row2">
             <input type="number" id="f-agemin" min="18" max="99" inputmode="numeric" placeholder="מגיל" data-i18n-ph="h090">
             <input type="number" id="f-agemax" min="18" max="99" inputmode="numeric" placeholder="עד גיל" data-i18n-ph="h091">
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label"><span data-i18n="h121">פתוח/ה להכיר:</span> <span class="hint" data-i18n="h029">אפשר לבחור כמה</span></span>
+          <div class="chips">
+            <label class="chip"><input type="checkbox" name="maritalOk" value="single" checked><span data-i18n="h117">רווק/ה</span></label>
+            <label class="chip"><input type="checkbox" name="maritalOk" value="divorced" checked><span data-i18n="h118">גרוש/ה</span></label>
+            <label class="chip"><input type="checkbox" name="maritalOk" value="widowed" checked><span data-i18n="h119">אלמן/ה</span></label>
           </div>
         </div>
 
@@ -265,6 +289,9 @@ if (location.hostname === "lebrati58.github.io") {
     <div class="paused-banner hidden" id="paused-banner"><span data-i18n="h104">⏸️ את/ה במצב השהיה — הכרטיס שלך לא מוצג כרגע</span> <button class="btn link" id="resume-btn" data-i18n="h068">חזרה ▶️</button></div>
     <div class="langs-banner hidden" id="langs-banner"><span data-i18n="h107">🆕 הוסיפו את השפות שאתם מדברים — זה עוזר להתאמות! 🇮🇱🇬🇧🇫🇷</span>
       <button class="btn gold small" id="langs-go" data-i18n="h108">✏️ להוספה</button></div>
+    <div class="langs-banner hidden" id="marital-banner"><span data-i18n="h126">✨ חדש! הוסיפו מצב משפחתי וכמה מילים עליכם — כך יכירו אתכם טוב יותר</span>
+      <button class="btn gold small" id="marital-go" data-i18n="h127">✏️ להשלים עכשיו</button>
+      <button class="btn link small" id="marital-x" aria-label="סגירה" data-i18n-aria="close">✕</button></div>
     <div class="tabs" role="tablist" style="margin-top:6px">
       <button class="tab active" data-tab="proposals" data-i18n="h071">✨ הצעות</button>
       <button class="tab" data-tab="requests"><span data-i18n="h105">💌 בקשות</span> <span class="badge hidden" id="badge-requests"></span></button>
@@ -363,10 +390,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261021c"></script>
-<script src="commun.js?v=20261021c"></script>
-<script src="matching.js?v=20261021c"></script>
-<script src="photos.js?v=20261021c"></script>
+<script src="i18n.js?v=20261022b"></script>
+<script src="commun.js?v=20261022b"></script>
+<script src="matching.js?v=20261022b"></script>
+<script src="photos.js?v=20261022b"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -571,6 +598,9 @@ $("#edit-me").addEventListener("click", async () => {
   setRadio("kids", me.kids); setRadio("shstyle", me.shabbatStyle); setRadio("pace", me.pace);
   setRadio("value", me.value); setRadio("weekend", me.weekend); setRadio("million", me.million);
   $("#f-clw").value = me.cantLiveWithout || "";
+  $("#f-about").value = me.about || "";
+  setRadio("marital", me.marital);
+  $$("input[name=maritalOk]").forEach(i => { i.checked = !me.maritalOk || me.maritalOk[i.value] === true; });
   $$("input[name=langs]").forEach(i => { i.checked = !!(me.langs && me.langs[i.value]); });
   $("#f-ok").checked = true;
   $("#reg-title").textContent = t("edit_title", { name: profileName(me.no) });
@@ -610,6 +640,11 @@ $("#reg-form").addEventListener("submit", async e => {
   if (ageMax && (ageMax < 18 || ageMax > 99)) ageMax = null;
   if (ageMin && ageMax && ageMin > ageMax) { const t = ageMin; ageMin = ageMax; ageMax = t; }
   const cantLiveWithout = $("#f-clw").value.trim();
+  const about = $("#f-about").value.trim().slice(0, 200);
+  const marital = val("marital") || null;
+  const okBoxes = $$("input[name=maritalOk]"), okChecked = okBoxes.filter(i => i.checked);
+  // toutes cochées = ouvert·e à tous → pas de filtre (null)
+  const maritalOk = okChecked.length && okChecked.length < okBoxes.length ? Object.fromEntries(okChecked.map(i => [i.value, true])) : null;
   const langs = {};
   $$("input[name=langs]:checked").forEach(i => { langs[i.value] = true; });
 
@@ -629,7 +664,8 @@ $("#reg-form").addEventListener("submit", async e => {
   if (!value) return regFail("v_value");
   if (!weekend) return regFail("v_weekend");
   if (!million) return regFail("v_million");
-  if ([...words, shabbat, city, cantLiveWithout].some(hasForbiddenContent)) return regFail("v_forbidden");
+  if (!okChecked.length) return regFail("v_marital_ok");
+  if ([...words, shabbat, city, cantLiveWithout, about].some(hasForbiddenContent)) return regFail("v_forbidden");
   if (!$("#f-ok").checked) return regFail("v_ok");
 
   const btn = $("#reg-btn");
@@ -643,7 +679,8 @@ $("#reg-form").addEventListener("submit", async e => {
         gender, age, city, religion, intent, words, shabbat,
         ageMin: ageMin || null, ageMax: ageMax || null, kids: kids || null, shabbatStyle: shabbatStyle || null,
         pace: pace || null, value: value || null, weekend: weekend || null, million: million || null,
-        cantLiveWithout: cantLiveWithout || null, langs
+        cantLiveWithout: cantLiveWithout || null, langs,
+        marital, maritalOk, about: about || null
       });
       toast(t("profile_updated"));
       track("profile_edit");
@@ -674,6 +711,9 @@ $("#reg-form").addEventListener("submit", async e => {
     if (weekend) extra.weekend = weekend;
     if (million) extra.million = million;
     if (cantLiveWithout) extra.cantLiveWithout = cantLiveWithout;
+    if (marital) extra.marital = marital;
+    if (maritalOk) extra.maritalOk = maritalOk;
+    if (about) extra.about = about;
     extra.langs = langs;
     me = Object.assign({}, base, extra);
     // Profil + réservation du numéro (profileNos) en une écriture atomique :
@@ -784,10 +824,19 @@ function renderNews() {
 /* ----- Mode pause ----- */
 /* Bandeau « ajoutez vos langues » : profils créés avant l'ajout des langues */
 function updateLangsBanner() {
-  const b = $("#langs-banner");
-  if (b) b.classList.toggle("hidden", !me || langList(me).length > 0);
+  const b = $("#langs-banner"), needLangs = !!me && !langList(me).length;
+  if (b) b.classList.toggle("hidden", !needLangs);
+  // anciens profils : situation familiale pas encore remplie (une bannière à la fois ; ✕ = plus jamais)
+  const mb = $("#marital-banner");
+  if (mb) mb.classList.toggle("hidden", !me || needLangs || !!me.marital || !!store.get("marital_banner_x"));
 }
 $("#langs-go").addEventListener("click", () => $("#edit-me").click());
+$("#marital-go").addEventListener("click", async () => {
+  track("marital_banner_go");
+  $("#edit-me").click();
+  setTimeout(() => { const f = $("input[name=marital]"); if (f) f.closest(".field").scrollIntoView({ behavior: "smooth", block: "center" }); }, 400);
+});
+$("#marital-x").addEventListener("click", () => { store.set("marital_banner_x", 1); updateLangsBanner(); });
 
 function updatePausedUI() {
   const paused = !!(me && me.paused);

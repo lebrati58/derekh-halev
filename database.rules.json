@@ -93,6 +93,17 @@
         "link": {
           ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9]{10}$/) && newData.parent().parent().parent().child('shareLinks/' + newData.val()).val() === $uid"
         },
+        "marital": {
+          ".validate": "newData.val() === 'single' || newData.val() === 'divorced' || newData.val() === 'widowed' || newData.val() === 'na'"
+        },
+        "maritalOk": {
+          "$m": {
+            ".validate": "($m === 'single' || $m === 'divorced' || $m === 'widowed') && newData.val() === true"
+          }
+        },
+        "about": {
+          ".validate": "newData.isString() && newData.val().length <= 200"
+        },
         "$other": {
           ".validate": false
         }

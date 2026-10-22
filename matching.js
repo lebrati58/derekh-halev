@@ -18,13 +18,16 @@ const QUIZ = {
 const MSG = {
   he: { soft_mine: "גיל מחוץ לטווח שבחרת", soft_his: "את/ה מחוץ לטווח הגילאים שלו", soft_hers: "את/ה מחוץ לטווח הגילאים שלה",
         soft_gap: "פער גילאים של {n} שנים", soft_rel: "אורח חיים שונה (דתי ↔ חילוני)", same_city: "שניכם מ{city}",
-        same_lang: "שניכם מדברים {lang} {flag}", same_rel: "אורח חיים דומה", same_age: "גיל דומה" },
+        same_lang: "שניכם מדברים {lang} {flag}", same_rel: "אורח חיים דומה", same_age: "גיל דומה",
+        soft_marital: "מצב משפחתי מחוץ להעדפות" },
   en: { soft_mine: "Age outside the range you chose", soft_his: "You're outside his age range", soft_hers: "You're outside her age range",
         soft_gap: "{n}-year age gap", soft_rel: "Different lifestyles (religious ↔ secular)", same_city: "You're both from {city}",
-        same_lang: "You both speak {lang} {flag}", same_rel: "Similar lifestyle", same_age: "Similar age" },
+        same_lang: "You both speak {lang} {flag}", same_rel: "Similar lifestyle", same_age: "Similar age",
+        soft_marital: "Marital status outside the preferences" },
   fr: { soft_mine: "Âge hors de votre tranche", soft_his: "Vous êtes hors de sa tranche d'âge", soft_hers: "Vous êtes hors de sa tranche d'âge",
         soft_gap: "{n} ans d'écart", soft_rel: "Modes de vie différents (religieux ↔ laïque)", same_city: "Vous êtes tous les deux de {city}",
-        same_lang: "Vous parlez tous les deux {lang} {flag}", same_rel: "Mode de vie proche", same_age: "Âge proche" }
+        same_lang: "Vous parlez tous les deux {lang} {flag}", same_rel: "Mode de vie proche", same_age: "Âge proche",
+        soft_marital: "Situation familiale hors des préférences" }
 };
 function _msg(lang, key, vars) {
   let s = ((MSG[lang] || MSG.he)[key]) || MSG.he[key];
@@ -66,6 +69,17 @@ function kidsOk(me, p) {
   return true;
 }
 
+/* Situation familiale : p.marital ∈ single | divorced | widowed | na ; p.maritalOk = { single, divorced, widowed }
+   (absent = ouvert·e à tous). Un statut inconnu ou « na » n'exclut jamais. Vérifié dans les deux sens. */
+const MARITAL = ["single", "divorced", "widowed"];
+function _maritalAccepts(prefs, status) {
+  if (!prefs || !MARITAL.includes(status)) return true;
+  return prefs[status] === true;
+}
+function maritalOk(me, p) {
+  return _maritalAccepts(me.maritalOk, p.marital) && _maritalAccepts(p.maritalOk, me.marital);
+}
+
 function isCompatible(me, p) {
   return !!(me && p) &&
     (p.gender === "m" || p.gender === "f") &&
@@ -73,6 +87,7 @@ function isCompatible(me, p) {
     !p.paused &&
     ageOk(me, p) &&
     kidsOk(me, p) &&
+    maritalOk(me, p) &&
     religionOk(me.religion, p.religion);
 }
 
@@ -97,6 +112,7 @@ function softReasons(me, p, lang = "he") {
   if ((pMin && me.age < pMin) || (pMax && me.age > pMax)) out.push(_msg(lang, p.gender === "f" ? "soft_hers" : "soft_his"));
   if (!meMin && !meMax && !pMin && !pMax && !ageOk(me, p)) out.push(_msg(lang, "soft_gap", { n: Math.abs(me.age - p.age) }));
   if (!religionOk(me.religion, p.religion)) out.push(_msg(lang, "soft_rel"));
+  if (!maritalOk(me, p)) out.push(_msg(lang, "soft_marital"));
   return out;
 }
 
@@ -275,5 +291,5 @@ function pickIcebreaker(a, b, lang = "he") { return icebreakerText(pickIcebreake
 
 /* ---------- Export Node (tests) ---------- */
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { QUIZ, religionOk, ageOk, kidsOk, isCompatible, isSoftCompatible, softReasons, LANGS, langList, langFlags, sharedLangs, matchScore, matchPercent, matchReasons, pickIcebreaker, pickIcebreakerKey, icebreakerText, ICEBREAKERS, ICEBREAKERS_I18N, WHY, WHY_I18N, MSG };
+  module.exports = { QUIZ, religionOk, ageOk, kidsOk, maritalOk, MARITAL, isCompatible, isSoftCompatible, softReasons, LANGS, langList, langFlags, sharedLangs, matchScore, matchPercent, matchReasons, pickIcebreaker, pickIcebreakerKey, icebreakerText, ICEBREAKERS, ICEBREAKERS_I18N, WHY, WHY_I18N, MSG };
 }

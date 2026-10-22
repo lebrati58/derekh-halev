@@ -106,6 +106,7 @@ const LABELS = {
   get intent() { return { serious: t("intent_serious"), see: t("intent_see") }; }
 };
 const religionLabel = (r, g) => (["dati", "masorti", "hiloni"].includes(r) && (g === "m" || g === "f")) ? t(`rel_${r}_${g}`) : "";
+const maritalLabel = p => (["single", "divorced", "widowed"].includes(p.marital) && (p.gender === "m" || p.gender === "f")) ? t(`mar_${p.marital}_${p.gender}`) : "";
 const profileName = no => t("profile", { no });
 const HEART = '<img class="heart-ico" src="logo-heart.png" alt="">';   // logo cœur (remplace 🎭)
 
@@ -217,13 +218,14 @@ function cardHTML(p, opts = {}) {
     </div>
     <div class="mc-words">${words}</div>
     <div class="mc-meta-row">
-      <div class="mc-meta">${esc(p.age)} · ${esc(p.city)} · ${esc(religionLabel(p.religion, p.gender))}</div>
+      <div class="mc-meta">${esc(p.age)} · ${esc(p.city)} · ${esc(religionLabel(p.religion, p.gender))}${maritalLabel(p) ? ` · ${esc(maritalLabel(p))}` : ""}</div>
       ${opts.tools ? `<button type="button" class="mc-share" data-share-no="${esc(p.no)}">🔗 ${esc(t("share_btn"))}</button>` : ""}
     </div>
     ${typeof langFlags === "function" && langFlags(p) ? `<div class="mc-langs" title="${esc(t("langs_title"))}">${esc(langFlags(p))}</div>` : ""}
     <div class="mc-intent">${esc(LABELS.intent[p.intent] || "")}</div>
     ${p.shabbat && !opts.noShabbat ? `<div class="mc-shabbat"><b>${esc(t("card_shabbat"))}</b> “${esc(p.shabbat)}”</div>` : ""}
     ${p.cantLiveWithout ? `<div class="mc-shabbat"><b>${esc(t("card_clw"))}</b> ${esc(p.cantLiveWithout)}</div>` : ""}
+    ${p.about ? `<div class="mc-shabbat mc-about"><b>${esc(t("card_about"))}</b> ${esc(p.about)}</div>` : ""}
   </div>`;
 }
 
