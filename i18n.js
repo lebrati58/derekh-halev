@@ -313,6 +313,8 @@ const TEXTS = {
   "mar_widowed_m": ["אלמן", "Widowed", "Veuf"],
   "mar_widowed_f": ["אלמנה", "Widowed", "Veuve"],
   "v_marital_ok": ["בחרו לפחות מצב משפחתי אחד שאתם פתוחים להכיר", "Choose at least one marital status you're open to", "Choisissez au moins une situation familiale"],
+  "h126": ["✨ חדש! הוסיפו מצב משפחתי וכמה מילים עליכם — כך יכירו אתכם טוב יותר", "✨ New! Add your marital status and a few words about yourself — so people get to know you better", "✨ Nouveau ! Ajoutez votre situation familiale et quelques mots sur vous — pour qu'on vous connaisse mieux"],
+  "h127": ["✏️ להשלים עכשיו", "✏️ Complete now", "✏️ Compléter"],
   "why_title": ["למה אתם מתאימים:", "Why you match:", "Pourquoi ça colle :"],
   "req_waiting": ["⏳ הבקשה נשלחה — מחכים בסבלנות", "⏳ Request sent — waiting patiently", "⏳ Demande envoyée — patience"],
   "req_send": ["💌 בקשה לשיחה", "💌 Ask to chat", "💌 Demander à discuter"],

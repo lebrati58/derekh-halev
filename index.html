@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261022a">
+<link rel="stylesheet" href="style.css?v=20261022b">
 </head>
 <body>
 
@@ -289,6 +289,9 @@ if (location.hostname === "lebrati58.github.io") {
     <div class="paused-banner hidden" id="paused-banner"><span data-i18n="h104">⏸️ את/ה במצב השהיה — הכרטיס שלך לא מוצג כרגע</span> <button class="btn link" id="resume-btn" data-i18n="h068">חזרה ▶️</button></div>
     <div class="langs-banner hidden" id="langs-banner"><span data-i18n="h107">🆕 הוסיפו את השפות שאתם מדברים — זה עוזר להתאמות! 🇮🇱🇬🇧🇫🇷</span>
       <button class="btn gold small" id="langs-go" data-i18n="h108">✏️ להוספה</button></div>
+    <div class="langs-banner hidden" id="marital-banner"><span data-i18n="h126">✨ חדש! הוסיפו מצב משפחתי וכמה מילים עליכם — כך יכירו אתכם טוב יותר</span>
+      <button class="btn gold small" id="marital-go" data-i18n="h127">✏️ להשלים עכשיו</button>
+      <button class="btn link small" id="marital-x" aria-label="סגירה" data-i18n-aria="close">✕</button></div>
     <div class="tabs" role="tablist" style="margin-top:6px">
       <button class="tab active" data-tab="proposals" data-i18n="h071">✨ הצעות</button>
       <button class="tab" data-tab="requests"><span data-i18n="h105">💌 בקשות</span> <span class="badge hidden" id="badge-requests"></span></button>
@@ -387,10 +390,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261022a"></script>
-<script src="commun.js?v=20261022a"></script>
-<script src="matching.js?v=20261022a"></script>
-<script src="photos.js?v=20261022a"></script>
+<script src="i18n.js?v=20261022b"></script>
+<script src="commun.js?v=20261022b"></script>
+<script src="matching.js?v=20261022b"></script>
+<script src="photos.js?v=20261022b"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -821,10 +824,19 @@ function renderNews() {
 /* ----- Mode pause ----- */
 /* Bandeau « ajoutez vos langues » : profils créés avant l'ajout des langues */
 function updateLangsBanner() {
-  const b = $("#langs-banner");
-  if (b) b.classList.toggle("hidden", !me || langList(me).length > 0);
+  const b = $("#langs-banner"), needLangs = !!me && !langList(me).length;
+  if (b) b.classList.toggle("hidden", !needLangs);
+  // anciens profils : situation familiale pas encore remplie (une bannière à la fois ; ✕ = plus jamais)
+  const mb = $("#marital-banner");
+  if (mb) mb.classList.toggle("hidden", !me || needLangs || !!me.marital || !!store.get("marital_banner_x"));
 }
 $("#langs-go").addEventListener("click", () => $("#edit-me").click());
+$("#marital-go").addEventListener("click", async () => {
+  track("marital_banner_go");
+  $("#edit-me").click();
+  setTimeout(() => { const f = $("input[name=marital]"); if (f) f.closest(".field").scrollIntoView({ behavior: "smooth", block: "center" }); }, 400);
+});
+$("#marital-x").addEventListener("click", () => { store.set("marital_banner_x", 1); updateLangsBanner(); });
 
 function updatePausedUI() {
   const paused = !!(me && me.paused);
