@@ -81,6 +81,12 @@ async function denied(name, fn) {
   await denied ("lire le private (téléphone) d'un autre",  () => get(ref(A, "private/bob")));
   await denied ("banni : modifier son profil",             () => set(ref(M, "profiles/mallory/city"), "חיפה"));
   await denied ("profil : champ inconnu (hack)",           () => update(ref(A, "profiles/alice"), { hack: true }));
+  await allowed("profil : situation familiale + préférence + « עליי »", () => update(ref(A, "profiles/alice"), { marital: "divorced", maritalOk: { single: true, widowed: true }, about: "אוהבת ים ושקט" }));
+  await denied ("profil : statut inconnu",                  () => update(ref(A, "profiles/alice"), { marital: "married" }));
+  await denied ("profil : préférence inconnue",             () => update(ref(A, "profiles/alice"), { maritalOk: { married: true } }));
+  await denied ("profil : préférence ≠ true",               () => update(ref(A, "profiles/alice"), { maritalOk: { single: "oui" } }));
+  await denied ("profil : « עליי » trop long (> 200)",      () => update(ref(A, "profiles/alice"), { about: "x".repeat(201) }));
+  await allowed("profil : on peut tout retirer (null)",     () => update(ref(A, "profiles/alice"), { marital: null, maritalOk: null, about: null }));
 
   /* ---------- Compteur de numéros ---------- */
   await allowed("compteur : incrément +1",                 () => set(ref(E, "counters/profileNo"), 6));

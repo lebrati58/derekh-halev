@@ -14,7 +14,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `stats.js` | Calcul **pur** des statistiques admin (`computeStats`, `insights`, périodes, rétention, entonnoir, compatibilité via `matching.js`) — testé par `test_stats.js` |
 | `admin-stats.js` | Interface du centre statistique de l'admin (`StatsUI`) : filtres période/segment, onglets, graphiques SVG, export CSV |
 | `photos.js` | Photos privées (« קודם הלב, אחר כך הפנים ») : « 📷 התמונות שלי » (4 emplacements, galerie/appareil, recadrage 4:5, ré-encodage JPEG dans le navigateur = EXIF/GPS supprimés, principale, réorganiser, remplacer, supprimer), « מי יכול לראות את התמונות שלי? » (révocation), barre photo dans le chat (partage débloqué quand les DEUX ont écrit), galerie plein écran avec filigrane « נצפה ע״י פרופיל N ». Jamais de photo dans les cartes, propositions, recherche ou demandes |
-| `matching.js` | Moteur de compatibilité pur (sans Firebase) : filtres durs, score, %, raisons « למה אתם מתאימים », icebreakers |
+| `matching.js` | Moteur de compatibilité pur (sans Firebase) : filtres durs (dont `maritalOk` : préférence de situation familiale, vérifiée dans les deux sens ; statut inconnu ou « na » jamais exclu ; hors préférence → « découverte » avec la raison), score, %, raisons « למה אתם מתאימים », icebreakers |
 | `style.css` | Styles partagés |
 | `logo.png`, `logo-heart.png`, `apple-touch-icon.png` | Logo complet (aperçu WhatsApp `og:image`), cœur seul transparent (en-tête + icône d'onglet), icône écran d'accueil |
 | `database.rules.json` | Règles de sécurité RTDB (source de vérité de la confidentialité) |
@@ -33,7 +33,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 - `config/adminPin` — PIN admin, saisi à la main dans la console, illisible par tous.
 - `admins/{uid}` — copie du PIN écrite par admin.html ; vaut « admin » si égal à `config/adminPin`.
 - `counters/profileNo` — compteur des numéros de profil (incrément +1 par transaction).
-- `profiles/{uid}` — profil **public** : `no`, `gender`, `age`, `city`, `religion`, `intent`, `words[3]`, `shabbat`, `createdAt` + questionnaire v2 optionnel (`ageMin/ageMax`, `kids`, `shabbatStyle`, `pace`, `value`, `weekend`, `million`, `cantLiveWithout`) + `langs` (`{he,en,fr: true}`, langues parlées → drapeaux 🇮🇱🇬🇧🇫🇷 sur la carte) + `paused`.
+- `profiles/{uid}` — profil **public** : `no`, `gender`, `age`, `city`, `religion`, `intent`, `words[3]`, `shabbat`, `createdAt` + questionnaire v2 optionnel (`ageMin/ageMax`, `kids`, `shabbatStyle`, `pace`, `value`, `weekend`, `million`, `cantLiveWithout`) + `langs` (`{he,en,fr: true}`, langues parlées → drapeaux 🇮🇱🇬🇧🇫🇷 sur la carte) + `paused` + facultatifs : `marital` (`single|divorced|widowed|na`, affiché sur la carte, accordé au genre), `maritalOk` (`{single,divorced,widowed: true}`, absent = ouvert·e à tous), `about` (« כמה מילים עליי », ≤ 200 car., filtre anti-téléphone côté client).
 - `profileNos/{no}: uid` — index d'unicité des numéros, réservé une fois à la création du profil.
 - `shareLinks/{code}: uid` + `profiles/{uid}/link: code` — lien de partage secret `/?c=code` (10 caractères aléatoires, créé au 1er chargement par `ensureShareLink()`). Les anciens liens `/?p=N` ouvrent la fiche seulement après inscription.
 - `private/{uid}` — `firstName`, `phone`.

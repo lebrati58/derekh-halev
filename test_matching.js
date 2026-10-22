@@ -72,6 +72,17 @@ check("langue commune = 1re raison (visible même limité à 3)", M.matchReasons
 check("raison « שניכם מדברים צרפתית »", M.matchReasons(fr1, fr2, 10).some(r => r.includes("צרפתית") && r.includes("🇫🇷")));
 check("bonus de score pour langue commune", M.matchScore(fr1, fr2) === M.matchScore(base, guy) + 4);
 
+console.log("— Situation familiale —");
+const gm = { ...guy, marital: "divorced" };
+check("sans préférence : divorcé accepté", M.isCompatible(base, gm));
+check("je ne veux que des célibataires → divorcé exclu", !M.isCompatible({ ...base, maritalOk: { single: true } }, gm));
+check("… dans les deux sens (lui ne veut que des célibataires, moi veuve)", !M.isCompatible({ ...base, marital: "widowed" }, { ...guy, maritalOk: { single: true } }));
+check("statut « préfère ne pas dire » jamais exclu", M.isCompatible({ ...base, maritalOk: { single: true } }, { ...guy, marital: "na" }));
+check("ancien profil sans statut jamais exclu", M.isCompatible({ ...base, maritalOk: { single: true } }, guy));
+check("divorcé accepté si coché", M.isCompatible({ ...base, maritalOk: { single: true, divorced: true } }, gm));
+check("exclu des matchs mais visible en « découverte » avec la raison", M.isSoftCompatible({ ...base, maritalOk: { single: true } }, gm) && M.softReasons({ ...base, maritalOk: { single: true } }, gm, "he").includes("מצב משפחתי מחוץ להעדפות"));
+check("raison traduite (fr)", M.softReasons({ ...base, maritalOk: { single: true } }, gm, "fr").includes("Situation familiale hors des préférences"));
+
 console.log("— Icebreakers —");
 check("weekend commun → question ים", M.pickIcebreaker(rich1, rich2) === M.ICEBREAKERS.weekend.sea);
 check("sans points communs → générique déterministe", M.ICEBREAKERS.generic.includes(M.pickIcebreaker(base, guy)));
