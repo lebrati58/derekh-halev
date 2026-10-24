@@ -263,6 +263,25 @@ textarea { resize: vertical; min-height: 70px; }
 .curtain.right { right: 0; border-left: 2px solid rgba(212,169,74,.6); }
 .reveal.open .curtain.left { transform: translateX(-96%) scaleX(.35); transform-origin: left; }
 .reveal.open .curtain.right { transform: translateX(96%) scaleX(.35); transform-origin: right; }
+/* avant l'ouverture : le cœur bat, le rideau frémit */
+.reveal.beat .curtain-mask img { animation: heartbeat .85s ease-in-out 2; }
+.reveal.beat .curtain.left { animation: sway-l .85s ease-in-out 2; transform-origin: left; }
+.reveal.beat .curtain.right { animation: sway-r .85s ease-in-out 2; transform-origin: right; }
+.beat-ring { position: absolute; left: 50%; top: 50%; width: 1em; height: 1em; margin: -.5em 0 0 -.5em; border-radius: 50%; border: 3px solid var(--gold-2); opacity: 0; }
+.reveal.beat .beat-ring { animation: ring .85s ease-out 2; }
+@keyframes heartbeat { 0%, 100% { transform: scale(1); } 14% { transform: scale(1.28); } 28% { transform: scale(1); } 42% { transform: scale(1.18); } 70% { transform: scale(1); } }
+@keyframes ring { 0% { transform: scale(.8); opacity: .9; } 100% { transform: scale(2.6); opacity: 0; } }
+@keyframes sway-l { 0%, 100% { transform: none; } 30% { transform: skewY(.6deg) scaleX(.985); } }
+@keyframes sway-r { 0%, 100% { transform: none; } 30% { transform: skewY(-.6deg) scaleX(.985); } }
+/* lumière de scène + nom qui apparaît */
+.spotlight { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; background: radial-gradient(ellipse 55% 45% at 50% 42%, rgba(255,226,150,.28), transparent 70%), conic-gradient(from 160deg at 50% -10%, transparent 0 14deg, rgba(255,226,150,.12) 18deg 26deg, transparent 30deg 360deg); transition: opacity 1.4s .9s; }
+.reveal.open .spotlight { opacity: 1; }
+.reveal.open .person .nm { animation: name-in 1s cubic-bezier(.2, 1.4, .4, 1) 2s both; background: linear-gradient(90deg, var(--gold-2), #fff6d8, var(--gold-2)) 0 0 / 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }
+@keyframes name-in { 0% { transform: scale(.4); opacity: 0; letter-spacing: .4em; } 100% { transform: none; opacity: 1; letter-spacing: normal; } }
+.burst { position: absolute; left: 50%; top: 50%; z-index: 5; pointer-events: none; }
+.burst span { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); opacity: 0; animation: burst 2.4s cubic-bezier(.15, .7, .3, 1) forwards; }
+@keyframes burst { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.3); } 12% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) + 90px)) rotate(var(--r)) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .reveal.beat .curtain-mask img, .reveal.beat .curtain, .reveal.beat .beat-ring, .reveal.open .person .nm { animation: none; } }
 .curtain-mask { position: absolute; z-index: 4; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4rem; transition: opacity .6s, transform .8s; filter: drop-shadow(0 6px 10px rgba(0,0,0,.5)); }
 .reveal.open .curtain, .reveal.open .curtain-mask { pointer-events: none; }
 .reveal.open .curtain-mask { opacity: 0; transform: translate(-50%, -90%) scale(1.6); }
