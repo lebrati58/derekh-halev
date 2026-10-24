@@ -632,7 +632,13 @@ body.ph-open { overflow: hidden; }
 /* ---------- Carrousel des propositions : un profil à la fois, défilement horizontal ---------- */
 .pcar-head { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 0 0 10px; }
 .pcar-count { min-width: 4.5em; text-align: center; color: var(--gold-2); font-weight: 700; font-size: .95rem; }
-.pcar-nav { width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(243,216,138,.45); background: rgba(0,0,0,.25); color: var(--gold-2); font-size: 1.4rem; line-height: 1; cursor: pointer; }
+.pcar-nav { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid rgba(243,216,138,.55); background: rgba(0,0,0,.25); color: var(--gold-2); font: inherit; font-size: .95rem; font-weight: 700; cursor: pointer; }
+.pcar-nav.next { background: linear-gradient(135deg, rgba(243,216,138,.28), rgba(243,216,138,.12)); }
+.pcar-ico { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.pcar-hint { text-align: center; font-size: .85rem; opacity: .8; margin: -4px 0 10px; }
+.pcar-foot { display: flex; justify-content: center; margin: 4px 0 6px; }
+.pcar-next-big { display: inline-flex; align-items: center; gap: 6px; }
+.pcar-foot .pcar-next-big:disabled { display: none; }
 .pcar-nav:disabled { opacity: .3; cursor: default; }
 .pcar { display: flex; align-items: flex-start; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; margin: 0 -16px; }
 .pcar::-webkit-scrollbar { display: none; }
