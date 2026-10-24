@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261024b">
+<link rel="stylesheet" href="style.css?v=20261024c">
 </head>
 <body>
 
@@ -366,6 +366,7 @@ if (location.hostname === "lebrati58.github.io") {
 <div id="reveal" class="reveal hidden">
   <div class="stage">
     <div class="stage-top"></div>
+    <div class="rays"></div>
     <div class="reveal-content">
       <h2 data-i18n="h081">✨ המסך נפתח ✨</h2>
       <p class="sub" style="margin:0" data-i18n="h082">שניכם בחרתם להסיר את המסך</p>
@@ -384,6 +385,9 @@ if (location.hostname === "lebrati58.github.io") {
     <div class="curtain left"></div>
     <div class="curtain right"></div>
     <div class="spotlight"></div>
+    <div class="dust"></div>
+    <div class="slit"></div>
+    <div class="flash"></div>
     <div class="curtain-mask"><span class="beat-ring"></span><img class="heart-ico" src="logo-heart.png" alt=""></div>
   </div>
 </div>
@@ -391,10 +395,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261024b"></script>
-<script src="commun.js?v=20261024b"></script>
-<script src="matching.js?v=20261024b"></script>
-<script src="photos.js?v=20261024b"></script>
+<script src="i18n.js?v=20261024c"></script>
+<script src="commun.js?v=20261024c"></script>
+<script src="matching.js?v=20261024c"></script>
+<script src="photos.js?v=20261024c"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -1613,7 +1617,7 @@ function playReveal(id) {
   if (!theirs) return;
   $("#reveal-who").innerHTML = `
     <div class="person"><div class="lbl">${esc(t("reveal_is", { name: profileName(partnerNo(m)) }))}</div>
-      <div class="nm">${esc(theirs.firstName)}</div><div class="ph">${esc(theirs.phone)}</div></div>
+      <div class="nm letters">${[...(theirs.firstName || "")].map((ch, i) => `<span style="--i:${i}">${esc(ch)}</span>`).join("")}</div><div class="ph">${esc(theirs.phone)}</div></div>
     <div class="person" style="opacity:.8"><div class="lbl">${esc(t("reveal_you", { name: profileName(myNo(m)) }))}</div>
       <div class="nm" style="font-size:1.2rem">${esc(mine.firstName || "")}</div></div>`;
   $("#reveal-wa").href = waLink(theirs.phone);
@@ -1632,8 +1636,27 @@ function openCurtain(r) {
   if (r.classList.contains("open")) return;
   r.classList.remove("beat"); r.classList.add("open");
   buzz([35, 45, 35, 45, 260]);
-  revealBurst();
+  revealBurst(); chime();
 }
+// Petit carillon doux (Web Audio, rien à télécharger) ; muet si le navigateur bloque le son
+function chime() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const ac = chime.ac || (chime.ac = new AC()); if (ac.state === "suspended") ac.resume();
+    [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain(), t0 = ac.currentTime + i * .11;
+      o.type = "sine"; o.frequency.value = f;
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(.07, t0 + .02); g.gain.exponentialRampToValueAtTime(.0001, t0 + 1.4);
+      o.connect(g).connect(ac.destination); o.start(t0); o.stop(t0 + 1.5);
+    });
+  } catch (e) {}
+}
+// Poussière d'or qui tombe doucement une fois le rideau ouvert (créée une seule fois)
+(() => {
+  const d = $("#reveal .dust");
+  for (let i = 0; i < 22; i++) { const sp = document.createElement("span"); sp.style.cssText = `left:${Math.random() * 100}%;animation-delay:${2 + Math.random() * 5}s;animation-duration:${4 + Math.random() * 4}s;transform:scale(${.5 + Math.random()})`; d.appendChild(sp); }
+})();
 // Confettis cœurs / étoiles depuis le centre de la scène (supprimés après l'animation)
 function revealBurst() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
