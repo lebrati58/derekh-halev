@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261024">
+<link rel="stylesheet" href="style.css?v=20261024c">
 </head>
 <body>
 
@@ -366,6 +366,7 @@ if (location.hostname === "lebrati58.github.io") {
 <div id="reveal" class="reveal hidden">
   <div class="stage">
     <div class="stage-top"></div>
+    <div class="rays"></div>
     <div class="reveal-content">
       <h2 data-i18n="h081">✨ המסך נפתח ✨</h2>
       <p class="sub" style="margin:0" data-i18n="h082">שניכם בחרתם להסיר את המסך</p>
@@ -383,17 +384,21 @@ if (location.hostname === "lebrati58.github.io") {
     </div>
     <div class="curtain left"></div>
     <div class="curtain right"></div>
-    <div class="curtain-mask"><img class="heart-ico" src="logo-heart.png" alt=""></div>
+    <div class="spotlight"></div>
+    <div class="dust"></div>
+    <div class="slit"></div>
+    <div class="flash"></div>
+    <div class="curtain-mask"><span class="beat-ring"></span><img class="heart-ico" src="logo-heart.png" alt=""></div>
   </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261024"></script>
-<script src="commun.js?v=20261024"></script>
-<script src="matching.js?v=20261024"></script>
-<script src="photos.js?v=20261024"></script>
+<script src="i18n.js?v=20261024c"></script>
+<script src="commun.js?v=20261024c"></script>
+<script src="matching.js?v=20261024c"></script>
+<script src="photos.js?v=20261024c"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -1302,6 +1307,7 @@ function notifyOnce(key, tpl, name, chatId, onOpen) {
   $(".notif-x", n).onclick = done;
   box.appendChild(n);
   requestAnimationFrame(() => n.classList.add("show"));
+  buzz([40, 60, 40]);
   track("notif_show");
 }
 function clearChatNotifs(id) { $$(`.notif[data-chat="${id}"]`).forEach(n => { store.set(n.dataset.key, 1); n.remove(); }); }
@@ -1591,6 +1597,7 @@ async function pressReveal() {
     await db.ref(`secrets/${id}/${uid}`).set({ firstName: priv.firstName, phone: priv.phone });
     await db.ref(`reveal/${id}/${uid}`).set(true);
     track("reveal_press");
+    buzz([30, 50, 30]);
     pressedCache[id] = true;
     updateChatView();
     tryOpen(id);
@@ -1610,16 +1617,66 @@ function playReveal(id) {
   if (!theirs) return;
   $("#reveal-who").innerHTML = `
     <div class="person"><div class="lbl">${esc(t("reveal_is", { name: profileName(partnerNo(m)) }))}</div>
-      <div class="nm">${esc(theirs.firstName)}</div><div class="ph">${esc(theirs.phone)}</div></div>
+      <div class="nm letters">${[...(theirs.firstName || "")].map((ch, i) => `<span style="--i:${i}">${esc(ch)}</span>`).join("")}</div><div class="ph">${esc(theirs.phone)}</div></div>
     <div class="person" style="opacity:.8"><div class="lbl">${esc(t("reveal_you", { name: profileName(myNo(m)) }))}</div>
       <div class="nm" style="font-size:1.2rem">${esc(mine.firstName || "")}</div></div>`;
   $("#reveal-wa").href = waLink(theirs.phone);
   const r = $("#reveal");
-  r.classList.remove("hidden", "open");
+  clearTimeout(revealTimer);
+  r.classList.remove("hidden", "open", "beat");
   void r.offsetWidth;
-  setTimeout(() => r.classList.add("open"), 500);
+  // 1) le cœur bat (2 battements, le téléphone vibre au même rythme)  2) le rideau s'ouvre + pluie de cœurs
+  r.classList.add("beat");
+  buzz([70, 110, 70, 420, 70, 110, 70]);
+  revealTimer = setTimeout(() => openCurtain(r), 1700);
 }
-$("#reveal-close").addEventListener("click", () => $("#reveal").classList.add("hidden"));
+let revealTimer = 0;
+function openCurtain(r) {
+  clearTimeout(revealTimer);
+  if (r.classList.contains("open")) return;
+  r.classList.remove("beat"); r.classList.add("open");
+  buzz([35, 45, 35, 45, 260]);
+  revealBurst(); chime();
+}
+// Petit carillon doux (Web Audio, rien à télécharger) ; muet si le navigateur bloque le son
+function chime() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const ac = chime.ac || (chime.ac = new AC()); if (ac.state === "suspended") ac.resume();
+    [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain(), t0 = ac.currentTime + i * .11;
+      o.type = "sine"; o.frequency.value = f;
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(.07, t0 + .02); g.gain.exponentialRampToValueAtTime(.0001, t0 + 1.4);
+      o.connect(g).connect(ac.destination); o.start(t0); o.stop(t0 + 1.5);
+    });
+  } catch (e) {}
+}
+// Poussière d'or qui tombe doucement une fois le rideau ouvert (créée une seule fois)
+(() => {
+  const d = $("#reveal .dust");
+  for (let i = 0; i < 22; i++) { const sp = document.createElement("span"); sp.style.cssText = `left:${Math.random() * 100}%;animation-delay:${2 + Math.random() * 5}s;animation-duration:${4 + Math.random() * 4}s;transform:scale(${.5 + Math.random()})`; d.appendChild(sp); }
+})();
+// Confettis cœurs / étoiles depuis le centre de la scène (supprimés après l'animation)
+function revealBurst() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const stage = $("#reveal .stage"), box = document.createElement("div"), em = ["💗", "✨", "💛", "💜", "⭐", "💖"];
+  box.className = "burst";
+  for (let i = 0; i < 30; i++) {
+    const a = Math.random() * Math.PI * 2, d = 110 + Math.random() * 170, sp = document.createElement("span");
+    sp.textContent = em[i % em.length];
+    sp.style.cssText = `--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d - 60}px;--r:${Math.random() * 360 - 180}deg;animation-delay:${Math.random() * .35}s;font-size:${.9 + Math.random() * .9}rem`;
+    box.appendChild(sp);
+  }
+  stage.appendChild(box);
+  setTimeout(() => box.remove(), 3200);
+}
+// Vibration (Android ; l'iPhone ne permet pas aux sites de faire vibrer → simplement ignoré)
+function buzz(pattern) {
+  try { if (navigator.vibrate && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) navigator.vibrate(pattern); } catch (e) {}
+}
+$("#reveal .stage").addEventListener("click", () => { const r = $("#reveal"); if (r.classList.contains("beat")) openCurtain(r); });   // toucher = ouvrir tout de suite
+$("#reveal-close").addEventListener("click", () => { clearTimeout(revealTimer); $("#reveal").classList.add("hidden"); });
 
 /* ----- Menu : signaler / terminer ----- */
 /* Revoir la carte de l'autre pendant la conversation (titre ou menu ⋯) */
