@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261023a">
+<link rel="stylesheet" href="style.css?v=20261023b">
 </head>
 <body>
 
@@ -390,10 +390,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261023a"></script>
-<script src="commun.js?v=20261023a"></script>
-<script src="matching.js?v=20261023a"></script>
-<script src="photos.js?v=20261023a"></script>
+<script src="i18n.js?v=20261023b"></script>
+<script src="commun.js?v=20261023b"></script>
+<script src="matching.js?v=20261023b"></script>
+<script src="photos.js?v=20261023b"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -1027,6 +1027,13 @@ async function shareProfile(no) {
 }
 
 /* ----- Propositions (matching) ----- */
+/* Ordre des propositions : pas toujours le même. Chaque profil reçoit un tirage au hasard pour la visite
+   (stable tant que la page reste ouverte → le carrousel ne saute pas) ; on trie sur % de compatibilité
+   + hasard (jusqu'à 35 points) : les meilleurs restent plutôt devant, mais l'ordre change à chaque visite.
+   Les profils à qui j'ai DÉJÀ envoyé une demande passent à la fin. */
+const visitDraw = {};
+const draw = u => (u in visitDraw ? visitDraw[u] : (visitDraw[u] = Math.random()));
+const byFreshness = (a, b) => (a.pending - b.pending) || ((b.pct + draw(b.uid) * 35) - (a.pct + draw(a.uid) * 35));
 function computeProposals() {
   if (!me) return [];
   const excluded = new Set();
@@ -1036,21 +1043,22 @@ function computeProposals() {
 
   const candidates = Object.entries(profiles)
     .filter(([u, p]) => u !== uid && !banned[u] && !blocks[u] && !hidden[u] && !excluded.has(u) && isCompatible(me, p))
-    .map(([u, p]) => ({ uid: u, p, pending: !!(outbox[u] && outbox[u].status === "pending"), score: matchScore(me, p) }));
+    .map(([u, p]) => ({ uid: u, p, pending: !!(outbox[u] && outbox[u].status === "pending"), pct: matchPercent(me, p) }));
 
-  candidates.sort((a, b) => (b.pending - a.pending) || (b.score - a.score) || (a.p.no - b.p.no));
-  const list = candidates;
+  candidates.sort(byFreshness);
+  const list = candidates.filter(c => !c.pending);
 
   // ✨ Découverte : à la suite des matchs stricts, tous les autres profils
   // hors préférences (âge/religion relaxés — genre, pause, blocages et
   // désaccord enfants restent respectés).
-  const shown = new Set(list.map(c => c.uid));
+  const shown = new Set(candidates.map(c => c.uid));   // tous les matchs stricts, y compris ceux déjà demandés (pas de doublon)
   const soft = Object.entries(profiles)
     .filter(([u, p]) => u !== uid && !banned[u] && !blocks[u] && !hidden[u] && !excluded.has(u) && !shown.has(u)
       && isSoftCompatible(me, p))
-    .map(([u, p]) => ({ uid: u, p, pending: !!(outbox[u] && outbox[u].status === "pending"), score: matchScore(me, p), soft: true }));
-  soft.sort((a, b) => (b.pending - a.pending) || (b.score - a.score) || (a.p.no - b.p.no));
-  list.push(...soft);
+    .map(([u, p]) => ({ uid: u, p, pending: !!(outbox[u] && outbox[u].status === "pending"), pct: matchPercent(me, p), soft: true }));
+  soft.sort(byFreshness);
+  // nouveaux matchs → nouveaux « découverte » → tout ce qui a déjà reçu ma demande
+  list.push(...soft.filter(c => !c.pending), ...candidates.filter(c => c.pending), ...soft.filter(c => c.pending));
   return list;
 }
 
