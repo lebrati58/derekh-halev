@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261024c">
+<link rel="stylesheet" href="style.css?v=20261026">
 </head>
 <body>
 
@@ -395,10 +395,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261024c"></script>
-<script src="commun.js?v=20261024c"></script>
-<script src="matching.js?v=20261024c"></script>
-<script src="photos.js?v=20261024c"></script>
+<script src="i18n.js?v=20261026"></script>
+<script src="commun.js?v=20261026"></script>
+<script src="matching.js?v=20261026"></script>
+<script src="photos.js?v=20261026"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -1617,7 +1617,7 @@ function playReveal(id) {
   if (!theirs) return;
   $("#reveal-who").innerHTML = `
     <div class="person"><div class="lbl">${esc(t("reveal_is", { name: profileName(partnerNo(m)) }))}</div>
-      <div class="nm letters">${[...(theirs.firstName || "")].map((ch, i) => `<span style="--i:${i}">${esc(ch)}</span>`).join("")}</div><div class="ph">${esc(theirs.phone)}</div></div>
+      <div class="nm letters" dir="auto">${[...(theirs.firstName || "")].map((ch, i) => `<span style="--i:${i}">${esc(ch)}</span>`).join("")}</div><div class="ph">${esc(theirs.phone)}</div></div>
     <div class="person" style="opacity:.8"><div class="lbl">${esc(t("reveal_you", { name: profileName(myNo(m)) }))}</div>
       <div class="nm" style="font-size:1.2rem">${esc(mine.firstName || "")}</div></div>`;
   $("#reveal-wa").href = waLink(theirs.phone);
@@ -1625,6 +1625,7 @@ function playReveal(id) {
   clearTimeout(revealTimer);
   r.classList.remove("hidden", "open", "beat");
   void r.offsetWidth;
+  // (dir="auto" : chaque lettre est un bloc à part, sans lui un prénom hébreu s'écrit à l'envers en fr/en)
   // 1) le cœur bat (2 battements, le téléphone vibre au même rythme)  2) le rideau s'ouvre + pluie de cœurs
   r.classList.add("beat");
   buzz([70, 110, 70, 420, 70, 110, 70]);
