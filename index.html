@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261028">
+<link rel="stylesheet" href="style.css?v=20261028b">
 </head>
 <body>
 
@@ -401,10 +401,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261028"></script>
-<script src="commun.js?v=20261028"></script>
-<script src="matching.js?v=20261028"></script>
-<script src="photos.js?v=20261028"></script>
+<script src="i18n.js?v=20261028b"></script>
+<script src="commun.js?v=20261028b"></script>
+<script src="matching.js?v=20261028b"></script>
+<script src="photos.js?v=20261028b"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -1391,14 +1391,40 @@ function welcomeRow() {
     </div>`;
 }
 $("#messages").addEventListener("click", async e => {
+  if (currentChat === WELCOME && welcomeWake) { welcomeSkip = true; welcomeWake(); }   // toucher = afficher la suite tout de suite
   if (!e.target.closest("#agetip-edit")) return;
   track("agetip_edit");
   closeChat();
   $("#edit-me").click();
   setTimeout(() => { const f = $("#f-agemin"); if (f) { f.scrollIntoView({ block: "center", behavior: "smooth" }); f.focus(); } }, 400);
 });
+/* Messages de l'équipe affichés un par un, comme une vraie conversation (« … » puis le message).
+   1re lecture : rythme de lecture ; ensuite plus vite. Toucher la conversation affiche tout de suite la suite. */
+let welcomeRun = 0, welcomeSkip = false, welcomeWake = null;
+const welcomeSleep = ms => new Promise(r => { welcomeWake = r; setTimeout(r, welcomeSkip ? 0 : ms); });
+async function playWelcome(items, slow) {
+  const run = ++welcomeRun, box = $("#messages");
+  const live = () => run === welcomeRun && currentChat === WELCOME;
+  welcomeSkip = false; box.innerHTML = "";
+  for (const it of items) {
+    if (!live()) return;
+    if (!welcomeSkip && it.msg) {
+      box.insertAdjacentHTML("beforeend", `<div class="msg theirs typing" aria-label="…"><i></i><i></i><i></i></div>`);
+      box.scrollTop = box.scrollHeight;
+      await welcomeSleep(slow ? Math.min(1800, 400 + it.len * 12) : 350);
+      if (!live()) return;
+      const ty = $(".typing", box); if (ty) ty.remove();
+    } else if (!welcomeSkip) await welcomeSleep(slow ? 500 : 200);
+    if (!live()) return;
+    box.insertAdjacentHTML("beforeend", it.html);
+    box.scrollTop = box.scrollHeight;
+    if (!welcomeSkip) await welcomeSleep(slow ? 350 : 120);
+  }
+  if (run === welcomeRun) welcomeWake = null;
+}
 function openWelcome() {
   track("welcome_open");
+  const slow = !store.get("welcome_read");
   closeChat();
   currentChat = WELCOME;
   store.set("welcome_read", 1);
@@ -1410,16 +1436,15 @@ function openWelcome() {
   $("#chat-menu-btn").classList.add("hidden");
   $("#composer").classList.add("hidden");
   const eb = $("#ended-bar"); eb.textContent = t("welcome_note"); eb.classList.remove("hidden");
-  $("#messages").innerHTML = ["welcome_m1", "welcome_m2", "welcome_m3", "welcome_m4", "welcome_m4b", "welcome_m5", "welcome_m6", "welcome_m7"]
-    .map(k => `<div class="msg theirs">${esc(t(k))}</div>`).join("") +
-    (tip ? `<div class="welcome-sep">${esc(t("agetip_sep"))}</div>` +
-      ["agetip_m1", "agetip_m2", "agetip_m3"].map(k => `<div class="msg theirs">${esc(t(k))}</div>`).join("") +
-      `<div class="msg theirs"><button class="btn gold small" id="agetip-edit">${esc(t("agetip_btn"))}</button></div>` : "");
-  if (tip) { const box = $("#messages"); setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50); }
+  const msg = k => ({ msg: true, len: t(k).length, html: `<div class="msg theirs">${esc(t(k))}</div>` });
+  const items = ["welcome_m1", "welcome_m2", "welcome_m3", "welcome_m4", "welcome_m4b", "welcome_m5", "welcome_m6", "welcome_m7"].map(msg);
+  if (tip) items.push({ html: `<div class="welcome-sep">${esc(t("agetip_sep"))}</div>` }, ...["agetip_m1", "agetip_m2", "agetip_m3"].map(msg),
+    { html: `<div class="msg theirs"><button class="btn gold small" id="agetip-edit">${esc(t("agetip_btn"))}</button></div>` });
   $("#chat-view").classList.remove("hidden");
   document.body.style.overflow = "hidden";
   fitChatToViewport();
   renderChats();
+  playWelcome(items, slow);
 }
 
 /* Prénom de l'autre une fois le rideau levé (secrets lisibles seulement si opened), sinon null */
