@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261027">
+<link rel="stylesheet" href="style.css?v=20261028">
 </head>
 <body>
 
@@ -88,6 +88,8 @@ if (location.hostname === "lebrati58.github.io") {
       <h2 style="margin-top:0" id="reg-title" data-i18n="h009">הכרטיס המסתורי שלך ✨</h2>
       <p class="sub" data-i18n="h010">כאן מכירים קודם את הלב: בלי פנים, שם או טלפון. רק מילים ושיחה — כאילו כל יום ט״ו באב ✨</p>
       <p class="sub hidden" id="old-identity"></p>
+      <div class="iab-banner hidden" id="sa-banner"><span data-i18n="h131">📲 פתחת מהסמל במסך הבית. כבר נרשמת? הפרופיל שמור ב־Safari: מחקו את הסמל והוסיפו אותו שוב כש„פתח כאפליקציית רשת” כבוי.</span>
+        <button type="button" class="btn link ih-link" data-i18n="h130">📲 להוסיף למסך הבית</button></div>
       <div class="pending-profile hidden" id="pending-profile"></div>
       <div class="iab-banner hidden" id="iab-banner">
         <b data-i18n="h011">🌐 טיפ קטן לפני שמתחילים:</b>
@@ -292,6 +294,9 @@ if (location.hostname === "lebrati58.github.io") {
     <div class="langs-banner hidden" id="marital-banner"><span data-i18n="h126">✨ חדש! הוסיפו מצב משפחתי וכמה מילים עליכם — כך יכירו אתכם טוב יותר</span>
       <button class="btn gold small" id="marital-go" data-i18n="h127">✏️ להשלים עכשיו</button>
       <button class="btn link small" id="marital-x" aria-label="סגירה" data-i18n-aria="close">✕</button></div>
+    <div class="langs-banner hidden" id="ih-banner"><span data-i18n="h128">📲 רוצים את דרך הלב במסך הבית? נכנסים בלחיצה אחת</span>
+      <button class="btn gold small ih-link" data-i18n="h129">איך עושים?</button>
+      <button class="btn link small" id="ih-x" aria-label="סגירה" data-i18n-aria="close">✕</button></div>
     <div class="tabs" role="tablist" style="margin-top:6px">
       <button class="tab active" data-tab="proposals" data-i18n="h071">✨ הצעות</button>
       <button class="tab" data-tab="requests"><span data-i18n="h105">💌 בקשות</span> <span class="badge hidden" id="badge-requests"></span></button>
@@ -332,6 +337,7 @@ if (location.hostname === "lebrati58.github.io") {
       ·
       <button class="btn link" id="delete-me" data-i18n="h076">מחיקת הפרופיל שלי</button>
       <br><button class="btn link coc-link" data-i18n="h110">📜 קוד ההתנהגות</button>
+      · <button class="btn link ih-link" data-i18n="h130">📲 להוסיף למסך הבית</button>
       · <a class="btn link help-link" href="https://www.instagram.com/dereh_halev/" target="_blank" rel="noopener" data-i18n="h115">🆘 צריכים עזרה? כתבו לנו באינסטגרם</a>
       <span class="hidden" id="unhide-wrap"> · <button class="btn link" id="unhide-all"></button></span>
     </div>
@@ -395,10 +401,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261027"></script>
-<script src="commun.js?v=20261027"></script>
-<script src="matching.js?v=20261027"></script>
-<script src="photos.js?v=20261027"></script>
+<script src="i18n.js?v=20261028"></script>
+<script src="commun.js?v=20261028"></script>
+<script src="matching.js?v=20261028"></script>
+<script src="photos.js?v=20261028"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -546,6 +552,7 @@ const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeo
         el.classList.remove("hidden");
       }
       setupIabBanner();
+      if (isStandalone()) $("#sa-banner").classList.remove("hidden");
       const pend = store.get("pending_profile");
       const pcode = store.get("pending_code");
       if (pend || pcode) { const el = $("#pending-profile"); el.textContent = pend ? t("link_need_reg", { name: profileName(pend) }) : ""; el.classList.toggle("hidden", !pend); if (pcode) showPendingCard(pcode); }
@@ -838,6 +845,9 @@ function updateLangsBanner() {
   // anciens profils : situation familiale pas encore remplie (une bannière à la fois ; ✕ = plus jamais)
   const mb = $("#marital-banner");
   if (mb) mb.classList.toggle("hidden", !me || needLangs || !!me.marital || !!store.get("marital_banner_x"));
+  const ib = $("#ih-banner");
+  if (ib) ib.classList.toggle("hidden", !me || needLangs || !mb.classList.contains("hidden") || !/Android|iPhone|iPad|iPod/.test(navigator.userAgent || "")
+    || isStandalone() || !!inAppBrowser() || !!store.get("ih_x"));
 }
 $("#langs-go").addEventListener("click", () => $("#edit-me").click());
 $("#marital-go").addEventListener("click", async () => {
@@ -846,6 +856,50 @@ $("#marital-go").addEventListener("click", async () => {
   setTimeout(() => { const f = $("input[name=marital]"); if (f) f.closest(".field").scrollIntoView({ behavior: "smooth", block: "center" }); }, 400);
 });
 $("#marital-x").addEventListener("click", () => { store.set("marital_banner_x", 1); updateLangsBanner(); });
+$("#ih-x").addEventListener("click", () => { store.set("ih_x", 1); track("ih_banner_x"); updateLangsBanner(); });
+
+/* ----- 📲 Guide illustré « ajouter à l'écran d'accueil » -----
+   Pas de manifeste : l'icône ouvre le navigateur habituel, qui garde le profil (une « app web » iPhone aurait
+   ses propres données → profil vide ; d'où le conseil de couper « פתח כאפליקציית רשת » et #sa-banner). */
+function isIOSDevice() { return /iPhone|iPad|iPod/.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); }
+function isStandalone() { return window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches; }
+const IH_SHARE = '<svg class="ih-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 11v9h14v-9"/></svg>';
+function ihMock(kind) {
+  const L = k => esc(t("ih_m_" + k)), hi = (x, cls = "") => `<span class="ih-hi ${cls}">${x}</span>`;
+  const app = `<span class="ih-app"><img src="logo-heart.png" alt=""><span>דרך הלב</span></span>`;
+  const url = `<span class="ih-url" dir="ltr">🔒 dereh-halev.web.app</span>`;
+  switch (kind) {
+    case "ios-open": return `<span class="ih-mock ih-light">${url}<span class="ih-page"></span><span class="ih-bar"><i>‹</i><i>›</i><i>${IH_SHARE}</i><i>📖</i><i>⧉</i></span></span>`;
+    case "ios-share": return `<span class="ih-mock ih-light"><span class="ih-page"></span><span class="ih-bar"><i>‹</i><i>›</i>${hi(IH_SHARE, "ih-dot")}<i>📖</i><i>⧉</i></span></span>`;
+    case "ios-add": return `<span class="ih-mock ih-light ih-sheet"><span class="ih-row">${L("copy")} <i>⧉</i></span><span class="ih-row">${L("read")} <i>👓</i></span>${hi(`<span class="ih-row">${L("addhome_ios")} <i>⊞</i></span>`)}<span class="ih-row ih-faint"></span></span>`;
+    case "ios-confirm": return `<span class="ih-mock ih-light ih-dlg"><span class="ih-top"><span>${L("cancel")}</span>${hi(`<b>${L("add_ios")}</b>`)}</span>${app}<span class="ih-row">${L("webapp")} ${hi('<span class="ih-switch"></span>')}</span></span>`;
+    case "and-open": return `<span class="ih-mock ih-light"><span class="ih-chrome">${url}<b>⋮</b></span><span class="ih-page"></span></span>`;
+    case "and-menu": return `<span class="ih-mock ih-light"><span class="ih-chrome">${url}${hi("<b>⋮</b>", "ih-dot")}</span><span class="ih-page"></span></span>`;
+    case "and-add": return `<span class="ih-mock ih-light ih-sheet"><span class="ih-row">${L("newtab")}</span><span class="ih-row">${L("history")}</span>${hi(`<span class="ih-row">${L("addhome_and")} <i>⊞</i></span>`)}<span class="ih-row ih-faint"></span></span>`;
+    case "and-confirm": return `<span class="ih-mock ih-light ih-dlg">${app}<span class="ih-top ih-btns"><span>${L("cancel")}</span>${hi(`<b>${L("add_and")}</b>`)}</span></span>`;
+    case "home": return `<span class="ih-mock ih-home">${"<i></i>".repeat(6)}${hi(app)}${"<i></i>".repeat(1)}</span>`;
+  }
+  return "";
+}
+function showInstallGuide(os) {
+  os = os || (isIOSDevice() ? "ios" : "and");
+  track("ih_open");
+  const steps = os === "ios" ? [["ih_ios_1", "ios-open"], ["ih_ios_2", "ios-share"], ["ih_ios_3", "ios-add"], ["ih_ios_4", "ios-confirm"], ["ih_done", "home"]]
+                             : [["ih_and_1", "and-open"], ["ih_and_2", "and-menu"], ["ih_and_3", "and-add"], ["ih_and_4", "and-confirm"], ["ih_done", "home"]];
+  const body = `<span class="ih">
+    <span class="ih-intro">${esc(t("ih_intro"))}</span>
+    ${inAppBrowser() ? `<span class="ih-warn">${esc(t("ih_iab"))}</span>` : ""}
+    <span class="ih-tabs"><button type="button" class="${os === "ios" ? "on" : ""}" data-ih-os="ios">📱 iPhone</button><button type="button" class="${os === "and" ? "on" : ""}" data-ih-os="and">🤖 Android</button></span>
+    ${steps.map(([k, m], i) => `<span class="ih-step"><span class="ih-num">${i < steps.length - 1 ? i + 1 : "✓"}</span><span class="ih-txt">${esc(t(k))}</span>${ihMock(m)}</span>`).join("")}
+    <span class="ih-note">${esc(t("ih_note"))}</span></span>`;
+  $$(".modal-wrap").forEach(w => w.remove());   // changement d'onglet : on remplace la fenêtre
+  showModal({ title: t("ih_title"), body, okText: t("close"), cancelText: "" });
+}
+document.addEventListener("click", e => {
+  const tab = e.target.closest("[data-ih-os]");
+  if (tab) return showInstallGuide(tab.dataset.ihOs);
+  if (e.target.closest(".ih-link")) { store.set("ih_x", 1); updateLangsBanner(); showInstallGuide(); }
+});
 
 function updatePausedUI() {
   const paused = !!(me && me.paused);

@@ -710,3 +710,47 @@ body.ph-open { overflow: hidden; }
 .partner-pressed { color: var(--gold-2); font-weight: 700; font-size: .9rem; margin-bottom: 6px; }
 .row-photos { display: inline-block; font-size: .7rem; font-weight: 700; color: var(--gold-2); border: 1px solid rgba(243,216,138,.5); border-radius: 999px; padding: 1px 7px; vertical-align: middle; white-space: nowrap; }
 .notif-name { font: inherit; font-weight: 700; color: var(--gold-2); background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+/* 📲 Guide « écran d'accueil » : maquettes dessinées en HTML (tout en <span> : le corps de la modale est un <p>) */
+.ih, .ih-intro, .ih-warn, .ih-step, .ih-note, .ih-mock, .ih-row, .ih-top, .ih-url, .ih-page, .ih-bar, .ih-chrome, .ih-app, .ih-tabs { display: block; }
+.ih-intro { margin-bottom: 10px; }
+.ih-warn { background: rgba(255,170,60,.15); border: 1px solid rgba(255,170,60,.6); border-radius: 12px; padding: 8px 10px; margin-bottom: 10px; font-size: .9rem; }
+.ih-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.ih-tabs button { flex: 1; min-height: 40px; border-radius: 999px; border: 1px solid rgba(243,216,138,.45); background: rgba(0,0,0,.25); color: var(--cream); font: inherit; font-weight: 700; cursor: pointer; }
+.ih-tabs button.on { background: linear-gradient(135deg, var(--gold-2), var(--gold)); color: #2a1640; }
+.ih-step { position: relative; padding-inline-start: 36px; margin-bottom: 14px; }
+.ih-num { position: absolute; inset-inline-start: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--gold); color: #2a1640; font-weight: 800; font-size: .9rem; }
+.ih-txt { display: block; margin-bottom: 6px; font-size: .95rem; }
+.ih-note { font-size: .85rem; color: var(--muted); border-top: 1px solid rgba(185,168,214,.25); padding-top: 10px; }
+.ih-mock { border-radius: 14px; overflow: hidden; border: 2px solid #3a2a55; max-width: 260px; font-size: .78rem; box-shadow: 0 6px 16px rgba(0,0,0,.35); }
+.ih-light { background: #f2f2f7; color: #1c1c1e; }
+.ih-url { margin: 8px; padding: 5px 10px; border-radius: 10px; background: #e3e3e8; text-align: center; color: #333; }
+.ih-page { height: 44px; margin: 0 8px 8px; border-radius: 8px; background: linear-gradient(135deg, #3b2160, #6a2f7c); }
+.ih-bar { display: flex; justify-content: space-around; align-items: center; padding: 6px 4px 8px; background: #f9f9fb; border-top: 1px solid #ddd; color: #0a84ff; font-size: 1rem; }
+.ih-bar i { font-style: normal; display: inline-grid; place-items: center; width: 28px; height: 28px; }
+.ih-ico { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ih-chrome { display: flex; align-items: center; gap: 4px; padding-inline-end: 6px; }
+.ih-chrome .ih-url { flex: 1; }
+.ih-chrome b { font-size: 1.2rem; padding: 0 6px; }
+.ih-sheet { padding: 6px; }
+.ih-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: #fff; padding: 8px 10px; border-radius: 8px; margin: 4px 0; }
+.ih-row i { font-style: normal; }
+.ih-faint { height: 14px; opacity: .5; }
+.ih-dlg { padding: 8px; }
+.ih-top { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px 8px; color: #0a84ff; }
+.ih-btns { justify-content: flex-end; gap: 18px; padding-top: 8px; }
+.ih-app { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 8px; padding: 6px 8px; font-weight: 700; }
+.ih-app img { width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg, #3b2160, #6a2f7c); padding: 4px; box-sizing: border-box; }
+.ih-switch { display: inline-block; width: 34px; height: 20px; border-radius: 999px; background: #c7c7cc; position: relative; vertical-align: middle; }
+.ih-switch::after { content: ""; position: absolute; top: 2px; inset-inline-start: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+.ih-home { display: grid; grid-template-columns: repeat(4, 46px); justify-content: space-between; row-gap: 10px; padding: 14px 16px; background: linear-gradient(160deg, #23143d, #4a2368); }
+.ih-home i { display: block; width: 46px; height: 46px; border-radius: 12px; background: rgba(255,255,255,.18); }
+.ih-home .ih-hi { border-radius: 12px; }
+.ih-home .ih-app { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 46px; background: none; padding: 0; color: #fff; font-size: .58rem; font-weight: 600; white-space: nowrap; }
+.ih-home .ih-app img { width: 46px; height: 46px; border-radius: 12px; }
+/* ce qu'il faut toucher : halo doré qui pulse */
+.ih-hi { display: inline-block; border-radius: 10px; box-shadow: 0 0 0 3px var(--gold); animation: ih-pulse 1.4s ease-in-out infinite; }
+.ih-sheet .ih-hi { display: block; }
+.ih-hi.ih-dot { border-radius: 50%; padding: 2px; }
+@keyframes ih-pulse { 0%, 100% { box-shadow: 0 0 0 3px var(--gold); } 50% { box-shadow: 0 0 0 6px rgba(212,169,74,.35); } }
+@media (prefers-reduced-motion: reduce) { .ih-hi { animation: none; } }
