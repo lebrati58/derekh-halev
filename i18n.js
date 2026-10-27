@@ -382,7 +382,7 @@ const TEXTS = {
   "report_thanks": ["תודה. הדיווח הועבר בדיסקרטיות 🙏", "Thank you. The report was sent discreetly 🙏", "Merci. Le signalement a été transmis discrètement 🙏"],
   "report_fail": ["הדיווח לא נשלח — נסו שוב", "Report not sent — try again", "Signalement non envoyé — réessayez"],
   "del_title": ["למחוק את הפרופיל?", "Delete your profile?", "Supprimer votre profil ?"],
-  "del_body": ["הכרטיס שלך ייעלם, והשיחות הפעילות ייסגרו. אי אפשר לבטל.", "Your card will disappear and active chats will close. This can't be undone.", "Votre carte disparaîtra et les conversations en cours seront fermées. Action irréversible."],
+  "del_body": ["הכרטיס, התמונות והבקשות שלך יימחקו, וגם השם והטלפון אם המסך עוד לא נפתח. השיחות ייסגרו. אי אפשר לבטל.", "Your card, photos and requests will be deleted, and so will your name and phone if the curtain hasn't been lifted yet. Chats will close. This can't be undone.", "Votre carte, vos photos et vos demandes seront supprimées, ainsi que votre prénom et votre téléphone si le rideau n'a pas encore été levé. Les conversations seront fermées. Action irréversible."],
   "del_ok": ["מחיקה", "Delete", "Supprimer"],
   "del_fail": ["שגיאה במחיקה", "Deletion error", "Erreur lors de la suppression"],
   "choose_lang": ["בחרו שפה", "Choose your language", "Choisissez votre langue"]

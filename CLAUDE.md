@@ -67,7 +67,7 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `config` | personne | personne (console uniquement) |
 | `admins/{uid}` | soi | soi, seulement si valeur == PIN |
 | `counters/profileNo` | tout inscrit | tout inscrit non banni, +1 strict, non supprimable |
-| `profiles` | liste entière : **membres inscrits non bannis** + admin ; **une seule fiche** (`profiles/{uid}`) : tout connecté, sauf profil banni ou en pause — un visiteur ne connaît un uid que via un lien secret `/?c=CODE` (`showPendingCard`) | admin : **suppression seule** ; soi, si non banni ; `no` immuable, ≤ compteur, et réservé à soi dans `profileNos` à la création ; champs inconnus refusés |
+| `profiles` | liste entière : **membres inscrits non bannis** + admin ; **une seule fiche** (`profiles/{uid}`) : tout connecté, sauf profil banni ou en pause — un visiteur ne connaît un uid que via un lien secret `/?c=CODE` (`showPendingCard`) | admin : **suppression seule** ; soi, si non banni ; `no` immuable, ≤ compteur, et réservé à soi dans `profileNos` à la création ; champs inconnus refusés ; textes libres (`city`, `words`, `shabbat`, `cantLiveWithout`, `about`) refusés s'ils contiennent un téléphone, un lien, un email ou un @pseudo (mêmes cas que `hasForbiddenContent`) |
 | `profileNos/{no}` | personne (un numéro se devine) | soi, une seule fois (réécriture identique tolérée), si son profil a ce `no` ; non supprimable |
 | `shareLinks/{code}` | tout connecté, **une entrée à la fois** (code aléatoire 10 car. → uid) ; jamais la liste | tout membre inscrit non banni : créer un code libre vers un profil existant non banni (le sien, ou celui qu'il partage si le propriétaire n'a pas encore de code — `ensureCodeFor()`, mémorisé dans `share_codes`) ; jamais réécrire ; supprimer : la personne visée ou l'admin |
 | `private/{uid}` | soi (jamais l'admin) | soi ; admin : **suppression seule** |
@@ -84,10 +84,10 @@ Site statique HTML/CSS/JS sans build, hébergé sur **Firebase Hosting : https:/
 | `stats/{event}/{day}/{id}` | admin | tout inscrit : **ajout seul** (`true`), nom d'événement `[a-z_]`, jour `AAAAMMJJ` ; ni modification ni suppression |
 | `chatActivity/{chatId}/{uid}` | admin | soi, membre du chat (`true`) |
 | `announcements/current` | tout inscrit | admin |
-| `inbox/{to}` | destinataire | expéditeur (création `pending`, `fromNo` vérifié, ni banni ni bloqué) ; destinataire (mise à jour) |
-| `outbox/{from}` | expéditeur | expéditeur (création, `toNo` vérifié) ; destinataire (mise à jour) |
+| `inbox/{to}` | destinataire | expéditeur (création `pending`, `fromNo` vérifié, ni banni ni bloqué ; `note` sans téléphone/lien) ; destinataire (mise à jour, suppression) ; expéditeur : **retirer** une demande `pending`, seulement une fois son profil supprimé |
+| `outbox/{from}` | expéditeur | expéditeur (création, `toNo` vérifié) ; destinataire (mise à jour, suppression) ; expéditeur : retirer une demande `pending` une fois son profil supprimé |
 | `chats` | les 2 membres **+ admin (tout le nœud)** | création par le destinataire d'une demande ; `status`→ended par membre ou admin ; `opened`→true si les 2 `reveal` sont à true |
-| `userChats/{uid}` | soi | un membre du chat concerné |
+| `userChats/{uid}` | soi | un membre du chat concerné (vérifié sur l'état **après** écriture → acceptation en une seule écriture multi-chemins) |
 | `messages/{chatId}` | les 2 membres seulement | membre, chat actif, non banni, `from` == soi, ≤ 500 car. |
 | `readAt/{chatId}/{uid}` | les 2 membres seulement (jamais l'admin) | soi, membre, nombre ≤ maintenant |
 | `reveal/{chatId}` | **les 2 membres** (l'autre est prévenu quand je lève le rideau — choix de l'utilisatrice ; textes « הצד השני יקבל הודעה קטנה ») ; jamais l'admin | `reveal/{chatId}/{uid}` : soi, membre, chat actif |
@@ -122,6 +122,7 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 - Ouvrir un fichier en écriture (`open(f,'w')`) AVANT de l'avoir lu le vide : toujours lire, puis écrire (admin.html a été vidé ainsi une fois).
 - Lire uniquement les fichiers nécessaires à la tâche en cours.
 - Faire des modifications ciblées plutôt que réécrire des fichiers entiers.
+- Expressions régulières dans `database.rules.json` (moteur différent de JavaScript, tester sur l'émulateur) : `\s` n'existe pas (écrire les espaces) ; `^` et `$` ancrent **toute** l'expression ; `a|b` devient `.*a|b.*` → toujours mettre une alternative entre parenthèses `(a|b)` ; `.` ne prend pas les retours à la ligne ; une expression trop grosse est refusée (« could not determinize ») → la découper en plusieurs `matches()`.
 - Ne jamais dire qu'une chose est testée si elle ne l'a pas été.
 - « **yallah** » = « **fusionne** » : les deux mots veulent dire « ouvre la PR vers `main` et fusionne-la » (puis vérifier le déploiement).
 
@@ -130,7 +131,7 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 **Confidentialité / règle absolue**
 1. L'admin lit tout `chats/` : il voit qui parle avec qui (`from`/`to`, `fromNo`/`toNo`), l'icebreaker et si le rideau s'est ouvert. Ce ne sont pas les messages, mais ce sont des métadonnées de conversation.
 2. L'admin, comme tout inscrit, lit `profiles/` en entier (âge, ville, genre, textes libres), pas seulement le numéro. Les `reports` lui exposent aussi des uids et une `reason` libre où le signaleur peut recopier des messages.
-3. Les profils publics contiennent du texte libre (`words`, `shabbat`, `city`, `cantLiveWithout`) : le filtre anti-téléphone/liens est uniquement côté client, les règles ne vérifient que la longueur. Un téléphone ou un nom peut donc atterrir dans un profil public.
+3. ~~Filtre anti-téléphone uniquement côté client~~ — corrigé : les règles refusent téléphone / lien / email / @pseudo dans les textes libres du profil et dans le petit mot (tests « filtre : » dans `test_rules.js`). Reste possible : un numéro écrit en lettres, ou un nom.
 4. ~~Rideau asymétrique~~ — corrigé dans les règles : `opened` exige désormais les deux `reveal` **et** les deux `secrets` (test « reveal SANS secret » dans `test_rules.js`). À republier dans la console Firebase.
 5. `secrets` n'est pas lié à `private/` : on peut y déposer n'importe quel prénom/téléphone.
 6. Un chat peut être créé directement avec `opened: true` (la règle de `opened` n'est vérifiée qu'en mise à jour). Pas de fuite constatée, mais incohérent.
@@ -143,8 +144,8 @@ Attention : le serveur local parle à la **vraie base de production** (`commun.j
 
 **Code / données**
 11. ~~Duplication partielle du matching~~ — corrigé : le complément « découverte » utilise `isSoftCompatible()` et `softReasons()` de `matching.js`.
-12. `acceptRequest()` enchaîne 5 écritures non atomiques (alors que `sendRequest()` utilise un update multi-path) → demi-états possibles si la connexion lâche.
-13. La suppression de profil ne retire que `profiles/` et `private/` : `secrets/` (prénom + téléphone), `inbox`/`outbox`, `messages`, `blocks`, `reports` restent indéfiniment.
+12. ~~`acceptRequest()` non atomique~~ — corrigé : une seule écriture multi-chemins (2e essai sans `outbox` pour les anciennes demandes ; un chat déjà créé par une ancienne acceptation à moitié n'est pas recréé).
+13. Suppression de profil : retire aussi prénom + téléphone des rideaux **pas encore ouverts**, `reveal`, `readAt`, `userChats`, demandes reçues (+ outbox de l'expéditeur), demandes envoyées en attente (+ petit mot), `hidden`, `archived`, photos, lien de partage. **Restent** : les messages (lisibles seulement par l'autre membre, comme WhatsApp), le prénom + téléphone d'un rideau déjà ouvert (l'autre les a reçus), les demandes envoyées déjà acceptées/refusées (numéro + petit mot), les métadonnées `chats/`, `blocks`, `reports`, `activity`/`chatActivity`/`stats`, `profileNos`.
 16. Statistiques : l'admin voit, par uid (donc par numéro de profil), les jours de visite, l'appareil (mobile ou non), la présence en ligne et si la personne a écrit dans un chat donné. Aucun texte, nom ni téléphone, mais ce sont des métadonnées d'usage. Les compteurs `stats/` sont anonymes mais peuvent être gonflés par un inscrit malveillant (ajout libre de `true`). Un même humain sur 2 navigateurs = 2 uids (visiteurs comptés deux fois).
 14. Les numéros de profil et uids sont visibles par tous les membres dans `profiles/` (plus par les visiteurs non inscrits) ; un membre peut donc toujours parcourir tous les profils (nécessaire au matching côté client) ; `banned/` est lisible par tous les inscrits.
 15. Préfixe localStorage `mhm_` (ancien nom du projet) à ne pas changer sans migration. (README mis à jour : adresse dereh-halev.web.app et déploiement auto.)

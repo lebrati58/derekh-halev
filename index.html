@@ -19,7 +19,7 @@ if (location.hostname === "lebrati58.github.io") {
 <meta property="og:image:height" content="600">
 <link rel="icon" type="image/png" href="logo-heart.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=20261026">
+<link rel="stylesheet" href="style.css?v=20261027">
 </head>
 <body>
 
@@ -395,10 +395,10 @@ if (location.hostname === "lebrati58.github.io") {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="i18n.js?v=20261026"></script>
-<script src="commun.js?v=20261026"></script>
-<script src="matching.js?v=20261026"></script>
-<script src="photos.js?v=20261026"></script>
+<script src="i18n.js?v=20261027"></script>
+<script src="commun.js?v=20261027"></script>
+<script src="matching.js?v=20261027"></script>
+<script src="photos.js?v=20261027"></script>
 <script>
 /* =================== État =================== */
 let uid = null;
@@ -1224,16 +1224,22 @@ $("#requests").addEventListener("click", async e => {
 async function acceptRequest(fromUid) {
   const p = profiles[fromUid];
   const chatId = `${fromUid}_${uid}`;
+  // Une seule écriture multi-chemins : tout passe ou rien (plus de conversation à moitié créée si le réseau coupe)
+  const upd = {
+    [`userChats/${uid}/${chatId}`]: true, [`userChats/${fromUid}/${chatId}`]: true,
+    [`inbox/${uid}/${fromUid}/status`]: "accepted", [`inbox/${uid}/${fromUid}/chatId`]: chatId
+  };
+  const out = { [`outbox/${fromUid}/${uid}/status`]: "accepted", [`outbox/${fromUid}/${uid}/chatId`]: chatId };
   try {
-    await db.ref("chats/" + chatId).set({
+    // acceptation restée à moitié avant cette version (chat déjà créé) : on complète sans le recréer
+    const exists = await db.ref("chats/" + chatId).once("value").then(s => s.exists(), () => false);
+    if (!exists) upd["chats/" + chatId] = {
       from: fromUid, to: uid, fromNo: p.no, toNo: me.no,
       status: "active", opened: false, createdAt: TS,
       icebreaker: pickIcebreakerKey(p, me)
-    });
-    await db.ref(`userChats/${uid}/${chatId}`).set(true);
-    await db.ref(`userChats/${fromUid}/${chatId}`).set(true);
-    await db.ref(`inbox/${uid}/${fromUid}`).update({ status: "accepted", chatId });
-    await db.ref(`outbox/${fromUid}/${uid}`).update({ status: "accepted", chatId }).catch(() => {});
+    };
+    // anciennes demandes sans outbox : refusé avec l'outbox → même écriture sans lui
+    await db.ref().update(Object.assign({}, upd, out)).catch(() => db.ref().update(upd));
     toast(t("chat_opened"));
     track("req_accepted");
     selectTab("chats");
@@ -1776,14 +1782,28 @@ $("#delete-me").addEventListener("click", async () => {
   const ok = await showModal({ title: t("del_title"), body: esc(t("del_body")), okText: t("del_ok"), cancelText: t("cancel"), danger: true });
   if (!ok) return;
   try {
+    // Suppression complète de ce qui m'appartient (chaque effacement est indépendant : un refus ne bloque pas le reste)
+    const wipe = path => db.ref(path).remove().catch(e => console.warn("wipe", path, e));
+    const wipes = [wipe("hidden/" + uid), wipe("archived/" + uid)];
+    for (const [id, m] of Object.entries(myChats)) {
+      if (!m.opened) wipes.push(wipe(`secrets/${id}/${uid}`));          // prénom + téléphone pas encore révélés (si le rideau est ouvert, l'autre les a déjà)
+      if (m.status === "active") wipes.push(wipe(`reveal/${id}/${uid}`));
+      wipes.push(wipe(`readAt/${id}/${uid}`));
+    }
+    for (const from of Object.keys(inbox)) wipes.push(wipe(`inbox/${uid}/${from}`), wipe(`outbox/${from}/${uid}`));   // demandes reçues
+    await Promise.all(wipes);
     for (const [id, m] of Object.entries(myChats)) {
       if (m.status === "active") await db.ref(`chats/${id}/status`).set("ended").catch(() => {});
+      await wipe(`userChats/${uid}/${id}`);
     }
     track("profile_delete");
     await photosWipeMine().catch(() => {});
     if (me && me.link) await db.ref("shareLinks/" + me.link).remove().catch(() => {});   // le lien de partage ne mène plus à rien      // photos, miniatures et partages (avant le profil : la règle l'exige)
     await db.ref("profiles/" + uid).remove();
     await db.ref("private/" + uid).remove();
+    // demandes envoyées encore EN ATTENTE : retirées (permis seulement une fois le profil supprimé)
+    await Promise.all(Object.entries(outbox).filter(([, r]) => r && r.status === "pending")
+      .map(([to]) => db.ref().update({ [`inbox/${to}/${uid}`]: null, [`outbox/${uid}/${to}`]: null }).catch(e => console.warn("withdraw", to, e))));
     Object.values(chatSubs).forEach(r => r.off());
     Object.values(lastMsgSubs).forEach(r => r.off());
     Object.values(readSubs).forEach(r => r.off());
