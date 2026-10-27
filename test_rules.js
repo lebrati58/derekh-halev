@@ -87,6 +87,21 @@ async function denied(name, fn) {
   await denied ("profil : préférence ≠ true",               () => update(ref(A, "profiles/alice"), { maritalOk: { single: "oui" } }));
   await denied ("profil : « עליי » trop long (> 200)",      () => update(ref(A, "profiles/alice"), { about: "x".repeat(201) }));
   await allowed("profil : on peut tout retirer (null)",     () => update(ref(A, "profiles/alice"), { marital: null, maritalOk: null, about: null }));
+  /* Filtre téléphone / liens garanti par les règles (le site le fait déjà, mais un petit malin peut contourner le site) */
+  const pa = v => update(ref(A, "profiles/alice"), v);
+  await denied ("filtre : téléphone dans la ville",          () => pa({ city: "חולון 050-1234567" }));
+  await denied ("filtre : téléphone dans un des 3 mots",     () => set(ref(A, "profiles/alice/words/0"), "0501234567"));
+  await denied ("filtre : chiffres éparpillés (« עליי »)",   () => pa({ about: "0 א 5 ב 0 ג 1 ד 2 ה 3 ו 4 ז 5 ח 6" }));
+  await denied ("filtre : téléphone coupé par des retours à la ligne", () => pa({ about: "050\n123\n4567" }));
+  await denied ("filtre : chiffres pleine largeur",          () => pa({ about: "０５０１２３４５６７" }));
+  await denied ("filtre : lien wa.me (שבת)",                 () => pa({ shabbat: "wa.me/972501234567" }));
+  await denied ("filtre : site .co.il",                      () => pa({ about: "ראו אותי ב-moshe.co.il" }));
+  await denied ("filtre : WWW en majuscules",                () => pa({ about: "WWW.SITE.COM" }));
+  await denied ("filtre : email (« בלי מה אי אפשר »)",       () => pa({ cantLiveWithout: "dana@gmail.com" }));
+  await denied ("filtre : pseudo @insta",                    () => pa({ about: "אינסטה @dana_cohen" }));
+  await allowed("filtre : texte normal avec âge / année / enfants", () => pa({ about: "בת 32, 2 ילדים, נולדתי ב-1990 🙂", city: "תל אביב-יפו" }));
+  await allowed("filtre : 3 mots courants",                  () => set(ref(A, "profiles/alice/words"), ["ים", "קפה", "שבת"]));
+  await allowed("filtre : on remet « עליי » à vide",          () => pa({ about: null }));
 
   /* ---------- Compteur de numéros ---------- */
   await allowed("compteur : incrément +1",                 () => set(ref(E, "counters/profileNo"), 6));
@@ -237,6 +252,7 @@ async function denied(name, fn) {
   const E2 = E;
   await denied ("demande : petit mot trop long (> 100)",     () => update(ref(E2), { "inbox/bob/eve": { fromNo: 6, status: "pending", createdAt: 1, note: "x".repeat(101) }, "outbox/eve/bob": { toNo: 2, status: "pending", createdAt: 1, note: "x".repeat(101) } }));
   await denied ("demande : petit mot vide",                 () => update(ref(E2), { "inbox/bob/eve": { fromNo: 6, status: "pending", createdAt: 1, note: "" }, "outbox/eve/bob": { toNo: 2, status: "pending", createdAt: 1 } }));
+  await denied ("demande : téléphone dans le petit mot",     () => update(ref(E2), { "inbox/bob/eve": { fromNo: 6, status: "pending", createdAt: 1, note: "תתקשרי 0501234567" }, "outbox/eve/bob": { toNo: 2, status: "pending", createdAt: 1, note: "תתקשרי 0501234567" } }));
   await allowed("demande avec un petit mot",                () => update(ref(E2), { "inbox/bob/eve": { fromNo: 6, status: "pending", createdAt: 1, note: "השבת שלך נשמעת כמו שלי 😊" }, "outbox/eve/bob": { toNo: 2, status: "pending", createdAt: 1, note: "השבת שלך נשמעת כמו שלי 😊" } }));
   await allowed("le destinataire lit le petit mot",         () => get(ref(B, "inbox/bob/eve/note")));
   await denied ("ADMIN : lire le petit mot",                () => get(ref(ADMIN, "inbox/bob/eve")));
@@ -379,6 +395,45 @@ async function denied(name, fn) {
   await denied ("inscrit : écrire dans le journal admin",        () => push(ref(A, "adminLog"), { action: "photos_removed", no: 1, ts: serverTimestamp() }));
   await denied ("inscrit : lire le journal admin",               () => get(ref(A, "adminLog")));
   await allowed("alice supprime tous ses partages (suppression du profil)", () => remove(ref(A, "photoShares/alice")));
+
+  /* ---------- Acceptation d'une demande EN UNE SEULE écriture (tout ou rien) ---------- */
+  await env.withSecurityRulesDisabled(async ctx => { await update(ref(ctx.database()), {
+    "inbox/alice/eve": { fromNo: 6, status: "pending", createdAt: 1 }, "outbox/eve/alice": { toNo: 1, status: "pending", createdAt: 1 },
+    "inbox/alice/dave": { fromNo: 4, status: "pending", createdAt: 1 }   // ancienne demande, sans outbox
+  }); });
+  const acc = (from, fromNo, withOutbox) => { const id = `${from}_alice`; return {
+    [`chats/${id}`]: { from, to: "alice", fromNo, toNo: 1, status: "active", opened: false, createdAt: 1, icebreaker: "weekend.sea" },
+    [`userChats/alice/${id}`]: true, [`userChats/${from}/${id}`]: true,
+    [`inbox/alice/${from}/status`]: "accepted", [`inbox/alice/${from}/chatId`]: id,
+    ...(withOutbox ? { [`outbox/${from}/alice/status`]: "accepted", [`outbox/${from}/alice/chatId`]: id } : {}) }; };
+  await allowed("accepter : chat + userChats ×2 + inbox + outbox en UNE écriture", () => update(ref(A), acc("eve", 6, true)));
+  await denied ("accepter une ancienne demande SANS outbox, outbox inclus (→ 2e essai)", () => update(ref(A), acc("dave", 4, true)));
+  await allowed("… 2e essai sans l'outbox",                   () => update(ref(A), acc("dave", 4, false)));
+  await denied ("userChats vers une conversation inexistante", () => set(ref(A, "userChats/alice/zz_alice"), true));
+  await denied ("chat SANS demande + userChats dans la même écriture", () => update(ref(A), { "chats/bob_alice": { from: "bob", to: "alice", fromNo: 2, toNo: 1, status: "active", opened: false, createdAt: 1 }, "userChats/alice/bob_alice": true }));
+  await denied ("un tiers ajoute la conversation à ses userChats", () => set(ref(B, "userChats/bob/eve_alice"), true));
+
+  /* ---------- Suppression complète de son profil (eve) ---------- */
+  await env.withSecurityRulesDisabled(async ctx => { await update(ref(ctx.database()), {
+    "inbox/dave/eve": { fromNo: 6, status: "pending", createdAt: 1 }, "outbox/eve/dave": { toNo: 4, status: "pending", createdAt: 1 },
+    "inbox/eve/bob": { fromNo: 2, status: "pending", createdAt: 1 }, "outbox/bob/eve": { toNo: 6, status: "pending", createdAt: 1 },
+    "chats/eve_dave": { from: "eve", to: "dave", fromNo: 6, toNo: 4, status: "active", opened: false, createdAt: 1 },
+    "userChats/eve/eve_dave": true, "userChats/dave/eve_dave": true,
+    "secrets/eve_dave/eve": { firstName: "איב", phone: "0506666666" }, "reveal/eve_dave/eve": true, "readAt/eve_dave/eve": 1
+  }); });
+  await denied ("retirer sa demande en attente tant que son profil existe", () => remove(ref(E, "inbox/dave/eve")));
+  await allowed("suppression : son prénom + téléphone (rideau pas encore ouvert)", () => remove(ref(E, "secrets/eve_dave/eve")));
+  await allowed("suppression : son « j'ouvre le rideau »",    () => remove(ref(E, "reveal/eve_dave/eve")));
+  await allowed("suppression : son « lu jusqu'à »",           () => remove(ref(E, "readAt/eve_dave/eve")));
+  await allowed("suppression : terminer la conversation",     () => set(ref(E, "chats/eve_dave/status"), "ended"));
+  await allowed("suppression : retirer la conversation de sa liste", () => remove(ref(E, "userChats/eve/eve_dave")));
+  await denied ("rideau DÉJÀ ouvert : le secret reste chez l'autre", () => remove(ref(A, "secrets/alice_bob/alice")));
+  await allowed("suppression : demandes reçues + outbox de l'expéditeur", () => update(ref(E), { "inbox/eve/bob": null, "outbox/bob/eve": null }));
+  await allowed("suppression : profil + private",             () => update(ref(E), { "profiles/eve": null, "private/eve": null }));
+  await allowed("profil supprimé : retirer ses demandes EN ATTENTE", () => update(ref(E), { "inbox/dave/eve": null, "outbox/eve/dave": null }));
+  await denied ("profil supprimé : retirer une demande ACCEPTÉE (reste chez l'autre)", () => remove(ref(E, "inbox/bob/eve")));
+  await denied ("profil supprimé : écrire une demande au lieu de la retirer", () => set(ref(E, "inbox/dave/eve"), { fromNo: 6, status: "pending", createdAt: 1 }));
+  await denied ("un tiers retire la demande d'un autre",       () => remove(ref(B, "inbox/alice/dave")));
 
   /* ---------- Compteur vide : la numérotation commence à 100 ---------- */
   await env.withSecurityRulesDisabled(async ctx => { const sdb = ctx.database();  await remove(ref(sdb, "counters/profileNo")); });
