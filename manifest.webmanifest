@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "דרך הלב",
+  "short_name": "דרך הלב",
+  "description": "מתאהבים בשיחה — לפני שרואים את הפנים",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1f1238",
+  "theme_color": "#2a1640",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
